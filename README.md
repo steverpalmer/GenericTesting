@@ -6,7 +6,7 @@ GenericTesting
 A scheme for generating python unittest tests based on an algebraic
 definitions of the properties.
 
-For example, if a method \_\_eq_\_\ is defined, then a user of the class
+For example, if a method \_\_eq\_\_ is defined, then a user of the class
 might expect:
 
  * Reflexivity [a == a]
