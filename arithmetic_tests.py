@@ -42,7 +42,6 @@ class FieldTests(AdditiveMonoid):
         self.assertEqual(a * (b + c), (a * b) + (a * c))
 
     def test_221_multiplication_addition_right_distributivity(self, a, b, c):
-        # Oddly, this test seems to pass, for the fudge is not used.
         self.assertEqual((a + b) * c, (a * c) + (b * c))
 
     def test_230_pos_definition(self, a):

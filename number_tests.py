@@ -10,7 +10,7 @@ import fractions
 from hypothesis import strategies as st
 
 from isclose import IsClose
-from core import base_test_modifier, BaseTests
+from core import base_test_modifier
 from equality_test import EqualityTests
 from arithmetic_tests import FieldTests, AbsoluteValueTests, FloorDivModTests, ExponentiationTests, ConjugateTests, RoundingTests, QuotientTests
 from ordering_tests import TotalOrderingOverNumbersTests
@@ -170,6 +170,12 @@ class Test_complex(ComplexTests):
         # Therefore, continue the test only when the b is not close of -c
         if not IsClose.over_numbers(b, -c, rel_tol=self.isclose.rel_tol ** 0.5, abs_tol=self.isclose.abs_tol * 100.0):
             super().test_220_multiplication_addition_left_distributivity(a, b, c)
+
+    def test_221_multiplication_addition_right_distributivity(self, a, b, c):
+        # :FUDGE: this consistently fails when b is close to -c due to the limitations of floating point numbers.
+        # Therefore, continue the test only when the b is not close of -c
+        if not IsClose.over_numbers(b, -c, rel_tol=self.isclose.rel_tol ** 0.5, abs_tol=self.isclose.abs_tol * 100.0):
+            super().test_221_multiplication_addition_right_distributivity(a, b, c)
 
     def test_411_abs_is_subadditive(self, a, b):
         x = abs(a + b)

@@ -7,7 +7,7 @@ Copyright 2018 Steve Palmer
 import unittest
 import inspect
 
-from hypothesis import given, strategies
+from hypothesis import given
 
 from isclose import IsClose
 
@@ -81,39 +81,9 @@ def base_test_modifier(strategy=None, *, testMethodPrefix='test'):
                 args = {arg: param for arg, param in parameters.items() if arg != 'self'}
                 if len(args) > 0:
                     attr = given(**{arg: strategy[param.annotation if param.annotation != inspect.Parameter.empty else None] for arg, param in args.items()})(method)
-#                     else:
-#                         for arg, param in args.items():
-#                             if param.annotation != inspect.Parameter.empty and param.annotation in strategy:
-#                                 parameters[arg] = param.replace(annotation=strategy[param.annotation])
-#                         signature = signature.replace(parameters=parameters)
-#                         
                     setattr(cls, name, attr)
         return cls
     return result
-
-
-"""
-To get a handle on the unittest.TestCase assert checks,
-I've been considering something like the following...
-
-class Wrapper():
-
-    def __init__(self, value):
-        self._value = value
-
-    @property
-    def value(self):
-        return self._value
-
-    def __repr__(self) -> str:
-        return "NumberWrapper({0.value!r})".format(self)
-
-    def __str__(self) -> str:
-        return str(self._value)
-
-    def __getattr__(self, name):
-        return getattr(self._value, name)
-"""
 
 
 __all__ = ('BaseTests', 'base_test_modifier')
