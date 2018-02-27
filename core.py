@@ -60,7 +60,7 @@ class BaseTests(unittest.TestCase):
             raise self.failureException(msg)
 
 
-def base_test_modifier(strategy=None, *, testMethodPrefix='test'):
+def Given(strategy=None, *, testMethodPrefix='test'):
     """
     Decorator for BaseTest derived test cases
     """
@@ -80,10 +80,13 @@ def base_test_modifier(strategy=None, *, testMethodPrefix='test'):
                 parameters = signature.parameters
                 args = {arg: param for arg, param in parameters.items() if arg != 'self'}
                 if len(args) > 0:
-                    attr = given(**{arg: strategy[param.annotation if param.annotation != inspect.Parameter.empty else None] for arg, param in args.items()})(method)
+                    attr = given(**{arg: strategy.get(param.annotation if param.annotation != inspect.Parameter.empty else None, None) for arg, param in args.items()})(method)
                     setattr(cls, name, attr)
         return cls
     return result
 
 
-__all__ = ('BaseTests', 'base_test_modifier')
+ClassUnderTest = 'ClassUnderTest'
+
+
+__all__ = ('BaseTests', 'Given', 'ClassUnderTest')

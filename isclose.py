@@ -15,7 +15,7 @@ class IsClose:
     """
 
     @staticmethod
-    def _rel_tol(rel_tol):
+    def _rel_tol(rel_tol) -> float:
         """
         Exposes the default value of rel_tol to the library IsClose function
         >>> IsClose._rel_tol("fred")
@@ -42,7 +42,7 @@ class IsClose:
         return result
 
     @staticmethod
-    def _abs_tol(abs_tol):
+    def _abs_tol(abs_tol) -> float:
         """
         Exposes the default value of abs_tol to the library IsClose function
         >>> IsClose._abs_tol("fred")
@@ -69,7 +69,7 @@ class IsClose:
         return result
 
     @staticmethod
-    def _over_numbers(a, b, rel_tol, abs_tol):
+    def _over_numbers(a: numbers.Number, b: numbers.Number, rel_tol: float, abs_tol: float) -> bool:
         """
         a polymorphic version of the IsClose library.
         >>> IsClose._over_numbers("fred", 0, 0.0, 0.0)
@@ -94,7 +94,7 @@ class IsClose:
         return result
 
     @staticmethod
-    def over_numbers(a, b, *, rel_tol=None, abs_tol=None):
+    def over_numbers(a: numbers.Number, b: numbers.Number, *, rel_tol: float=None, abs_tol: float=None) -> bool:
         """
         uses the polymorphic version of the IsClose library, with the usual defaults
         >>> IsClose.over_numbers(complex(1/3, 1/3), complex(0.3333333333333333333333, 0.33333333333333333333))
@@ -106,12 +106,12 @@ class IsClose:
         abs_tol = IsClose._abs_tol(abs_tol)
         return IsClose._over_numbers(a, b, rel_tol=rel_tol, abs_tol=abs_tol)
 
-    def __init__(self, rel_tol=None, abs_tol=None):
+    def __init__(self, rel_tol: numbers.Real=None, abs_tol: numbers.Real=None) -> None:
         self._rel_tol = IsClose._rel_tol(rel_tol)
         self._abs_tol = IsClose._abs_tol(abs_tol)
 
     @property
-    def rel_tol(self):
+    def rel_tol(self) -> float:
         """
         >>> ic = IsClose(0.01, 0.001)
         >>> ic.rel_tol
@@ -120,7 +120,7 @@ class IsClose:
         return self._rel_tol
 
     @property
-    def abs_tol(self):
+    def abs_tol(self) -> float:
         """
         >>> ic = IsClose(0.01, 0.001)
         >>> ic.abs_tol
@@ -128,7 +128,7 @@ class IsClose:
         """
         return self._abs_tol
 
-    def __call__(self, a, b) -> bool:
+    def __call__(self, a: numbers.Number, b: numbers.Number) -> bool:
         """
         >>> myisclose = IsClose()
         >>> myisclose(1.0, 1.0)
@@ -150,7 +150,7 @@ class IsClose:
         >>> callable(myisclose.notclose)
         True
         """
-        def result(a, b):
+        def result(a: numbers.Number, b: numbers.Number):
             return not self(a, b)
         return result
 
