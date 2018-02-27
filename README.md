@@ -6,7 +6,7 @@ GenericTesting
 A scheme for generating python unittest tests based on an algebraic
 definitions of the properties.
 
-For example, if a method __eq__ is defined, then a user of the class
+For example, if a method \_\_eq_\_\ is defined, then a user of the class
 might expect:
 
  * Reflexivity [a == a]
@@ -16,17 +16,18 @@ might expect:
 These properties are (largely) independent of the type or specific
 functionality of the equality being defined.  For example, the
 equality may be between objects representing people or objects
-representing addresses.  Similarly, it could be checking with
+representing addresses.  Similarly, it could be checking if
 addresses are identical (letter by letter), or whether they are the
 same building, or even just in the same postal district.  The details
-of the comparison are important, but they properties above are likely
-to be expected by any one using the comparison.  Similar lists of
+of the comparison are important, but the properties above are likely
+to be expected by any one using the comparison, and are independent of
+the type and hence Generic.  Similar lists of
 properties can be identified for many of the special methods in the
 Python Data Model.
 
 I believe that by testing the generic properties above, and some
-specific examples exercising the behaviour, you could build a fairly
-comprehensive test suite.
+examples exercising the specific behaviour, you could build a fairly
+comprehensive test suite quite quickly.
 
 I've been trying to build the process using the excellent hypothesis
 [https://hypothesis.readthedocs.io/en/latest/index.html] library.
