@@ -19,7 +19,7 @@ ValueT = 'ValueT'
 
 class IterableTests(BaseTests):
 
-    def test_610_iter_on_iterable_returns_an_iterator(self, a: ClassUnderTest) -> None:
+    def test_610_iter_returns_an_iterator(self, a: ClassUnderTest) -> None:
         self.assertTrue(isinstance(iter(a), collections.abc.Iterator))
 
     def test_611_iterator_protocol_observed(self, a: ClassUnderTest) -> None:
@@ -52,10 +52,6 @@ class ContainerTests(BaseTests):
         self.assertTrue(isinstance(a in b, bool))
 
 
-class SizedIterable(collections.abc.Sized, collections.abc.Iterable):
-    pass
-
-
 class SizedOverIterableTests(SizedTests, IterableTests):
 
     def test_622_len_iterations(self, a: ClassUnderTest) -> None:
@@ -66,10 +62,6 @@ class SizedOverIterableTests(SizedTests, IterableTests):
             if iter_count > a_len:
                 break
         self.assertEqual(a_len, iter_count)
-
-
-class IterableContainer(collections.abc.Iterable, collections.abc.Container):
-    pass
 
 
 class ContainerOverIterableTests(IterableTests, ContainerTests):
