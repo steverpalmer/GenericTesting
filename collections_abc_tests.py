@@ -217,9 +217,7 @@ element_st = st.integers()
 @Given({ClassUnderTest: st.sets(element_st), ElementT: element_st})
 class Test_set(frozensetExtensionTests):
 
-    @property
-    def empty(self) :
-        return set()
+    empty = set()
 
     def test_629_copy_definition(self, a: ClassUnderTest) -> None:
         b = a.copy()
@@ -301,9 +299,7 @@ value_st = st.integers()
 @Given({ClassUnderTest: st.dictionaries(key_st, value_st), ElementT: key_st})
 class Test_dict(MutableMappingTests):
 
-    @property
-    def empty(self):
-        return dict()
+    empty = dict()
 
 
 if __name__ == '__main__':
