@@ -6,7 +6,7 @@ import abc
 import collections.abc
 import unittest
 
-from hypothesis import strategies as st
+from hypothesis import assume, strategies as st
 
 from core import GenericTests, Given, ClassUnderTest
 from equality_test import EqualityTests
@@ -16,6 +16,7 @@ from lattice_tests import BoundedBelowLatticeTests
 
 ElementT = 'ElementT'
 ValueT = 'ValueT'
+DataT = 'DataT'
 
 class IterableTests(GenericTests):
 
@@ -142,6 +143,22 @@ class MutableSetTests(SetTests):
         self.assertTrue(b not in a)
 
 
+class MappingViewTests(SizedTests):
+    pass
+
+
+class KeysViewTests(MappingViewTests, SetTests):
+    pass
+
+
+class ItemsViewTests(MappingViewTests, SetTests):
+    pass
+
+
+class ValuesViewTests(MappingViewTests, ContainerOverIterableTests):
+    pass
+
+
 class MappingTests(SizedOverIterableTests, ContainerOverIterableTests, EqualityTests):
 
     @property
@@ -156,16 +173,54 @@ class MappingTests(SizedOverIterableTests, ContainerOverIterableTests, EqualityT
     def test_generic_623_len_empty_is_zero(self) -> None:
         self.assertEqual(len(self.empty), 0)
 
-    def test_generic_627_get_on_empty_raises_KeyError(self, a: ElementT) -> None:
+    def test_generic_627_subscript_on_empty_raises_KeyError(self, a: ElementT) -> None:
         with self.assertRaises(KeyError):
             _ = self.empty[a]
 
-#     def test_650_keys_view_type(self, a):
-#         self.assertEqual(isinstance(a.keys(), collections.abc.KeysView))
+    def test_generic_650_keys_returns_a_KeysView(self, a: ClassUnderTest) -> None:
+        self.assertTrue(isinstance(a.keys(), collections.abc.KeysView))
+
+    def test_generic_651_items_returns_an_ItemsView(self, a: ClassUnderTest) -> None:
+        self.assertTrue(isinstance(a.items(), collections.abc.ItemsView))
+
+    def test_generic_652_values_returns_an_ValuesView(self, a: ClassUnderTest) -> None:
+        self.assertTrue(isinstance(a.values(), collections.abc.ValuesView))
+
+    def test_generic_653_get_on_empty_returns_default(self, a: ElementT, b: ValueT) -> None:
+        self.assertEqual(self.empty.get(a, b), b)
 
 
 class MutableMappingTests(MappingTests):
-    pass
+
+    def test_generic_628_update_remembers(self, a: ClassUnderTest, b: ElementT, c: ValueT) -> None:
+        a[b] = c
+        self.assertEqual(a[b], c)
+
+    def test_generic_629_update_does_not_corrupt(self, a: ClassUnderTest, b: ElementT, c: ValueT, d: DataT) -> None:
+        assume(len(a) > 0)
+        assume(b not in a)
+        k = None
+        while k is None or k == b:
+            k = d.draw(st.sampled_from(list(a.keys())))
+        v = a[k]
+        a[b] = c
+        self.assertEqual(a[k], v)
+
+    def test_generic_630_delete_removed_item(self, a: ClassUnderTest, b: ElementT, c: ValueT) -> None:
+        a[b] = c
+        del a[b]
+        with self.assertRaises(KeyError):
+            _ = a[b]
+
+    def test_generic_631_delete_does_not_corrupt(self, a: ClassUnderTest, d: DataT) -> None:
+        assume(len(a) > 1)
+        k1 = d.draw(st.sampled_from(list(a.keys())))
+        k2 = None
+        while k2 is None or k2 == k1:
+            k2 = d.draw(st.sampled_from(list(a.keys())))
+        v = a[k1]
+        del a[k2]
+        self.assertEqual(a[k1], v)
 
 
 class frozensetExtensionTests(SetTests):
@@ -288,7 +343,31 @@ class Test_set(frozensetExtensionTests):
 
 key_st = st.integers()
 value_st = st.integers()
-@Given({ClassUnderTest: st.dictionaries(key_st, value_st), ElementT: key_st})
+@Given({ClassUnderTest: st.builds(lambda m: m.keys(), st.dictionaries(key_st, value_st)), ElementT: key_st})
+class Test_dict_KeysView(KeysViewTests):
+
+    empty = dict().keys()
+
+
+key_st = st.integers()
+value_st = st.integers()
+@Given({ClassUnderTest: st.builds(lambda m: m.items(), st.dictionaries(key_st, value_st)), ElementT: key_st})
+class Test_dict_ItemsView(ItemsViewTests):
+
+    empty = dict().items()
+
+
+key_st = st.integers()
+value_st = st.integers()
+@Given({ClassUnderTest: st.builds(lambda m: m.values(), st.dictionaries(key_st, value_st)), ElementT: key_st})
+class Test_dict_ValuesView(ValuesViewTests):
+
+    empty = dict().values()
+
+
+key_st = st.integers()
+value_st = st.integers()
+@Given({ClassUnderTest: st.dictionaries(key_st, value_st), ElementT: key_st, ValueT: value_st, DataT: st.data()})
 class Test_dict(MutableMappingTests):
 
     empty = dict()
@@ -297,8 +376,11 @@ class Test_dict(MutableMappingTests):
 if __name__ == '__main__':
 
     SUITE = unittest.TestSuite()
-    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_frozenset))
-    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_set))
+#     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_frozenset))
+#     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_set))
+#     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_dict_KeysView))
+#     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_dict_ItemsView))
+#     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_dict_ValuesView))
     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_dict))
     TR = unittest.TextTestRunner(verbosity=2)
     TR.run(SUITE)
