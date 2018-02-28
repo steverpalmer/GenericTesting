@@ -12,7 +12,7 @@ from hypothesis import given
 from isclose import IsClose
 
 
-class BaseTests(unittest.TestCase):
+class GenericTests(unittest.TestCase):
 
     def __init__(self, methodName='runTest'):
         super().__init__(methodName)
@@ -60,7 +60,7 @@ class BaseTests(unittest.TestCase):
             raise self.failureException(msg)
 
 
-def Given(strategy=None, *, testMethodPrefix='test'):
+def Given(strategy=None, *, testMethodPrefix='test_generic'):
     """
     Decorator for BaseTest derived test cases
     """
@@ -70,7 +70,7 @@ def Given(strategy=None, *, testMethodPrefix='test'):
         strategy = {None: strategy}
 #    apply_given = all(isinstance(value, strategies) for value in strategy.values())
     def result(cls):
-        if not issubclass(cls, BaseTests):
+        if not issubclass(cls, GenericTests):
             raise TypeError("should operate on classes inheriting from BaseTest")
         for name, method in inspect.getmembers(cls):
             if name.startswith(testMethodPrefix) and callable(method):
@@ -89,4 +89,4 @@ def Given(strategy=None, *, testMethodPrefix='test'):
 ClassUnderTest = 'ClassUnderTest'
 
 
-__all__ = ('BaseTests', 'Given', 'ClassUnderTest')
+__all__ = ('GenericTests', 'Given', 'ClassUnderTest')

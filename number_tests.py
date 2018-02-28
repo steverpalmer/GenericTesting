@@ -7,7 +7,7 @@ import unittest
 import numbers
 import fractions
 
-from hypothesis import strategies as st
+from hypothesis import assume, strategies as st
 
 from isclose import IsClose
 from core import Given, ClassUnderTest
@@ -36,49 +36,49 @@ def complex_numbers(min_real_value=None, max_real_value=None, min_imag_value=Non
 
 class _ComplexTests(EqualityTests, FieldTests, AbsoluteValueTests):
 
-    def test_010_zero_type(self) -> None:
+    def test_generic_010_zero_type(self) -> None:
         self.assertTrue(isinstance(self.zero, numbers.Complex))
 
-    def test_011_one_type(self) -> None:
+    def test_generic_011_one_type(self) -> None:
         self.assertTrue(isinstance(self.one, numbers.Complex))
 
-    def test_012_real_zero_type(self) -> None:
+    def test_generic_012_real_zero_type(self) -> None:
         self.assertTrue(isinstance(self.real_zero, numbers.Real))
 
 
 class ComplexTests(_ComplexTests, ConjugateTests):
 
-    def test_013_i_type(self) -> None:
+    def test_generic_013_i_type(self) -> None:
         self.assertTrue(isinstance(self.i, numbers.Complex))
 
-    def test_490_complex(self) -> None:
+    def test_generic_490_complex(self) -> None:
         self.assertEqual(complex(0), complex(self.zero))
         self.assertEqual(complex(1), complex(self.one))
         self.assertEqual(complex(0, 1), complex(self.i))
 
-    def test_491_i_squared_is_minus_one(self) -> None:
+    def test_generic_491_i_squared_is_minus_one(self) -> None:
         self.assertEqual(self.i * self.i, -self.one)
 
 
 class _RealTests(_ComplexTests, FloorDivModTests, ExponentiationTests, TotalOrderingOverNumbersTests):
 
-    def test_010_zero_type(self) -> None:
+    def test_generic_010_zero_type(self) -> None:
         self.assertTrue(isinstance(self.zero, numbers.Real))
 
-    def test_011_one_type(self) -> None:
+    def test_generic_011_one_type(self) -> None:
         self.assertTrue(isinstance(self.one, numbers.Real))
 
 
 class RealTests(_RealTests, RoundingTests):
 
-    def test_014_root_two_type(self) -> None:
+    def test_generic_014_root_two_type(self) -> None:
         self.assertTrue(isinstance(self.root_two, numbers.Real))
 
-    def test_490_float(self) -> None:
+    def test_generic_490_float(self) -> None:
         self.assertEqual(0.0, float(self.zero))
         self.assertEqual(1.0, float(self.one))
 
-    def test_491_root_two_squared_is_two(self) -> None:
+    def test_generic_491_root_two_squared_is_two(self) -> None:
         self.assertEqual(self.root_two * self.root_two, self.one + self.one)
 
 
@@ -88,22 +88,22 @@ class _RationalTests(_RealTests):
 
 class RationalTests(_RationalTests, QuotientTests):
 
-    def test_015_half_type(self) -> None:
+    def test_generic_015_half_type(self) -> None:
         self.assertTrue(isinstance(self.half, numbers.Rational))
 
-    def test_491_half_plus_half_is_one(self) -> None:
+    def test_generic_491_half_plus_half_is_one(self) -> None:
         self.assertEqual(self.half + self.half, self.one)
 
 
 class IntegralTests(_RationalTests, BitwiseTests):
 
-    def test_010_zero_type(self) -> None:
+    def test_generic_010_zero_type(self) -> None:
         self.assertTrue(isinstance(self.zero, numbers.Integral))
 
-    def test_011_one_type(self) -> None:
+    def test_generic_011_one_type(self) -> None:
         self.assertTrue(isinstance(self.one, numbers.Integral))
 
-    def test_490_int(self) -> None:
+    def test_generic_490_int(self) -> None:
         self.assertEqual(0, int(self.zero))
         self.assertEqual(1, int(self.one))
 
@@ -138,21 +138,18 @@ class Test_float(RealTests):
     real_zero = 0.0
     root_two = 2.0 ** 0.5
 
-    def test_200_addition_associativity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
-        if not self.isclose(a, b) and not self.isclose(b, c):
-            super().test_200_addition_associativity(a, b, c)
+    def test_generic_200_addition_associativity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
+        assume(not self.isclose(a, b) and not self.isclose(b, c))
+        super().test_generic_200_addition_associativity(a, b, c)
 
-    def test_220_multiplication_addition_left_distributivity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
+    def test_generic_220_multiplication_addition_left_distributivity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
         # :FUDGE: this consistently fails when b is close to -c due to the limitations of floating point numbers.
         # Therefore, continue the test only when the b is not close of -c
-        if not IsClose.over_numbers(b, -c, rel_tol=self.isclose.rel_tol ** 0.5, abs_tol=self.isclose.abs_tol * 100.0):
-            super().test_220_multiplication_addition_left_distributivity(a, b, c)
+        assume(not IsClose.over_numbers(b, -c, rel_tol=self.isclose.rel_tol ** 0.5, abs_tol=self.isclose.abs_tol * 100.0))
+        super().test_generic_220_multiplication_addition_left_distributivity(a, b, c)
 
-    def test_411_abs_is_subadditive(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        x = abs(a + b)
-        y = abs(a) + abs(b)
-        if not self.isclose(x, y):
-            self.assertLessEqual(abs(a + b), abs(a) + abs(b))
+    def test_generic_411_abs_is_subadditive(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        self.assertCloseOrLessThan(abs(a + b), abs(a) + abs(b))
 
 
 COMPLEX_RANGE = 1e10
@@ -167,23 +164,20 @@ class Test_complex(ComplexTests):
     real_zero = 0.0
     i = complex(0, 1)
 
-    def test_220_multiplication_addition_left_distributivity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
+    def test_generic_220_multiplication_addition_left_distributivity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
         # :FUDGE: this consistently fails when b is close to -c due to the limitations of floating point numbers.
         # Therefore, continue the test only when the b is not close of -c
-        if not IsClose.over_numbers(b, -c, rel_tol=self.isclose.rel_tol ** 0.5, abs_tol=self.isclose.abs_tol * 100.0):
-            super().test_220_multiplication_addition_left_distributivity(a, b, c)
+        assume(not IsClose.over_numbers(b, -c, rel_tol=self.isclose.rel_tol ** 0.5, abs_tol=self.isclose.abs_tol * 100.0))
+        super().test_generic_220_multiplication_addition_left_distributivity(a, b, c)
 
-    def test_221_multiplication_addition_right_distributivity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
+    def test_generic_221_multiplication_addition_right_distributivity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
         # :FUDGE: this consistently fails when b is close to -c due to the limitations of floating point numbers.
         # Therefore, continue the test only when the b is not close of -c
-        if not IsClose.over_numbers(b, -c, rel_tol=self.isclose.rel_tol ** 0.5, abs_tol=self.isclose.abs_tol * 100.0):
-            super().test_221_multiplication_addition_right_distributivity(a, b, c)
+        assume(not IsClose.over_numbers(b, -c, rel_tol=self.isclose.rel_tol ** 0.5, abs_tol=self.isclose.abs_tol * 100.0))
+        super().test_generic_221_multiplication_addition_right_distributivity(a, b, c)
 
-    def test_411_abs_is_subadditive(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        x = abs(a + b)
-        y = abs(a) + abs(b)
-        if not self.isclose(x, y):
-            self.assertLessEqual(abs(a + b), abs(a) + abs(b))
+    def test_generic_411_abs_is_subadditive(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        self.assertCloseOrLessThan(abs(a + b), abs(a) + abs(b))
 
 
 if __name__ == '__main__':
