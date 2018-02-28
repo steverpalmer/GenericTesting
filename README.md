@@ -30,7 +30,7 @@ examples exercising the specific behaviour, you could build a fairly
 comprehensive test suite quite quickly.
 
 I've been trying to build the process using the excellent
-[https://hypothesis.readthedocs.io/en/latest/index.html hypothesis] library.
+[hypothesis](https://hypothesis.readthedocs.io/en/latest/index.html) library.
 
 Note: This is still very much a ''Work-In-Progress''.  I am testing my generic
 tests using the Python built-in types.
