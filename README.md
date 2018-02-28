@@ -29,8 +29,8 @@ I believe that by testing the generic properties above, and some
 examples exercising the specific behaviour, you could build a fairly
 comprehensive test suite quite quickly.
 
-I've been trying to build the process using the excellent hypothesis
-[https://hypothesis.readthedocs.io/en/latest/index.html] library.
+I've been trying to build the process using the excellent
+[https://hypothesis.readthedocs.io/en/latest/index.html hypothesis] library.
 
 Note: This is still very much a ''Work-In-Progress''.  I am testing my generic
 tests using the Python built-in types.
