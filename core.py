@@ -4,15 +4,16 @@ Copyright 2018 Steve Palmer
 """
 
 
+import abc
 import unittest
 import inspect
 
-from hypothesis import given
+from hypothesis import given, strategies as st
 
 from isclose import IsClose
 
 
-class GenericTests(unittest.TestCase):
+class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):
 
     def __init__(self, methodName='runTest'):
         super().__init__(methodName)
@@ -60,7 +61,7 @@ class GenericTests(unittest.TestCase):
             raise self.failureException(msg)
 
 
-def Given(strategy=None, *, testMethodPrefix='test_generic'):
+def Given(strategy=None, *, testMethodPrefix='test_generic', data_arg='data'):
     """
     Decorator for BaseTest derived test cases
     """
@@ -80,7 +81,17 @@ def Given(strategy=None, *, testMethodPrefix='test_generic'):
                 parameters = signature.parameters
                 args = {arg: param for arg, param in parameters.items() if arg != 'self'}
                 if len(args) > 0:
-                    attr = given(**{arg: strategy.get(param.annotation if param.annotation != inspect.Parameter.empty else None, None) for arg, param in args.items()})(method)
+                    given_args = dict()
+                    for arg, param in args.items():
+                        annotation = None if param.annotation == inspect.Parameter.empty else param.annotation
+                        if annotation in strategy:
+                            strat = strategy[annotation]
+                        elif arg == data_arg:
+                            strat = st.data()
+                        else:
+                            strat = None
+                        given_args[arg] = strat
+                    attr = given(**given_args)(method)
                     setattr(cls, name, attr)
         return cls
     return result

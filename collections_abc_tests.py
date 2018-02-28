@@ -3,7 +3,7 @@ Copyright 2018 Steve Palmer
 """
 
 import abc
-import collections.abc
+import collections
 import unittest
 
 from hypothesis import assume, strategies as st
@@ -16,7 +16,6 @@ from lattice_tests import BoundedBelowLatticeTests
 
 ElementT = 'ElementT'
 ValueT = 'ValueT'
-DataT = 'DataT'
 
 class IterableTests(GenericTests):
 
@@ -97,6 +96,9 @@ class SetTests(SizedOverIterableTests, ContainerOverIterableTests, EqualityTests
     def bottom(self) -> ClassUnderTest:
         return self.empty
 
+    def test_generic_020_empty_has_right_type(self) -> None:
+        self.assertTrue(isinstance(self.empty), collections.abc.Set)
+
     def test_generic_306_less_or_equal_orientation(self, a: ClassUnderTest) -> None:
         self.assertTrue(self.empty <= a)
 
@@ -130,17 +132,40 @@ class SetTests(SizedOverIterableTests, ContainerOverIterableTests, EqualityTests
 
 class MutableSetTests(SetTests):
 
-    def test_generic_635_add_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        expected_len = len(a) if b in a else len(a) + 1
+    @abc.abstractmethod
+    def copy(self, a: ClassUnderTest) -> ClassUnderTest:
+        pass
+
+    @abc.abstractmethod
+    def singleton_constructor(self, a: ElementT) -> ClassUnderTest:
+        pass
+
+    def test_generic_020_empty_has_right_type(self) -> None:
+        self.assertTrue(isinstance(self.empty, collections.abc.MutableSet))
+
+    def test_generic_021_copy_helper_definition(self, a: ClassUnderTest) -> None:
+        a_copy = self.copy(a)
+        self.assertTrue(isinstance(a_copy, collections.abc.MutableSet))
+        self.assertNotEqual(id(a), id(a_copy))
+        self.assertEqual(a, a_copy)
+
+    def test_generic_022_singleton_constructor_helper_definition(self, a: ElementT) -> None:
+        a_singleton = self.singleton_constructor(a)
+        self.assertTrue(isinstance(a_singleton, collections.abc.MutableSet))
+        self.assertTrue(a in a_singleton)
+        self.assertEqual(len(a_singleton), 1)
+
+    def test_generic_635_add_definition(self, a: ClassUnderTest, b: ElementT) -> None:
+        a_copy = self.copy(a)
+        b_singleton = self.singleton_constructor(b)
         a.add(b)
-        self.assertEqual(len(a), expected_len)
-        self.assertTrue(b in a)
+        self.assertEqual(a, a_copy | b_singleton)
 
     def test_generic_636_discard_definition(self, a: ClassUnderTest, b: ElementT) -> None:
-        expected_len = len(a) - 1 if b in a else len(a)
+        a_copy = self.copy(a)
+        b_singleton = self.singleton_constructor(b)
         a.discard(b)
-        self.assertEqual(len(a), expected_len)
-        self.assertTrue(b not in a)
+        self.assertEqual(a, a_copy - b_singleton)
 
 
 class MappingViewTests(SizedTests):
@@ -166,6 +191,22 @@ class MappingTests(SizedOverIterableTests, ContainerOverIterableTests, EqualityT
     def empty(self) -> ClassUnderTest:
         pass
 
+    @abc.abstractmethod
+    def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
+        pass
+
+    def test_generic_020_empty_has_the_right_type(self) -> None:
+        self.assertTrue(isinstance(self.empty, collections.abc.Mapping))
+
+    def test_generic_021_singleton_constructor_helper_definition(self, a: ElementT, b: ValueT):
+        map_singleton = self.singleton_constructor(a, b)
+        self.assertTrue(isinstance(map_singleton, collections.abc.Mapping))
+        self.assertEqual(map_singleton[a], b)
+        self.assertEqual(len(map_singleton), 1)
+
+    def test_generic_105_equality_definition(self, a: ClassUnderTest, b: ClassUnderTest):
+        self.assertEqual(a == b, a.keys() == b.keys() and all(a[k] == b[k] for k in a))
+
     def test_generic_612_zero_iterations_over_empty(self) -> None:
         with self.assertRaises(StopIteration):
             next(iter(self.empty))
@@ -173,54 +214,62 @@ class MappingTests(SizedOverIterableTests, ContainerOverIterableTests, EqualityT
     def test_generic_623_len_empty_is_zero(self) -> None:
         self.assertEqual(len(self.empty), 0)
 
-    def test_generic_627_subscript_on_empty_raises_KeyError(self, a: ElementT) -> None:
-        with self.assertRaises(KeyError):
+    def test_generic_627_getitem_on_empty_either_succeeds_or_raises_KeyError(self, a: ElementT) -> None:
+        try:
             _ = self.empty[a]
+        except KeyError:
+            pass
+        except:
+            self.fail()
 
-    def test_generic_650_keys_returns_a_KeysView(self, a: ClassUnderTest) -> None:
-        self.assertTrue(isinstance(a.keys(), collections.abc.KeysView))
+    def test_generic_628_getitem_over_all_keys_succeeds(self, a: ClassUnderTest) -> None:
+        a_keys = a.keys()
+        self.assertTrue(isinstance(a_keys, collections.abc.KeysView))
+        try:
+            for k in a_keys:
+                _ = a[k]
+        except KeyError:
+            self.fail()
 
-    def test_generic_651_items_returns_an_ItemsView(self, a: ClassUnderTest) -> None:
+    def test_generic_650_items_returns_an_ItemsView(self, a: ClassUnderTest) -> None:
         self.assertTrue(isinstance(a.items(), collections.abc.ItemsView))
 
-    def test_generic_652_values_returns_an_ValuesView(self, a: ClassUnderTest) -> None:
+    def test_generic_651_values_returns_an_ValuesView(self, a: ClassUnderTest) -> None:
         self.assertTrue(isinstance(a.values(), collections.abc.ValuesView))
 
-    def test_generic_653_get_on_empty_returns_default(self, a: ElementT, b: ValueT) -> None:
+    def test_generic_652_get_on_empty_returns_default(self, a: ElementT, b: ValueT) -> None:
         self.assertEqual(self.empty.get(a, b), b)
 
 
 class MutableMappingTests(MappingTests):
 
-    def test_generic_628_update_remembers(self, a: ClassUnderTest, b: ElementT, c: ValueT) -> None:
+    @abc.abstractmethod
+    def copy(self, a: ClassUnderTest) -> ClassUnderTest:
+        pass
+
+    def test_generic_022_copy_helper_definition(self, a: ClassUnderTest) -> None:
+        a_copy = self.copy(a)
+        self.assertTrue(isinstance(a_copy, collections.abc.MutableMapping))
+        self.assertNotEqual(id(a), id(a_copy))
+        self.assertEqual(a, a_copy)
+
+    def test_generic_630_setitem_definition(self, a: ClassUnderTest, b: ElementT, c: ValueT) -> None:
+        a_copy = self.copy(a)
         a[b] = c
         self.assertEqual(a[b], c)
+        for key in a_copy:
+            if key != b:
+                self.assertEqual(a[key], a_copy[key])
 
-    def test_generic_629_update_does_not_corrupt(self, a: ClassUnderTest, b: ElementT, c: ValueT, d: DataT) -> None:
+    def test_generic_631_delitem_definition(self, a: ClassUnderTest, data) -> None:
         assume(len(a) > 0)
-        assume(b not in a)
-        k = None
-        while k is None or k == b:
-            k = d.draw(st.sampled_from(list(a.keys())))
-        v = a[k]
-        a[b] = c
-        self.assertEqual(a[k], v)
-
-    def test_generic_630_delete_removed_item(self, a: ClassUnderTest, b: ElementT, c: ValueT) -> None:
-        a[b] = c
-        del a[b]
-        with self.assertRaises(KeyError):
-            _ = a[b]
-
-    def test_generic_631_delete_does_not_corrupt(self, a: ClassUnderTest, d: DataT) -> None:
-        assume(len(a) > 1)
-        k1 = d.draw(st.sampled_from(list(a.keys())))
-        k2 = None
-        while k2 is None or k2 == k1:
-            k2 = d.draw(st.sampled_from(list(a.keys())))
-        v = a[k1]
-        del a[k2]
-        self.assertEqual(a[k1], v)
+        a_copy = self.copy(a)
+        key_to_forget = data.draw(st.sampled_from(list(a.keys())))
+        del a[key_to_forget]
+        self.assertTrue(key_to_forget not in a)
+        for other_key in a_copy:
+            if other_key != key_to_forget:
+                self.assertEqual(a[other_key], a_copy[other_key])
 
 
 class frozensetExtensionTests(SetTests):
@@ -248,6 +297,12 @@ class frozensetExtensionTests(SetTests):
         self.assertEqual(a.symmetric_difference(b), a ^ b)
 
 
+class dictExtensionTests(MutableMappingTests):
+
+    def copy(self, a: ClassUnderTest) -> ClassUnderTest:
+        return a.copy()
+
+
 element_st = st.integers()
 @Given({ClassUnderTest: st.frozensets(element_st), ElementT: element_st})
 class Test_frozenset(frozensetExtensionTests):
@@ -262,26 +317,20 @@ class Test_frozenset(frozensetExtensionTests):
 
 element_st = st.integers()
 @Given({ClassUnderTest: st.sets(element_st), ElementT: element_st})
-class Test_set(frozensetExtensionTests):
+class Test_set(MutableSetTests, frozensetExtensionTests):
 
     empty = set()
+
+    def copy(self, s: ClassUnderTest) -> ClassUnderTest:
+        return s.copy()
+
+    def singleton_constructor(self, a: ElementT) -> ClassUnderTest:
+        return set([a])
 
     def test_generic_629_copy_definition(self, a: ClassUnderTest) -> None:
         b = a.copy()
         self.assertNotEqual(id(a), id(b))
         self.assertEqual(a, b)
-
-    def test_generic_646_add_definition(self, a: ClassUnderTest, b: ElementT) -> None:
-        a_copy = a.copy()
-        a.add(b)
-        self.assertTrue(a_copy <= a)
-        self.assertTrue(b in a)
-
-    def test_generic_647_discard_definition(self, a: ClassUnderTest, b: ElementT) -> None:
-        a_copy = a.copy()
-        a.discard(b)
-        self.assertTrue(a <= a_copy)
-        self.assertTrue(b not in a)
 
     def test_generic_648_update_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         a_copy = a.copy()
@@ -367,10 +416,35 @@ class Test_dict_ValuesView(ValuesViewTests):
 
 key_st = st.integers()
 value_st = st.integers()
-@Given({ClassUnderTest: st.dictionaries(key_st, value_st), ElementT: key_st, ValueT: value_st, DataT: st.data()})
-class Test_dict(MutableMappingTests):
+@Given({ClassUnderTest: st.dictionaries(key_st, value_st), ElementT: key_st, ValueT: value_st})
+class Test_dict(dictExtensionTests):
 
     empty = dict()
+
+    def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
+        return {a: b}
+
+
+key_st = st.characters()
+value_st = st.integers(min_value=0)
+@Given({ClassUnderTest: st.builds(collections.Counter, st.text(key_st)), ElementT: key_st, ValueT: value_st})
+class Test_Counter(dictExtensionTests):
+
+    empty = collections.Counter()
+
+    def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
+        return collections.Counter({a: b})
+
+
+key_st = st.integers()
+value_st = st.integers()
+@Given({ClassUnderTest: st.builds(collections.OrderedDict, st.lists(st.tuples(key_st, value_st))), ElementT: key_st, ValueT: value_st})
+class Test_OrderedDict(dictExtensionTests):
+
+    empty = collections.OrderedDict()
+
+    def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
+        return collections.OrderedDict([(a, b)])
 
 
 if __name__ == '__main__':
@@ -382,5 +456,7 @@ if __name__ == '__main__':
 #     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_dict_ItemsView))
 #     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_dict_ValuesView))
     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_dict))
+    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_Counter))
+    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_OrderedDict))
     TR = unittest.TextTestRunner(verbosity=2)
     TR.run(SUITE)
