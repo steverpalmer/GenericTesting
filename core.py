@@ -21,6 +21,16 @@ class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):
         self.addTypeEqualityFunc(float, self.assertIsClose)
         self.addTypeEqualityFunc(complex, self.assertIsClose)
 
+    def assertIsInstance(self, obj, type_, msg: str=None):
+        """
+        I kept writing self.assertTrue(isinstance(obj, type_)),
+        and getting little useful information back on failure!
+        """
+        if not isinstance(obj, type_):
+            if msg is None:
+                msg = "{obj} has type {obj_type}, not {type} as expected".format(obj=obj, obj_type=type(obj), type=type_)
+            raise self.failureException(msg)
+
     def assertImplies(self, antecedent, consequent, msg: str=None):
         """
         I like implies as an operator ... so shoot me.
