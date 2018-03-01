@@ -20,23 +20,6 @@ from lattices import LatticeWithComplement
 from arithmetic import FieldTests, AbsoluteValueTests, FloorDivModTests, ExponentiationTests
 
 
-# :TODO: This is under consideration (https://github.com/HypothesisWorks/hypothesis-python/issues/1076), but here's my quick&dirty attempt
-@st.cacheable
-@st.base_defines_strategy(True)
-def complex_numbers(min_real_value=None, max_real_value=None, min_imag_value=None, max_imag_value=None, allow_nan=None, allow_infinity=None):
-    """Returns a strategy that generates complex numbers.
-
-    Examples from this strategy shrink by shrinking their component real
-    and imaginary parts.
-
-    """
-    from hypothesis.searchstrategy.numbers import ComplexStrategy
-    return ComplexStrategy(
-        st.tuples(
-            st.floats(min_value=min_real_value, max_value=max_real_value, allow_nan=allow_nan, allow_infinity=allow_infinity),
-            st.floats(min_value=min_imag_value, max_value=max_imag_value, allow_nan=allow_nan, allow_infinity=allow_infinity)))
-
-
 class _ComplexTests(EqualityTests, FieldTests, AbsoluteValueTests):
     """
     These is the property test of Complex numbers that are shared with
@@ -204,7 +187,7 @@ class RationalTests(_RationalTests):
         pass
 
     def test_generic_2000_zero_type(self):
-        self.assertIsIstance(self.zero, numbers.Rational)
+        self.assertIsInstance(self.zero, numbers.Rational)
 
     def test_generic_2001_one_type(self):
         self.assertIsInstance(self.one, numbers.Rational)
@@ -268,83 +251,6 @@ class IntegralTests(_RationalTests, LatticeWithComplement):
         if 0 <= b <= 64:
             self.assertEqual(a >> b, a // pow(2, b))
 
-@Given({ClassUnderTest: st.integers()})
-class Test_int(IntegralTests):
-    zero = 0
-    one = 1
-    real_zero = float(0)
 
+__all__ = ('ComplexTests', 'RealTests', 'RationalTests', 'IntegralTests')
 
-FRACTIONS_RANGE = 10000000000
-
-
-@Given({ClassUnderTest: st.fractions(min_value=fractions.Fraction(-FRACTIONS_RANGE),
-                                     max_value=fractions.Fraction(FRACTIONS_RANGE),
-                                     max_denominator=FRACTIONS_RANGE)})
-class Test_Fraction(RationalTests):
-    zero = fractions.Fraction(0)
-    one = fractions.Fraction(1)
-    real_zero = float(fractions.Fraction(0))
-    half = fractions.Fraction(1, 2)
-
-
-FLOATS_RANGE = 1e30
-
-
-@Given({ClassUnderTest: st.floats(min_value=-FLOATS_RANGE, max_value=FLOATS_RANGE)})
-class Test_float(RealTests):
-    zero = 0.0
-    one = 1.0
-    root_two = 2.0 ** 0.5
-
-    def test_generic_2220_addition_associativity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
-        assume(not self.isclose(a, b) and not self.isclose(b, c))
-        super().test_generic_2220_addition_associativity(a, b, c)
-
-    def test_generic_2237_multiplication_addition_left_distributivity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
-        # :FUDGE: this consistently fails when b is close to -c due to the limitations of floating point numbers.
-        # Therefore, continue the test only when the b is not close of -c
-        assume(not IsClose.over_numbers(b, -c, rel_tol=self.isclose.rel_tol ** 0.5, abs_tol=self.isclose.abs_tol * 100.0))
-        super().test_generic_2237_multiplication_addition_left_distributivity(a, b, c)
-
-    def test_generic_2274_abs_is_subadditive(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        self.assertCloseOrLessThan(abs(a + b), abs(a) + abs(b))
-
-
-COMPLEX_RANGE = 1e10
-
-
-@Given({ClassUnderTest: complex_numbers(-COMPLEX_RANGE, COMPLEX_RANGE,
-                                        -COMPLEX_RANGE, COMPLEX_RANGE,
-                                        allow_nan=False, allow_infinity=False)})
-class Test_complex(ComplexTests):
-    zero = complex(0)
-    one = complex(1)
-    real_zero = 0.0
-    i = complex(0, 1)
-
-    def test_generic_2237_multiplication_addition_left_distributivity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
-        # :FUDGE: this consistently fails when b is close to -c due to the limitations of floating point numbers.
-        # Therefore, continue the test only when the b is not close of -c
-        assume(not IsClose.over_numbers(b, -c, rel_tol=self.isclose.rel_tol ** 0.5, abs_tol=self.isclose.abs_tol * 100.0))
-        super().test_generic_2237_multiplication_addition_left_distributivity(a, b, c)
-
-    def test_generic_2238_multiplication_addition_right_distributivity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
-        # :FUDGE: this consistently fails when b is close to -c due to the limitations of floating point numbers.
-        # Therefore, continue the test only when the b is not close of -c
-        assume(not IsClose.over_numbers(b, -c, rel_tol=self.isclose.rel_tol ** 0.5, abs_tol=self.isclose.abs_tol * 100.0))
-        super().test_generic_2238_multiplication_addition_right_distributivity(a, b, c)
-
-    def test_generic_2274_abs_is_subadditive(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        self.assertCloseOrLessThan(abs(a + b), abs(a) + abs(b))
-
-
-if __name__ == '__main__':
-
-    SUITE = unittest.TestSuite()
-    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_int))
-    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_Fraction))
-    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_float))
-    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_complex))
-    TR = unittest.TextTestRunner(verbosity=2)
-    TR.run(SUITE)

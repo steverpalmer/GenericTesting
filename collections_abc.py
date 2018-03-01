@@ -295,137 +295,10 @@ class MutableMappingTests(MappingTests):
                 self.assertEqual(a[other_key], a_copy[other_key])
 
 
-class frozensetExtensionTests(SetTests):
-
-    def test_generic_2600_issubset_defintion(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        self.assertEqual(a.issubset(b), a <= b)
-
-    def test_generic_2601_isuperset_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        self.assertEqual(a.issuperset(b), a >= b)
-
-    def test_generic_2602_union_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        self.assertEqual(a.union(b), a | b)
-
-    def test_generic_2603_intersection_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        self.assertEqual(a.intersection(b), a & b)
-
-    def test_generic_2604_difference_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        self.assertEqual(a.difference(b), a - b)
-
-    def test_generic_2605_symmetric_difference_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        self.assertEqual(a.symmetric_difference(b), a ^ b)
-
-
 class dictExtensionTests(MutableMappingTests):
 
     def copy(self, a: ClassUnderTest) -> ClassUnderTest:
         return a.copy()
-
-
-element_st = st.integers()
-@Given({ClassUnderTest: st.frozensets(element_st), ElementT: element_st})
-class Test_frozenset(frozensetExtensionTests):
-
-    empty = frozenset()
-
-
-element_st = st.integers()
-@Given({ClassUnderTest: st.sets(element_st), ElementT: element_st})
-class Test_set(MutableSetTests, frozensetExtensionTests):
-
-    empty = set()
-
-    def copy(self, s: ClassUnderTest) -> ClassUnderTest:
-        return s.copy()
-
-    def singleton_constructor(self, a: ElementT) -> ClassUnderTest:
-        return set([a])
-
-    def test_generic_2010_copy_helper_definition(self, a: ClassUnderTest) -> None:
-        b = a.copy()
-        self.assertNotEqual(id(a), id(b))
-        self.assertEqual(a, b)
-
-    def test_generic_2610_update_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        a_copy = a.copy()
-        a_nother = a.copy()
-        a |= b
-        self.assertEqual(a, a_copy | b)
-        a_nother.update(b)
-        self.assertEqual(a, a_nother)
-
-    def test_generic_2611_intersection_update_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        a_copy = a.copy()
-        a_nother = a.copy()
-        a &= b
-        self.assertEqual(a, a_copy & b)
-        a_nother.intersection_update(b)
-        self.assertEqual(a, a_nother)
-
-    def test_generic_2612_difference_update_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        a_copy = a.copy()
-        a_nother = a.copy()
-        a -= b
-        self.assertEqual(a, a_copy - b)
-        a_nother.difference_update(b)
-        self.assertEqual(a, a_nother)
-
-    def test_generic_2613_symmetric_difference_update_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        a_copy = a.copy()
-        a_nother = a.copy()
-        a ^= b
-        self.assertEqual(a, a_copy ^ b)
-        a_nother.symmetric_difference_update(b)
-        self.assertEqual(a, a_nother)
-
-    def test_generic_2614_remove_definition(self, a: ClassUnderTest, b: ElementT) -> None:
-        a.add(b)
-        a_copy = a.copy()
-        a.remove(b)
-        a_copy.discard(b)
-        self.assertEqual(a, a_copy)
-        with self.assertRaises(KeyError):
-            a.remove(b)
-
-    def test_generic_2615_pop_definition(self, a: ClassUnderTest) -> None:
-        if a:
-            a_copy = a.copy()
-            b = a.pop()
-            self.assertTrue(b in a_copy)
-            self.assertTrue(b not in a)
-            a_copy.discard(b)
-            self.assertEqual(a, a_copy)
-        else:
-            with self.assertRaises(KeyError):
-                _ = a.pop()
-
-    def test_generic_2616_clear_definition(self, a: ClassUnderTest) -> None:
-        a.clear()
-        self.assertEqual(a, self.empty)
-
-
-key_st = st.integers()
-value_st = st.integers()
-@Given({ClassUnderTest: st.builds(lambda m: m.keys(), st.dictionaries(key_st, value_st)), ElementT: key_st})
-class Test_dict_KeysView(KeysViewTests):
-
-    empty = dict().keys()
-
-
-key_st = st.integers()
-value_st = st.integers()
-@Given({ClassUnderTest: st.builds(lambda m: m.items(), st.dictionaries(key_st, value_st)), ElementT: key_st})
-class Test_dict_ItemsView(ItemsViewTests):
-
-    empty = dict().items()
-
-
-key_st = st.integers()
-value_st = st.integers()
-@Given({ClassUnderTest: st.builds(lambda m: m.values(), st.dictionaries(key_st, value_st)), ElementT: key_st})
-class Test_dict_ValuesView(ValuesViewTests):
-
-    empty = dict().values()
 
 
 key_st = st.integers()
@@ -464,11 +337,6 @@ class Test_OrderedDict(dictExtensionTests):
 if __name__ == '__main__':
 
     SUITE = unittest.TestSuite()
-    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_frozenset))
-    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_set))
-    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_dict_KeysView))
-    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_dict_ItemsView))
-    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_dict_ValuesView))
     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_dict))
     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_Counter))
     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_OrderedDict))
