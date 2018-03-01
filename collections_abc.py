@@ -298,8 +298,43 @@ class MutableMappingTests(MappingTests):
             if other_key != key_to_forget:
                 self.assertEqual(a[other_key], a_copy[other_key])
 
+    def test_generic_2502_pop_definition(self, a: ClassUnderTest, b: ElementT) -> None:
+        a_copy = self.copy(a)
+        try:
+            v = a.pop(b)
+            self.assertEqual(v, a_copy[b])
+            del a_copy[b]
+        except KeyError:
+            self.assertFalse(b in a)
+        self.assertEqual(a, a_copy)
 
-class dictExtensionTests(MutableMappingTests):
+    def test_generic_2503_popitem_definition(self, a: ClassUnderTest) -> None:
+        a_copy = self.copy(a)
+        try:
+            k, v = a.popitem()
+            self.assertTrue(k in a_copy)
+            self.assertEqual(a_copy[k], v)
+            del a_copy[k]
+            self.assertEqual(a, a_copy)
+        except KeyError:
+            self.assertFalse(bool(a_copy))
+
+    def test_generic_2504_clear_definition(self, a: ClassUnderTest) -> None:
+        a.clear()
+        self.assertFalse(bool(a))
+
+    def test_generic_2505_setdefault_definition(self, a: ClassUnderTest, b: ElementT, c: ValueT) -> None:
+        a_copy = self.copy(a)
+        v = a.setdefault(b, c)
+        self.assertTrue(b in a)
+        self.assertEqual(a[b], v)
+        if b not in a_copy:
+            self.assertEqual(v, c)
+            del a[b]
+        self.assertEqual(a, a_copy)
+
+
+class dictTests(MutableMappingTests):
 
     def copy(self, a: ClassUnderTest) -> ClassUnderTest:
         return a.copy()
@@ -308,7 +343,7 @@ class dictExtensionTests(MutableMappingTests):
 key_st = st.integers()
 value_st = st.integers()
 @Given({ClassUnderTest: st.dictionaries(key_st, value_st), ElementT: key_st, ValueT: value_st})
-class Test_dict(dictExtensionTests):
+class Test_dict(dictTests):
 
     empty = dict()
 
@@ -319,7 +354,7 @@ class Test_dict(dictExtensionTests):
 key_st = st.characters()
 value_st = st.integers(min_value=0)
 @Given({ClassUnderTest: st.builds(collections.Counter, st.text(key_st)), ElementT: key_st, ValueT: value_st})
-class Test_Counter(dictExtensionTests):
+class Test_Counter(dictTests):
 
     empty = collections.Counter()
 
@@ -330,7 +365,7 @@ class Test_Counter(dictExtensionTests):
 key_st = st.integers()
 value_st = st.integers()
 @Given({ClassUnderTest: st.builds(collections.OrderedDict, st.lists(st.tuples(key_st, value_st))), ElementT: key_st, ValueT: value_st})
-class Test_OrderedDict(dictExtensionTests):
+class Test_OrderedDict(dictTests):
 
     empty = collections.OrderedDict()
 
@@ -351,15 +386,13 @@ class factory:
 key_st = st.integers()
 value_st = st.integers()
 @Given({ClassUnderTest: st.builds((lambda items: collections.defaultdict(factory(), items)), st.lists(st.tuples(key_st, value_st))), ElementT: key_st, ValueT: value_st})
-class Test_defaultdict(dictExtensionTests):
+class Test_defaultdict(dictTests):
 
     empty = collections.defaultdict(factory())
 
     def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
         return collections.defaultdict(factory(), [(a, b)])
 
-#     def test_generic_2492_get_on_empty_returns_default(self, a: ElementT, b: ValueT) -> None:
-#         pass
 
 if __name__ == '__main__':
 
