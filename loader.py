@@ -79,7 +79,7 @@ if __name__ == '__main__':
     # Define the tests
     from hypothesis import strategies as st
     @core.Given({core.ClassUnderTest: st.builds(IntSetDecorator), collections_abc.ElementT: st.integers()})
-    class MyClassTests(defaultGenericTestLoader.discover(IntSetDecorator)):
+    class IntSetDecoratorTests(defaultGenericTestLoader.discover(IntSetDecorator)):
         empty = IntSetDecorator([])
 
         def test_sum(self):
@@ -107,5 +107,5 @@ if __name__ == '__main__':
     # Run the tests
     from functools import partial
     TR = unittest.TextTestRunner(verbosity=2, resultclass=partial(LimitedTextTestResult, max_failures=None, max_errors=1))
-    TR.run(unittest.defaultTestLoader.loadTestsFromTestCase(MyClassTests))
+    TR.run(unittest.defaultTestLoader.loadTestsFromTestCase(IntSetDecoratorTests))
 
