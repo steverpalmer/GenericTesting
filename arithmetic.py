@@ -88,7 +88,7 @@ class FieldTests(CommutativeRingTests):
     """
 
     def test_generic_2239_truediv_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        assume(b != self.zero)
+        assume(not b == self.zero)
         calc = (a / b) * b
         self.assertEqual(calc, type(calc)(a))
 
@@ -102,7 +102,7 @@ class FloorDivModTests(GenericTests):
     """
 
     def test_generic_2240_mod_range(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        assume(b != self.zero)
+        assume(not b == self.zero)
         rem = a % b
         if b <= self.zero:
             self.assertGreaterEqual(self.zero, rem)
@@ -112,11 +112,11 @@ class FloorDivModTests(GenericTests):
             self.assertLess(rem, b)
 
     def test_generic_2241_floordiv_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        assume(b != self.zero)
+        assume(not b == self.zero)
         self.assertEqual((a // b) * b + a % b, a)
 
     def test_generic_2242_divmod_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        assume(b != self.zero)
+        assume(not b == self.zero)
         self.assertEqual(divmod(a, b), (a // b, a % b))
 
 
@@ -144,7 +144,7 @@ class ExponentiationTests(GenericTests):
         self.assertEqual(self.zero ** self.zero, self.one)
 
     def test_generic_2251_exponentiation_by_zero(self, a: ClassUnderTest) -> None:
-        assume(a != self.zero)
+        assume(not a == self.zero)
         self.assertEqual(a ** self.zero, self.one)
 
     def test_generic_2252_exponentiation_with_base_zero(self, a: ClassUnderTest) -> None:
@@ -152,11 +152,11 @@ class ExponentiationTests(GenericTests):
         self.assertEqual(self.zero ** a, self.zero)
 
     def test_generic_2253_exponentiation_with_base_one(self, a: ClassUnderTest) -> None:
-        assume(a != self.zero)
+        assume(not a == self.zero)
         self.assertEqual(self.one ** a, self.one)
 
     def test_generic_2254_exponentiation_by_one(self, a: ClassUnderTest) -> None:
-        assume(a != self.zero)
+        assume(not a == self.zero)
         self.assertEqual(a ** self.one, a)
 
 
