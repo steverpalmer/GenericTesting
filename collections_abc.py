@@ -375,6 +375,8 @@ class Test_Counter(dictTests):
         for k in a:
             self.assertEqual(a[k], b[k] + a_copy[k])
 
+    # TODO: add tests for Counter specific methods
+
 
 key_st = st.integers()
 value_st = st.integers()
@@ -385,6 +387,8 @@ class Test_OrderedDict(dictTests):
 
     def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
         return collections.OrderedDict([(a, b)])
+
+    # TODO: add tests for OrderedDict specific features and methods
 
 
 class factory:
