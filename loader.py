@@ -87,25 +87,11 @@ if __name__ == '__main__':
             self.assertEqual(isd.sum(), 9)
 
     # Define a unittest.TextTestResult decorator to control cascade failure effects
-    import unittest
-    class LimitedTextTestResult(unittest.TextTestResult):
-        """
-        Stop after a certain number of failures or errors
-        """
-
-        def __init__(self, stream, descriptions, verbosity, max_failures: int=None, max_errors: int=None):
-            super().__init__(stream, descriptions, verbosity)
-            self._max_failures = max_failures
-            self._max_errors = max_errors
-
-        def stopTest(self, _):
-            if self._max_failures is not None and len(self.failures) >= self._max_failures:
-                self.stop()
-            elif self._max_errors is not None and len(self.errors) >= self._max_errors:
-                self.stop()
+    from limited_text_test_result import LimitedTextTestResult
 
     # Run the tests
     from functools import partial
+    import unittest
     TR = unittest.TextTestRunner(verbosity=2, resultclass=partial(LimitedTextTestResult, max_failures=None, max_errors=1))
     TR.run(unittest.defaultTestLoader.loadTestsFromTestCase(IntSetDecoratorTests))
 
