@@ -35,5 +35,8 @@ I've been trying to build the process using the excellent
 Note: This is still very much a ''Work-In-Progress''.  I am testing my generic
 tests using the Python built-in types.
 
+However, there is a working illustration of how this could be used at the end
+of the `loader.py` module.
+
 Cheers,
 Steve Palmer
