@@ -323,7 +323,14 @@ class MutableMappingTests(MappingTests):
         a.clear()
         self.assertFalse(bool(a))
 
-    def test_generic_2505_setdefault_definition(self, a: ClassUnderTest, b: ElementT, c: ValueT) -> None:
+    def test_generic_2505_update_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        a_copy = self.copy(a)
+        a.update(b)
+        self.assertLessEqual(b.keys(), a.keys())
+        for k in a:
+            self.assertEqual(a[k], b[k] if k in b else a_copy[k])
+
+    def test_generic_2506_setdefault_definition(self, a: ClassUnderTest, b: ElementT, c: ValueT) -> None:
         a_copy = self.copy(a)
         v = a.setdefault(b, c)
         self.assertTrue(b in a)
@@ -360,6 +367,13 @@ class Test_Counter(dictTests):
 
     def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
         return collections.Counter({a: b})
+
+    def test_generic_2505_update_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        a_copy = self.copy(a)
+        a.update(b)
+        self.assertLessEqual(b.keys(), a.keys())
+        for k in a:
+            self.assertEqual(a[k], b[k] + a_copy[k])
 
 
 key_st = st.integers()
