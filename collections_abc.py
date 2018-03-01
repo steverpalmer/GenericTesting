@@ -260,8 +260,12 @@ class MappingTests(SizedOverIterableTests, ContainerOverIterableTests, EqualityT
     def test_generic_2491_values_returns_an_ValuesView(self, a: ClassUnderTest) -> None:
         self.assertIsInstance(a.values(), collections.abc.ValuesView)
 
-    def test_generic_2492_get_on_empty_returns_default(self, a: ElementT, b: ValueT) -> None:
-        self.assertEqual(self.empty.get(a, b), b)
+    def test_generic_2492_get_definition(self, a: ClassUnderTest, b: ElementT, c: ValueT) -> None:
+        if b in a:
+            expected = a[b]
+        else:
+            expected = c
+        self.assertEqual(a.get(b, c), expected)
 
 
 class MutableMappingTests(MappingTests):
@@ -334,11 +338,38 @@ class Test_OrderedDict(dictExtensionTests):
         return collections.OrderedDict([(a, b)])
 
 
+class factory:
+
+    def __init__(self):
+        self.count = 0
+
+    def __call__(self):
+        self.count += 1
+        return self.count
+
+
+key_st = st.integers()
+value_st = st.integers()
+@Given({ClassUnderTest: st.builds((lambda items: collections.defaultdict(factory(), items)), st.lists(st.tuples(key_st, value_st))), ElementT: key_st, ValueT: value_st})
+class Test_defaultdict(dictExtensionTests):
+
+    empty = collections.defaultdict(factory())
+
+    def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
+        return collections.defaultdict(factory(), [(a, b)])
+
+#     def test_generic_2492_get_on_empty_returns_default(self, a: ElementT, b: ValueT) -> None:
+#         pass
+
 if __name__ == '__main__':
 
     SUITE = unittest.TestSuite()
     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_dict))
     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_Counter))
     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_OrderedDict))
-    TR = unittest.TextTestRunner(verbosity=2)
+    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_defaultdict))
+
+    from limited_text_test_result import LimitedTextTestResult
+    from functools import partial
+    TR = unittest.TextTestRunner(verbosity=2, resultclass=partial(LimitedTextTestResult, max_failures=None, max_errors=1))
     TR.run(SUITE)
