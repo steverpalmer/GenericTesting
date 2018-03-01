@@ -347,6 +347,18 @@ class dictTests(MutableMappingTests):
         return a.copy()
 
 
+import types
+key_st = st.integers()
+value_st = st.integers()
+@Given({ClassUnderTest: st.builds((lambda d: types.MappingProxyType(d)), st.dictionaries(key_st, value_st)), ElementT: key_st, ValueT: value_st})
+class Test_MappingProxyType(MappingTests):
+
+    empty = types.MappingProxyType(dict())
+
+    def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
+        return types.MappingProxyType({a: b})
+
+
 key_st = st.integers()
 value_st = st.integers()
 @Given({ClassUnderTest: st.dictionaries(key_st, value_st), ElementT: key_st, ValueT: value_st})
@@ -415,6 +427,7 @@ class Test_defaultdict(dictTests):
 if __name__ == '__main__':
 
     SUITE = unittest.TestSuite()
+    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_MappingProxyType))
     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_dict))
     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_Counter))
     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_OrderedDict))
