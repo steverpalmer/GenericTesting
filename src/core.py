@@ -77,6 +77,9 @@ class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):
             raise self.failureException(msg)
 
 
+ClassUnderTest = 'ClassUnderTest'
+
+
 def Given(strategy=None, *, testMethodPrefix='test_generic', data_arg='data'):
     """
     Decorator for BaseTest derived test cases
@@ -84,7 +87,7 @@ def Given(strategy=None, *, testMethodPrefix='test_generic', data_arg='data'):
     if strategy is None:
         strategy = dict()
     elif not isinstance(strategy, dict):
-        strategy = {None: strategy}
+        strategy = {ClassUnderTest: strategy}
 
 #    apply_given = all(isinstance(value, strategies) for value in strategy.values())
     def result(cls):
@@ -110,9 +113,6 @@ def Given(strategy=None, *, testMethodPrefix='test_generic', data_arg='data'):
                     setattr(cls, name, attr)
         return cls
     return result
-
-
-ClassUnderTest = 'ClassUnderTest'
 
 
 __all__ = ('GenericTests', 'Given', 'ClassUnderTest')

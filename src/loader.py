@@ -62,6 +62,7 @@ class GenericTestLoader:
         for known_T in reversed(self._superclass_mapping):
             if issubclass(T, known_T):
                 result = self._superclass_mapping[known_T]
+                break
         if result is None:
             # Need to work a bit harder
             base_class_list = list(self.collection_like_list[_ContainerLikeFlags.discover(T)])

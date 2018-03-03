@@ -35,8 +35,22 @@ I've been trying to build the process using the excellent
 Note: This is still very much a ''Work-In-Progress''.  I am testing my generic
 tests using the Python built-in types.
 
-However, there is a working illustration of how this could be used at the end
-of the `loader.py` module.
+For example, to perform a test of the built-in int class, use:
+
+    @Given(st.integers())
+    class Test_int(defaultGenericTestLoader.discover(int)):
+        pass
+
+    SUITE = unittest.defaultTestLoader.loadTestsFromTestCase(Test_int)
+
+The `defaultGenericTestLoader.discover(int)` looks for the best set of generic
+tests for the specified class.  This can be inherrited by your own class where you
+can add any special tests you want in the normal `unittest.TestCase` style.
+The `Given` class decorator will bind the generic tests to the production strategy.
+The standard library `unittest.defaultTestLoader.loadTestsFromTestCase` can be
+used to generate a normal `unittest.TestSuite` collecting all the tests together
+ready to be run.  In this case, in excess of 57 properties of ints will be run against
+the hypothesis default 100 example ints.
 
 Cheers,
 Steve Palmer

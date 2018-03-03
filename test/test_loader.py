@@ -14,6 +14,11 @@ from hypothesis import strategies as st
 from src import *
 
 
+@Given(st.integers())
+class Test_int(defaultGenericTestLoader.discover(int)):
+    pass
+
+
 class IntSetDecorator(collections.abc.Set):
     """
     A class discribing a set of ints, with an extra method 'total'.

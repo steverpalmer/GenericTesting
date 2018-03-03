@@ -52,7 +52,7 @@ class ComplexTests(_ComplexTests):
     def test_generic_2300_i_times_i_is_minus_one(self) -> None:
         self.assertEqual(self.i * self.i, -self.one)
 
-    def test_generic_2301_complex(self) -> None:
+    def test_generic_2301_complex_function(self) -> None:
         self.assertEqual(complex(0), complex(self.zero))
         self.assertEqual(complex(1), complex(self.one))
         self.assertEqual(complex(0, 1), complex(self.i))
@@ -88,10 +88,10 @@ class _RealTests(_ComplexTests, TotalOrderingTests, FloorDivModTests, Exponentia
     def test_generic_2150_less_or_equal_orientation(self) -> None:
         self.assertTrue(self.zero <= self.one)
 
-    def test_generic_2151_less_or_equal_consistent_with_addition(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
+    def test_generic_2330_less_or_equal_consistent_with_addition(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
         self.assertEqual(a <= b, a + c <= b + c)
 
-    def test_generic_2152_less_or_equal_consistent_with_multiplication(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2331_less_or_equal_consistent_with_multiplication(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         self.assertImplies(self.zero <= a and self.zero <= b, self.zero <= a * b)
 
 
@@ -118,10 +118,10 @@ class RealTests(_RealTests):
     def test_generic_2004_root_two_type(self) -> None:
         self.assertIsInstance(self.root_two, numbers.Real)
 
-    def test_generic_2330_root_two_times_root_two_is_two(self) -> None:
+    def test_generic_2332_root_two_times_root_two_is_two(self) -> None:
         self.assertEqual(self.root_two * self.root_two, self.one + self.one)
 
-    def test_generic_2331_float(self) -> None:
+    def test_generic_2333_float_function(self) -> None:
         self.assertEqual(0.0, float(self.zero))
         self.assertEqual(1.0, float(self.one))
         self.assertEqual(1.414213562, float(self.root_two))
@@ -228,7 +228,7 @@ class IntegralTests(_RationalTests, LatticeWithComplement):
     def test_generic_2001_one_type(self):
         self.assertIsInstance(self.one, numbers.Integral)
 
-    def test_generic_2380_int(self) -> None:
+    def test_generic_2380_int_function(self) -> None:
         self.assertEqual(0, int(self.zero))
         self.assertEqual(1, int(self.one))
 
