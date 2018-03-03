@@ -9,7 +9,7 @@ A library of generic test for the elementary relationships...
 """
 
 
-from core import GenericTests, ClassUnderTest
+from .core import GenericTests, ClassUnderTest
 
 
 class EqualsOnlyTests(GenericTests):

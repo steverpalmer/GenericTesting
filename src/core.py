@@ -10,7 +10,7 @@ import inspect
 
 from hypothesis import given, strategies as st
 
-from isclose import IsClose
+from .isclose import IsClose
 
 
 class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):

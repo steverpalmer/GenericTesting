@@ -3,8 +3,6 @@ Copyright 2018 Steve Palmer
 """
 
 import unittest
-
-
 class LimitedTextTestResult(unittest.TextTestResult):
     """
     Stop after a certain number of failures or errors

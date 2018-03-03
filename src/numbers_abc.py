@@ -13,11 +13,11 @@ import math
 
 from hypothesis import assume, strategies as st
 
-from isclose import IsClose
-from core import Given, ClassUnderTest
-from relations import EqualityTests, TotalOrderingTests
-from lattices import LatticeWithComplement
-from arithmetic import FieldTests, AbsoluteValueTests, FloorDivModTests, ExponentiationTests
+from .isclose import IsClose
+from .core import Given, ClassUnderTest
+from .relations import EqualityTests, TotalOrderingTests
+from .lattices import LatticeWithComplement
+from .arithmetic import FieldTests, AbsoluteValueTests, FloorDivModTests, ExponentiationTests
 
 
 class _ComplexTests(EqualityTests, FieldTests, AbsoluteValueTests):
@@ -253,4 +253,3 @@ class IntegralTests(_RationalTests, LatticeWithComplement):
 
 
 __all__ = ('ComplexTests', 'RealTests', 'RationalTests', 'IntegralTests')
-

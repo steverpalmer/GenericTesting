@@ -1,6 +1,6 @@
-/__pycache__
-/.hypothesis
-/.project
-/.pydevproject
+__pycache__
+.hypothesis
 tmp*
 *~
+/.project
+/.pydevproject

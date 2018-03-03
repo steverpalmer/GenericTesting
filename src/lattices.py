@@ -9,7 +9,7 @@ A library of generic test for the elementary operators...
 
 import abc
 
-from core import GenericTests, ClassUnderTest
+from .core import GenericTests, ClassUnderTest
 
 
 class LatticeTests(GenericTests):

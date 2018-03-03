@@ -6,13 +6,12 @@ A library of generic test for the base classes in the collections.abc library
 
 import abc
 import collections
-import unittest
 
 from hypothesis import assume, strategies as st
 
-from core import GenericTests, Given, ClassUnderTest
-from relations import EqualityTests, PartialOrderingTests
-from lattices import BoundedBelowLatticeTests
+from .core import GenericTests, ClassUnderTest
+from .relations import EqualityTests, PartialOrderingTests
+from .lattices import BoundedBelowLatticeTests
 
 
 ElementT = 'ElementT'
@@ -348,10 +347,4 @@ __all__ = ('ElementT', 'ValueT',
            'MappingTests', 'MutableMappingTests')
 
 if __name__ == '__main__':
-
-    SUITE = unittest.TestSuite()
-
-    from limited_text_test_result import LimitedTextTestResult
-    from functools import partial
-    TR = unittest.TextTestRunner(verbosity=2, resultclass=partial(LimitedTextTestResult, max_failures=None, max_errors=1))
-    TR.run(SUITE)
+    pass

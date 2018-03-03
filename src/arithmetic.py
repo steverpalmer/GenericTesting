@@ -11,7 +11,7 @@ import abc
 
 from hypothesis import assume
 
-from core import GenericTests, ClassUnderTest
+from .core import GenericTests, ClassUnderTest
 
 
 class AdditiveMonoidTests(GenericTests):
@@ -192,5 +192,5 @@ class AbsoluteValueTests(GenericTests):
         self.assertLessEqual(abs(a + b), abs(a) + abs(b))
 
 
-__all__ = ('AdditiveMonoid', 'Ring', 'CommutatuveRing', 'FieldTests', 'FieldTests',
+__all__ = ('AdditiveMonoidTests', 'RingTests', 'CommutativeRingTests', 'FieldTests', 'FieldTests',
            'FloorDivModTests', 'ExponentiationTests', 'AbsoluteValueTests')
