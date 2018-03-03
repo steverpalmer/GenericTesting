@@ -15,7 +15,14 @@ from isclose import IsClose
 
 class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):
 
-    def __init__(self, methodName='runTest'):
+    def __init__(self, methodName=None):
+        """
+        unittest.TestCase defines the default methodName to be 'runtest'.
+        Rather than repeat this through the code,
+        GenericTests default the value to None, and then substitute 'runTest' here.
+        """
+        if methodName is None:
+            methodName = 'runTest'
         super().__init__(methodName)
         self.isclose = IsClose()
         self.addTypeEqualityFunc(float, self.assertIsClose)

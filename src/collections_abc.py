@@ -341,97 +341,15 @@ class MutableMappingTests(MappingTests):
         self.assertEqual(a, a_copy)
 
 
-class dictTests(MutableMappingTests):
-
-    def copy(self, a: ClassUnderTest) -> ClassUnderTest:
-        return a.copy()
-
-
-import types
-key_st = st.integers()
-value_st = st.integers()
-@Given({ClassUnderTest: st.builds((lambda d: types.MappingProxyType(d)), st.dictionaries(key_st, value_st)), ElementT: key_st, ValueT: value_st})
-class Test_MappingProxyType(MappingTests):
-
-    empty = types.MappingProxyType(dict())
-
-    def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
-        return types.MappingProxyType({a: b})
-
-
-key_st = st.integers()
-value_st = st.integers()
-@Given({ClassUnderTest: st.dictionaries(key_st, value_st), ElementT: key_st, ValueT: value_st})
-class Test_dict(dictTests):
-
-    empty = dict()
-
-    def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
-        return {a: b}
-
-
-key_st = st.characters()
-value_st = st.integers(min_value=0)
-@Given({ClassUnderTest: st.builds(collections.Counter, st.text(key_st)), ElementT: key_st, ValueT: value_st})
-class Test_Counter(dictTests):
-
-    empty = collections.Counter()
-
-    def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
-        return collections.Counter({a: b})
-
-    def test_generic_2505_update_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        a_copy = self.copy(a)
-        a.update(b)
-        self.assertLessEqual(b.keys(), a.keys())
-        for k in a:
-            self.assertEqual(a[k], b[k] + a_copy[k])
-
-    # TODO: add tests for Counter specific methods
-
-
-key_st = st.integers()
-value_st = st.integers()
-@Given({ClassUnderTest: st.builds(collections.OrderedDict, st.lists(st.tuples(key_st, value_st))), ElementT: key_st, ValueT: value_st})
-class Test_OrderedDict(dictTests):
-
-    empty = collections.OrderedDict()
-
-    def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
-        return collections.OrderedDict([(a, b)])
-
-    # TODO: add tests for OrderedDict specific features and methods
-
-
-class factory:
-
-    def __init__(self):
-        self.count = 0
-
-    def __call__(self):
-        self.count += 1
-        return self.count
-
-
-key_st = st.integers()
-value_st = st.integers()
-@Given({ClassUnderTest: st.builds((lambda items: collections.defaultdict(factory(), items)), st.lists(st.tuples(key_st, value_st))), ElementT: key_st, ValueT: value_st})
-class Test_defaultdict(dictTests):
-
-    empty = collections.defaultdict(factory())
-
-    def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
-        return collections.defaultdict(factory(), [(a, b)])
-
+__all__ = ('ElementT', 'ValueT',
+           'IterableTests', 'SizedTests', 'ContainerTests',
+           'SizedOverIterableTests', 'ContainerOverIterableTests',
+           'SetTests', 'MappingViewTests', 'KeysViewTests', 'ItemsViewTests', 'ValuesViewTests', 'MutableSetTests',
+           'MappingTests', 'MutableMappingTests')
 
 if __name__ == '__main__':
 
     SUITE = unittest.TestSuite()
-    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_MappingProxyType))
-    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_dict))
-    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_Counter))
-    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_OrderedDict))
-    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_defaultdict))
 
     from limited_text_test_result import LimitedTextTestResult
     from functools import partial

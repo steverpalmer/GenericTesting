@@ -7,13 +7,15 @@ A library of generic test for the python built-in types.
 
 import fractions
 import unittest
+import types
+import collections
 
 from hypothesis import assume, strategies as st
 
 from isclose import IsClose
 from core import Given, ClassUnderTest
 from numbers_abc import *
-from collections_abc import ElementT, SetTests, MutableSetTests, KeysViewTests, ItemsViewTests, ValuesViewTests
+from collections_abc import *
 
 #=======================================================================================================================
 # Unbound tests
@@ -187,9 +189,70 @@ class dictValuesViewTests(ValuesViewTests):
     pass
 
 
+class MappingProxyTypeTests(MappingTests):
+
+    empty = types.MappingProxyType(dict())
+
+    def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
+        return types.MappingProxyType({a: b})
+
+
+class dictTests(MutableMappingTests):
+
+    empty = dict()
+
+    def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
+        return {a: b}
+
+    def copy(self, a: ClassUnderTest) -> ClassUnderTest:
+        return a.copy()
+
+
+class CounterTests(dictTests):
+
+    empty = collections.Counter()
+
+    def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
+        return collections.Counter({a: b})
+
+    def test_generic_2505_update_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        a_copy = self.copy(a)
+        a.update(b)
+        self.assertLessEqual(b.keys(), a.keys())
+        for k in a:
+            self.assertEqual(a[k], b[k] + a_copy[k])
+
+    # TODO: add tests for Counter specific methods
+
+
+class OrderedDictTests(dictTests):
+
+    empty = collections.OrderedDict()
+
+    def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
+        return collections.OrderedDict([(a, b)])
+
+    # TODO: add tests for OrderedDict specific features and methods
+
+
+class defaultdictTests(dictTests):
+
+    def __init__(self, default_factory, methodName=None):
+        super().__init__(methodName)
+        self._default_factory = default_factory
+
+    @property
+    def empty(self):
+        return collections.defaultdict(self._default_factory)
+
+    def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
+        return collections.defaultdict(self._default_factory, [(a, b)])
+
+
 __all__ = ('intTests', 'FractionTests', 'floatTests', 'complexTests',
            'frozensetTests', 'setTests',
-           'dictKeysViewTests', 'dictItemsViewTests', 'dictValuesViewTests')
+           'dictKeysViewTests', 'dictItemsViewTests', 'dictValuesViewTests',
+           'dictTests', 'CounterTests', )
 
 
 
@@ -274,6 +337,52 @@ if __name__ == '__main__':
         pass
 
 
+    key_st = st.integers()
+    value_st = st.integers()
+    @Given({ClassUnderTest: st.builds((lambda d: types.MappingProxyType(d)), st.dictionaries(key_st, value_st)), ElementT: key_st, ValueT: value_st})
+    class Test_MappingProxyType(MappingProxyTypeTests):
+        pass
+
+
+    key_st = st.integers()
+    value_st = st.integers()
+    @Given({ClassUnderTest: st.dictionaries(key_st, value_st), ElementT: key_st, ValueT: value_st})
+    class Test_dict(dictTests):
+        pass
+
+
+    key_st = st.characters()
+    value_st = st.integers(min_value=0)
+    @Given({ClassUnderTest: st.builds(collections.Counter, st.text(key_st)), ElementT: key_st, ValueT: value_st})
+    class Test_Counter(CounterTests):
+        pass
+
+
+    key_st = st.integers()
+    value_st = st.integers()
+    @Given({ClassUnderTest: st.builds(collections.OrderedDict, st.lists(st.tuples(key_st, value_st))), ElementT: key_st, ValueT: value_st})
+    class Test_OrderedDict(OrderedDictTests):
+        pass
+
+
+    class factory:
+
+        def __init__(self):
+            self.count = 0
+
+        def __call__(self):
+            self.count += 1
+            return self.count
+
+    key_st = st.integers()
+    value_st = st.integers()
+    @Given({ClassUnderTest: st.builds((lambda items: collections.defaultdict(factory(), items)), st.lists(st.tuples(key_st, value_st))), ElementT: key_st, ValueT: value_st})
+    class Test_defaultdict(defaultdictTests):
+
+        def __init__(self, methodName=None):
+            super().__init__(factory(), methodName)
+
+
     SUITE = unittest.TestSuite()
     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_int))
     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_Fraction))
@@ -284,6 +393,11 @@ if __name__ == '__main__':
     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_dict_KeysView))
     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_dict_ItemsView))
     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_dict_ValuesView))
+    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_MappingProxyType))
+    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_dict))
+    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_Counter))
+    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_OrderedDict))
+    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_defaultdict))
     TR = unittest.TextTestRunner(verbosity=2)
     TR.run(SUITE)
 
