@@ -3,7 +3,6 @@
 Copyright 2018 Steve Palmer
 """
 
-
 import abc
 import unittest
 import inspect
@@ -86,14 +85,13 @@ def Given(strategy=None, *, testMethodPrefix='test_generic', data_arg='data'):
         strategy = dict()
     elif not isinstance(strategy, dict):
         strategy = {None: strategy}
+
 #    apply_given = all(isinstance(value, strategies) for value in strategy.values())
     def result(cls):
         if not issubclass(cls, GenericTests):
             raise TypeError("should operate on classes inheriting from BaseTest")
         for name, method in inspect.getmembers(cls):
             if name.startswith(testMethodPrefix) and callable(method):
-#                 args = {arg: strategy[value.annotation if value.annotation != inspect.Parameter.empty else None]
-#                         for arg, value in inspect.signature(method).parameters.items() if arg != 'self'}
                 signature = inspect.signature(method)
                 parameters = signature.parameters
                 args = {arg: param for arg, param in parameters.items() if arg != 'self'}

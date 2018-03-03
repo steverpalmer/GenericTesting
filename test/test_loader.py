@@ -5,12 +5,15 @@ Copyright 2018 Steve Palmer
 A test of the generic_test.loader.
 """
 
+from typing import List
 import collections
+from functools import reduce
+
+from hypothesis import strategies as st
 
 from src import *
 
-# Test1: Define the Class that I'm going to test
-from typing import List
+
 class IntSetDecorator(collections.abc.Set):
     """
     A class discribing a set of ints, with an extra method 'total'.
@@ -35,9 +38,8 @@ class IntSetDecorator(collections.abc.Set):
     def __repr__(self):
         return "MyClass({self.data})".format(self=self)
 
-# Define the tests
-from hypothesis import strategies as st
-@core.Given({core.ClassUnderTest: st.builds(IntSetDecorator), collections_abc.ElementT: st.integers()})
+
+@Given({core.ClassUnderTest: st.builds(IntSetDecorator), collections_abc.ElementT: st.integers()})
 class Test_IntSetDecorator(defaultGenericTestLoader.discover(IntSetDecorator)):
     empty = IntSetDecorator([])
 
@@ -45,15 +47,14 @@ class Test_IntSetDecorator(defaultGenericTestLoader.discover(IntSetDecorator)):
         isd = IntSetDecorator([1, 3, 5])
         self.assertEqual(isd.total(), 9)
 
-# Test2: bit set?
-import functools
+
 class BitSet:
     """
     An embrionic class describing a set of ints, stored as bitmasks.
     """
 
     def __init__(self, values: List[int]) -> None:
-        self._value = functools.reduce((lambda x, y: (x | pow(2, y))), values, 0)
+        self._value = reduce((lambda x, y: (x | pow(2, y))), values, 0)
 
     def __eq__(self, other: 'BitSet'):
         return self._value == other._value
@@ -67,15 +68,18 @@ class BitSet:
 #                 if result in self:
 #                     yield result
 #                 result *= 2
-# 
+#
 #         def __iter__(self):
 #             return self._iterator()
 
-#Define the tests
+
 element_st = st.integers(min_value=0, max_value=63)
-@core.Given({core.ClassUnderTest: st.builds(BitSet, st.lists(element_st)), collections_abc.ElementT: element_st})
+
+
+@Given({core.ClassUnderTest: st.builds(BitSet, st.lists(element_st)), collections_abc.ElementT: element_st})
 class Test_BitSet(defaultGenericTestLoader.discover(BitSet)):
     pass
+
 
 if __name__ == '__main__':
     # Run the tests

@@ -25,7 +25,6 @@ class AdditiveMonoidTests(GenericTests):
     def zero(self) -> ClassUnderTest:
         pass
 
-
     def test_generic_2220_addition_associativity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
         self.assertEqual(a + (b + c), (a + b) + c)
 
@@ -166,7 +165,7 @@ class AbsoluteValueTests(GenericTests):
 
     It is assumed that these will be inherited along with
     one of the above test, so don't bother redefining zero and one
-    
+
     However, since abs delivers a value of a different type,
     we need a real value for zero.
     """

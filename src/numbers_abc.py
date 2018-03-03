@@ -136,7 +136,7 @@ class RealTests(_RealTests):
         round_result = round(a)
         self.assertImplies(self.isclose(abs(float(a) - float(round_result)), 0.5), round_result % 2.0 == 0)
 
-    #:TODO: It would be good to have tests of round(a, n)
+    # :TODO: It would be good to have tests of round(a, n)
 
     def test_generic_2350_floor_definition(self, a: ClassUnderTest) -> None:
         a_floor = math.floor(a)

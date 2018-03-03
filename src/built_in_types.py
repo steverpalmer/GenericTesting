@@ -13,9 +13,9 @@ from hypothesis import assume
 
 from .isclose import IsClose
 from .core import ClassUnderTest
-from .numbers_abc import *
-from .collections_abc import ElementT, ValueT, SetTests, KeysViewTests, ItemsViewTests, ValuesViewTests, \
-                             MutableSetTests, MappingTests, MutableMappingTests
+from .numbers_abc import IntegralTests, RationalTests, RealTests, ComplexTests
+from .collections_abc import (ElementT, ValueT, SetTests, KeysViewTests, ItemsViewTests, ValuesViewTests,
+                              MutableSetTests, MappingTests, MutableMappingTests)
 
 
 class intTests(IntegralTests):
@@ -31,6 +31,7 @@ class FractionTests(RationalTests):
     one = fractions.Fraction(1)
     real_zero = float(fractions.Fraction(0))
     half = fractions.Fraction(1, 2)
+
 
 class floatTests(RealTests):
     zero = 0.0
@@ -164,7 +165,7 @@ class setTests(MutableSetTests, frozensetTests):
             self.assertEqual(a, a_copy)
         else:
             with self.assertRaises(KeyError):
-                _ = a.pop()
+                a.pop()
 
     def test_generic_2616_clear_definition(self, a: ClassUnderTest) -> None:
         a.clear()

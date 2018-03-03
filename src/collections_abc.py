@@ -17,6 +17,7 @@ from .lattices import BoundedBelowLatticeTests
 ElementT = 'ElementT'
 ValueT = 'ValueT'
 
+
 class IterableTests(GenericTests):
     """
     These is the property test of Iterables.
@@ -28,12 +29,12 @@ class IterableTests(GenericTests):
     def test_generic_2401_iterator_protocol_observed(self, a: ClassUnderTest) -> None:
         a_iter = iter(a)
         try:
-            _ = next(a_iter)
+            next(a_iter)
             return  # next can return
         except StopIteration:
             # ... or rasie a StopIteration
             with self.assertRaises(StopIteration):  # ... and continues to do so
-                _ = next(a_iter)
+                next(a_iter)
             return
         self.fail()  # ... but nothing else
 
@@ -91,10 +92,10 @@ class ContainerOverIterableTests(IterableTests, ContainerTests):
 
 
 # class HashableTests(GenericTests):
-# 
+#
 #     def test_generic_635_hash_returns_int(self, a: elementT) -> None:
 #         self.assertTrue(isinstance(hash(a), int))
-# 
+#
 #     def test_generic_636_equal_implies_equal_hash(self, a: elementT, b: elementT) -> None:
 #         # Implicity checks that a.__eq__(b) is defined
 #         self.assertImplies(a == b, hash(a) == hash(b))
@@ -238,10 +239,10 @@ class MappingTests(SizedOverIterableTests, ContainerOverIterableTests, EqualityT
 
     def test_generic_2480_getitem_on_empty_either_succeeds_or_raises_KeyError(self, a: ElementT) -> None:
         try:
-            _ = self.empty[a]
+            self.empty[a]
         except KeyError:
             pass
-        except:
+        except BaseException:
             self.fail()
 
     def test_generic_2481_getitem_over_all_keys_succeeds(self, a: ClassUnderTest) -> None:
@@ -249,7 +250,7 @@ class MappingTests(SizedOverIterableTests, ContainerOverIterableTests, EqualityT
         self.assertIsInstance(a_keys, collections.abc.KeysView)
         try:
             for k in a_keys:
-                _ = a[k]
+                a[k]
         except KeyError:
             self.fail()
 
@@ -345,6 +346,3 @@ __all__ = ('ElementT', 'ValueT',
            'SizedOverIterableTests', 'ContainerOverIterableTests',
            'SetTests', 'MappingViewTests', 'KeysViewTests', 'ItemsViewTests', 'ValuesViewTests', 'MutableSetTests',
            'MappingTests', 'MutableMappingTests')
-
-if __name__ == '__main__':
-    pass
