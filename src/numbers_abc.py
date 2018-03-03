@@ -6,15 +6,12 @@ A library of generic test for the base classes in the numbers library
 """
 
 import abc
-import unittest
 import numbers
-import fractions
 import math
 
-from hypothesis import assume, strategies as st
+from hypothesis import assume
 
-from .isclose import IsClose
-from .core import Given, ClassUnderTest
+from .core import ClassUnderTest
 from .relations import EqualityTests, TotalOrderingTests
 from .lattices import LatticeWithComplement
 from .arithmetic import FieldTests, AbsoluteValueTests, FloorDivModTests, ExponentiationTests
