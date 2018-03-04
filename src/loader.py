@@ -46,7 +46,8 @@ class GenericTestLoader:
 
     @staticmethod
     def _is_user_defined(obj, mthd) -> bool:
-        return getattr(obj, mthd, None) is not getattr(object, mthd, None)
+        attr = getattr(obj, mthd, None)
+        return attr is not None and attr is not getattr(object, mthd, None)
 
     collection_like_list = ([],  # Init
                             [ContainerTests],  # Container
