@@ -7,6 +7,7 @@ Merge generic_testing into a single namespace
 from . import isclose
 
 from .core import *
+from .relations import *
 from .arithmetic import *
 from .lattices import *
 from .numbers_abc import *
