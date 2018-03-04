@@ -203,21 +203,9 @@ class RationalTests(_RationalTests):
         self.assertGreater(int(a.denominator), 0)
         self.assertEqual(0 <= int(a.numerator), self.zero <= a)
 
-    @staticmethod
-    def _gcd(a: int, b: int) -> int:
-        a = abs(a)
-        b = abs(b)
-        if a < b:
-            a, b = (b, a)
-        rem = a % b
-        while rem != 0:
-            a, b = (b, rem)
-            rem = a % b
-        return b
-
     def test_generic_2372_lowest_terms(self, a: ClassUnderTest) -> None:
         assume(a != self.zero)
-        self.assertEqual(RationalTests._gcd(int(a.numerator), int(a.denominator)), 1)
+        self.assertEqual(math.gcd(int(a.numerator), int(a.denominator)), 1)
 
 
 class IntegralTests(_RationalTests, LatticeWithComplement):
