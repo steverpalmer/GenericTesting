@@ -30,17 +30,20 @@ class intTests(IntegralTests, IntegralAugmentedAssignmentTests, FloorDivAugmente
     def test_generic_2021_one_type(self):
         self.assertIsInstance(self.one, int)
 
-    def test_generic_2290_ilshift_definition(self, a: ClassUnderTest, b: ClassUnderTest):
-        super().test_generic_2290_ilshift_definition(a, b & 63)
-
-    def test_generic_2291_irshift_definition(self, a: ClassUnderTest, b: ClassUnderTest):
-        super().test_generic_2291_irshift_definition(a, b & 63)
+    # To avoid << and >> related test killing performance,
+    # restrict the test range on b or [0 .. 63]
 
     def test_generic_2390_lshift_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         super().test_generic_2390_lshift_definition(a, b & 63)
 
     def test_generic_2391_rshift_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         super().test_generic_2391_rshift_definition(a, b & 63)
+
+    def test_generic_2392_ilshift_definition(self, a: ClassUnderTest, b: ClassUnderTest):
+        super().test_generic_2392_ilshift_definition(a, b & 63)
+
+    def test_generic_2393_irshift_definition(self, a: ClassUnderTest, b: ClassUnderTest):
+        super().test_generic_2393_irshift_definition(a, b & 63)
 
     # TODO: tests for bit_length, to_bytes, from_bytes
 

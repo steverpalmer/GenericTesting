@@ -80,13 +80,13 @@ class FloorDivAugmentedAssignmentTests(GenericTests):
 
 class IntegralAugmentedAssignmentTests(ComplexAugmentedAssignmentTests):
 
-    def test_generic_2290_ilshift_definition(self, a: ClassUnderTest, b: ClassUnderTest):
+    def test_generic_2392_ilshift_definition(self, a: ClassUnderTest, b: ClassUnderTest):
         assume(self.zero <= b)
         a_expected = a << b
         a <<= b
         self.assertEqual(a, a_expected)
 
-    def test_generic_2291_irshift_definition(self, a: ClassUnderTest, b: ClassUnderTest):
+    def test_generic_2393_irshift_definition(self, a: ClassUnderTest, b: ClassUnderTest):
         assume(self.zero <= b)
         a_expected = a >> b
         a >>= b
