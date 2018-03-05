@@ -203,10 +203,11 @@ class AbsoluteValueTests(GenericTests):
     Discrete tests of __abs__
 
     It is assumed that these will be inherited along with
-    one of the above test, so don't bother redefining zero and one
+    one of the above test, so I don't bother redefining zero and one
 
     However, since abs may deliver a value of a different type,
     we need a zero value in the abs() type.
+    I define a default value "abs(zero)", but it can be overwritten in a derived class.
     """
 
     @property
