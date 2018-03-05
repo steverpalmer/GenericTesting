@@ -29,7 +29,7 @@ class Test_ModuloN_digit(ModuloNTests):
     one = ModuloN.digit(1)
 
 
-class ModuloPow2Tests(EqualityTests, FieldTests, LatticeWithComplement):
+class ModuloPow2Tests(ModuloNTests, LatticeWithComplement):
 
     @property
     def bottom(self):
@@ -39,11 +39,11 @@ class ModuloPow2Tests(EqualityTests, FieldTests, LatticeWithComplement):
     def top(self):
         return -self.one
  
-    unittest.skip("bottom is zero")
+    @unittest.skip("bottom is zero")
     def test_generic_2000_bottom_type(self):
         pass
  
-    unittest.skip("top is -one")
+    @unittest.skip("top is -one")
     def test_generic_2001_top_type(self):
         pass
 
@@ -74,5 +74,5 @@ if __name__ == '__main__':
     for name, value in locals().items():
         if name.startswith('Test_'):
             SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(value))
-    TR = unittest.TextTestRunner(verbosity=1)
+    TR = unittest.TextTestRunner(verbosity=2)
     TR.run(SUITE)
