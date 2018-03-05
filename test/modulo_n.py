@@ -2,10 +2,9 @@
 """
 Copyright 2018 Steve Palmer
 
-I simplistic ModuloN class to help test the generic_test library.
+A simplistic ModuloN class to help test the generic_test library.
 """
 
-from typing import Union, Callable
 import numbers
 import operator
 

@@ -8,6 +8,7 @@ A library of generic test for the base classes in the numbers library
 import abc
 import numbers
 import math
+import unittest
 
 from hypothesis import assume
 
@@ -37,17 +38,17 @@ class ComplexTests(_ComplexTests):
     def i(self) -> ClassUnderTest:
         pass
 
-    def test_generic_2000_zero_type(self):
+    def test_generic_2020_zero_type(self):
         self.assertIsInstance(self.zero, numbers.Complex)
 
-    def test_generic_2001_one_type(self):
+    def test_generic_2021_one_type(self):
         self.assertIsInstance(self.one, numbers.Complex)
 
-    def test_generic_2002_real_zero_type(self) -> None:
-        self.assertIsInstance(self.real_zero, numbers.Real)
-
-    def test_generic_2003_i_type(self) -> None:
+    def test_generic_2024_i_type(self) -> None:
         self.assertIsInstance(self.i, numbers.Complex)
+
+    def test_generic_2030_abs_zero_type(self) -> None:
+        self.assertIsInstance(self.abs_zero, numbers.Real)
 
     def test_generic_2300_i_times_i_is_minus_one(self) -> None:
         self.assertEqual(self.i * self.i, -self.one)
@@ -85,6 +86,14 @@ class _RealTests(_ComplexTests, TotalOrderingTests, FloorDivModTests, Exponentia
     derived classes.
     """
 
+    @property
+    def abs_zero(self):
+        return self.zero
+
+    @unittest.skip("abs_zero is zero")
+    def test_generic_2030_abs_zero_type(self) -> None:
+        pass
+
     def test_generic_2150_less_or_equal_orientation(self) -> None:
         self.assertTrue(self.zero <= self.one)
 
@@ -98,24 +107,23 @@ class _RealTests(_ComplexTests, TotalOrderingTests, FloorDivModTests, Exponentia
 class RealTests(_RealTests):
     """
     These are the property test specific to the base class numbers.Real.
-    """
 
-    @property
-    def real_zero(self):
-        return self.zero
+    Although not a strict requirement, I assume that abs() on a number.Real returns a numbers.Real,
+    as opposed to float() which should return the build-in float type.
+    """
 
     @property
     @abc.abstractmethod
     def root_two(self) -> ClassUnderTest:
         pass
 
-    def test_generic_2000_zero_type(self):
+    def test_generic_2020_zero_type(self):
         self.assertIsInstance(self.zero, numbers.Real)
 
-    def test_generic_2001_one_type(self):
+    def test_generic_2021_one_type(self):
         self.assertIsInstance(self.one, numbers.Real)
 
-    def test_generic_2004_root_two_type(self) -> None:
+    def test_generic_2023_root_two_type(self) -> None:
         self.assertIsInstance(self.root_two, numbers.Real)
 
     def test_generic_2332_root_two_times_root_two_is_two(self) -> None:
@@ -183,13 +191,13 @@ class RationalTests(_RationalTests):
     def half(self) -> ClassUnderTest:
         pass
 
-    def test_generic_2000_zero_type(self):
+    def test_generic_2020_zero_type(self):
         self.assertIsInstance(self.zero, numbers.Rational)
 
-    def test_generic_2001_one_type(self):
+    def test_generic_2021_one_type(self):
         self.assertIsInstance(self.one, numbers.Rational)
 
-    def test_generic_2005_half_type(self) -> None:
+    def test_generic_2022_half_type(self) -> None:
         self.assertIsInstance(self.half, numbers.Rational)
 
     def test_generic_2360_half_plus_half_is_one(self) -> None:
@@ -210,16 +218,6 @@ class RationalTests(_RationalTests):
 
 class IntegralTests(_RationalTests, LatticeWithComplement):
 
-    def test_generic_2000_zero_type(self):
-        self.assertIsInstance(self.zero, numbers.Integral)
-
-    def test_generic_2001_one_type(self):
-        self.assertIsInstance(self.one, numbers.Integral)
-
-    def test_generic_2380_int_function(self) -> None:
-        self.assertEqual(0, int(self.zero))
-        self.assertEqual(1, int(self.one))
-
     @property
     def bottom(self) -> ClassUnderTest:
         return self.zero
@@ -227,6 +225,24 @@ class IntegralTests(_RationalTests, LatticeWithComplement):
     @property
     def top(self) -> ClassUnderTest:
         return -self.one
+
+    @unittest.skip("bottom is zero")
+    def test_generic_2000_bottom_type(self):
+        pass
+
+    @unittest.skip("top is -one")
+    def test_generic_2001_top_type(self):
+        pass
+
+    def test_generic_2020_zero_type(self):
+        self.assertIsInstance(self.zero, numbers.Integral)
+
+    def test_generic_2021_one_type(self):
+        self.assertIsInstance(self.one, numbers.Integral)
+
+    def test_generic_2380_int_function(self) -> None:
+        self.assertEqual(0, int(self.zero))
+        self.assertEqual(1, int(self.one))
 
     def test_generic_2390_lshift_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         if 0 <= b <= 64:

@@ -6,6 +6,7 @@ A library of generic test for the base classes in the collections.abc library
 
 import abc
 import collections
+import unittest
 
 from hypothesis import assume, strategies as st
 
@@ -20,7 +21,7 @@ ValueT = 'ValueT'
 
 class IterableTests(GenericTests):
     """
-    These is the property test of Iterables.
+    The property test of collections.abc.Iterables.
     """
 
     def test_generic_2400_iter_returns_an_iterator(self, a: ClassUnderTest) -> None:
@@ -41,7 +42,9 @@ class IterableTests(GenericTests):
 
 class SizedTests(GenericTests):
     """
-    These is the property test of Sized.
+    The property test of collections.abc.Sized.
+
+    I assume that the len() function returns a value that can be compared to an int.
     """
 
     def test_generic_2410_len_returns_a_non_negative_int(self, a: ClassUnderTest) -> None:
@@ -55,19 +58,29 @@ class SizedTests(GenericTests):
 
 class ContainerTests(GenericTests):
     """
-    These is the property test of Container.
+    The property test of collections.abc.Container.
     """
 
     def test_generic_2420_contains_returns_a_boolean(self, a: ElementT, b: ClassUnderTest) -> None:
+        """
+        In fact, the standard does *not* say that the __contains__ method must return a bool.
+        It only says that it returns a true or false (not even True or False).
+        However, if this is property was not true, I think it would be a surprise, so it is included.
+        If this is not true for your contained, then simply skip this test.
+        """
         self.assertIsInstance(a in b, bool)
 
 
 class SizedOverIterableTests(SizedTests, IterableTests):
     """
-    :FIXME:
+    The property tests of an class that is both collections.abc.Sized and collections.abc.Iterable.
     """
 
     def test_generic_2411_len_iterations(self, a: ClassUnderTest) -> None:
+        """
+        In fact, this is *not* required, but it would be a surprise if it were not true.
+        If this is not true for your contained, then simply skip this test.
+        """
         a_len = len(a)
         iter_count = 0
         for _ in a:
@@ -79,10 +92,14 @@ class SizedOverIterableTests(SizedTests, IterableTests):
 
 class ContainerOverIterableTests(IterableTests, ContainerTests):
     """
-    :FIXME:
+    The property tests of an class that is both collections.abc.Iterable and collections.abc.Container.
     """
 
     def test_generic_2421_contains_over_iterable_definition(self, a: ElementT, b: ClassUnderTest) -> None:
+        """
+        See Language Reference Manual §3.3.6 "The membership test operators (in and not in) are normally
+        implemented as an iteration ..."
+        """
         contains = False
         for x in b:
             if x == a:
@@ -91,19 +108,9 @@ class ContainerOverIterableTests(IterableTests, ContainerTests):
         self.assertEqual(a in b, contains)
 
 
-# class HashableTests(GenericTests):
-#
-#     def test_generic_635_hash_returns_int(self, a: elementT) -> None:
-#         self.assertTrue(isinstance(hash(a), int))
-#
-#     def test_generic_636_equal_implies_equal_hash(self, a: elementT, b: elementT) -> None:
-#         # Implicity checks that a.__eq__(b) is defined
-#         self.assertImplies(a == b, hash(a) == hash(b))
-
-
-class SetTests(SizedOverIterableTests, ContainerOverIterableTests, EqualityTests, PartialOrderingTests, BoundedBelowLatticeTests):
+class SizedIterableContainerWithEmpty(SizedOverIterableTests, ContainerOverIterableTests):
     """
-    These is the property test of Container.
+    These test common properties of almost all containers.
     """
 
     @property
@@ -111,21 +118,9 @@ class SetTests(SizedOverIterableTests, ContainerOverIterableTests, EqualityTests
     def empty(self) -> ClassUnderTest:
         pass
 
-    @property
-    def bottom(self) -> ClassUnderTest:
-        return self.empty
-
-    def test_generic_2000_empty_type(self) -> None:
-        self.assertIsInstance(self.empty, collections.abc.Set)
-
-    def test_generic_2150_less_or_equal_orientation(self, a: ClassUnderTest) -> None:
-        self.assertLessEqual(self.empty, a)
-
-    def test_generic_2151_ordering_consistent_with_lattice(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        union = a | b
-        intersection = a & b
-        self.assertTrue(intersection <= a <= union)
-        self.assertTrue(intersection <= b <= union)
+    @abc.abstractmethod
+    def test_generic_2010_empty_type(self) -> None:
+        self.fail("Need to define a test that the helper empty has the correct type")
 
     def test_generic_2402_zero_iterations_over_empty(self) -> None:
         with self.assertRaises(StopIteration):
@@ -136,6 +131,29 @@ class SetTests(SizedOverIterableTests, ContainerOverIterableTests, EqualityTests
 
     def test_generic_2422_empty_contains_nothing(self, a: ElementT) -> None:
         self.assertFalse(a in self.empty)
+
+
+class SetTests(SizedIterableContainerWithEmpty, EqualityTests, PartialOrderingTests, BoundedBelowLatticeTests):
+    """
+    The property tests of collections.abc.Set.
+    """
+
+    @property
+    def bottom(self) -> ClassUnderTest:
+        return self.empty
+
+    @unittest.skip("bottom is empty")
+    def test_generic_2000_bottom_type(self) -> None:
+        pass
+
+    def test_generic_2150_less_or_equal_orientation(self, a: ClassUnderTest) -> None:
+        self.assertLessEqual(self.empty, a)
+
+    def test_generic_2151_ordering_consistent_with_lattice(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        union = a | b
+        intersection = a & b
+        self.assertTrue(intersection <= a <= union)
+        self.assertTrue(intersection <= b <= union)
 
     def test_generic_2430_disjoint_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         self.assertEqual(a.isdisjoint(b), a & b == self.empty)
@@ -150,47 +168,60 @@ class SetTests(SizedOverIterableTests, ContainerOverIterableTests, EqualityTests
 
 
 class MappingViewTests(SizedTests):
+    """
+    The property tests of collections.abc.MappingView.
+
+    :TODO: Maybe could try to test the dynamic nature of mapping views here.
+    """
     pass
 
 
 class KeysViewTests(MappingViewTests, SetTests):
-
-    def test_generic_2000_empty_type(self) -> None:
-        self.assertIsInstance(self.empty, collections.abc.KeysView)
+    """
+    The property tests of collections.abc.KeysView.
+    """
 
 
 class ItemsViewTests(MappingViewTests, SetTests):
-
-    def test_generic_2000_empty_type(self) -> None:
-        self.assertIsInstance(self.empty, collections.abc.ItemsView)
+    """
+    The property tests of collections.abc.ItemsView.
+    """
 
 
 class ValuesViewTests(MappingViewTests, ContainerOverIterableTests):
-    pass
+    """
+    The property tests of collections.abc.ValuesView.
+    """
+
 
 
 class MutableSetTests(SetTests):
+    """
+    The property tests of collections.abc.MutableSet.
+    """
+
 
     @abc.abstractmethod
     def copy(self, a: ClassUnderTest) -> ClassUnderTest:
-        pass
+        """
+        To test Mutable containers, it is useful to have a helper that takes a copy
+        of the container before it is mutated.
+        """
 
     @abc.abstractmethod
     def singleton_constructor(self, a: ElementT) -> ClassUnderTest:
-        pass
+        """
+        Since we have comprehensive test of set operations,
+        it is useful to have a helper to construct a set from a single value.
+        """
 
-    def test_generic_2000_empty_type(self) -> None:
-        self.assertIsInstance(self.empty, collections.abc.MutableSet)
-
-    def test_generic_2010_copy_helper_definition(self, a: ClassUnderTest) -> None:
+    def test_generic_2040_copy_helper_definition(self, a: ClassUnderTest) -> None:
         a_copy = self.copy(a)
-        self.assertIsInstance(a_copy, collections.abc.MutableSet)
         self.assertNotEqual(id(a), id(a_copy))
         self.assertEqual(a, a_copy)
 
-    def test_generic_2021_singleton_constructor_helper_definition(self, a: ElementT) -> None:
+    def test_generic_2041_singleton_constructor_helper_definition(self, a: ElementT) -> None:
         a_singleton = self.singleton_constructor(a)
-        self.assertIsInstance(a_singleton, collections.abc.MutableSet)
         self.assertTrue(a in a_singleton)
         self.assertEqual(len(a_singleton), 1)
 
@@ -207,35 +238,10 @@ class MutableSetTests(SetTests):
         self.assertEqual(a, a_copy - b_singleton)
 
 
-class MappingTests(SizedOverIterableTests, ContainerOverIterableTests, EqualityTests):
-
-    @property
-    @abc.abstractmethod
-    def empty(self) -> ClassUnderTest:
-        pass
-
-    @abc.abstractmethod
-    def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
-        pass
-
-    def test_generic_2000_empty_type(self) -> None:
-        self.assertIsInstance(self.empty, collections.abc.Mapping)
-
-    def test_generic_2021_singleton_constructor_helper_definition(self, a: ElementT, b: ValueT):
-        map_singleton = self.singleton_constructor(a, b)
-        self.assertIsInstance(map_singleton, collections.abc.Mapping)
-        self.assertEqual(map_singleton[a], b)
-        self.assertEqual(len(map_singleton), 1)
+class MappingTests(SizedIterableContainerWithEmpty, EqualityTests):
 
     def test_generic_2110_equality_definition(self, a: ClassUnderTest, b: ClassUnderTest):
         self.assertEqual(a == b, a.keys() == b.keys() and all(a[k] == b[k] for k in a))
-
-    def test_generic_2402_zero_iterations_over_empty(self) -> None:
-        with self.assertRaises(StopIteration):
-            next(iter(self.empty))
-
-    def test_generic_2412_len_empty_is_zero(self) -> None:
-        self.assertEqual(len(self.empty), 0)
 
     def test_generic_2480_getitem_on_empty_either_succeeds_or_raises_KeyError(self, a: ElementT) -> None:
         try:
@@ -272,13 +278,28 @@ class MutableMappingTests(MappingTests):
 
     @abc.abstractmethod
     def copy(self, a: ClassUnderTest) -> ClassUnderTest:
-        pass
+        """
+        To test Mutable containers, it is useful to have a helper that takes a copy
+        of the container before it is mutated.
+        """
 
-    def test_generic_2010_copy_helper_definition(self, a: ClassUnderTest) -> None:
+#     @abc.abstractmethod
+#     def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
+#         """
+#         Since we have comprehensive test of Mapping operations,
+#         it is useful to have a helper to construct a dict from a single value pair.
+#         """
+
+    def test_generic_2040_copy_helper_definition(self, a: ClassUnderTest) -> None:
         a_copy = self.copy(a)
-        self.assertIsInstance(a_copy, collections.abc.MutableMapping)
         self.assertNotEqual(id(a), id(a_copy))
         self.assertEqual(a, a_copy)
+
+#     def test_generic_2041_singleton_constructor_helper_definition(self, a: ElementT, b: ValueT):
+#         map_singleton = self.singleton_constructor(a, b)
+#         self.assertIsInstance(map_singleton, collections.abc.Mapping)
+#         self.assertEqual(map_singleton[a], b)
+#         self.assertEqual(len(map_singleton), 1)
 
     def test_generic_2500_setitem_definition(self, a: ClassUnderTest, b: ElementT, c: ValueT) -> None:
         a_copy = self.copy(a)
@@ -343,6 +364,6 @@ class MutableMappingTests(MappingTests):
 
 __all__ = ('ElementT', 'ValueT',
            'IterableTests', 'SizedTests', 'ContainerTests',
-           'SizedOverIterableTests', 'ContainerOverIterableTests',
+           'SizedOverIterableTests', 'ContainerOverIterableTests', 'SizedIterableContainerWithEmpty',
            'SetTests', 'MappingViewTests', 'KeysViewTests', 'ItemsViewTests', 'ValuesViewTests', 'MutableSetTests',
            'MappingTests', 'MutableMappingTests')

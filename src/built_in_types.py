@@ -80,6 +80,9 @@ class frozensetTests(SetTests):
 
     empty = frozenset()
 
+    def test_generic_2010_empty_type(self) -> None:
+        self.assertIsInstance(self.empty, frozenset)
+
     def test_generic_2600_issubset_defintion(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         self.assertEqual(a.issubset(b), a <= b)
 
@@ -108,6 +111,9 @@ class setTests(MutableSetTests, frozensetTests):
 
     def singleton_constructor(self, a: ElementT) -> ClassUnderTest:
         return set([a])
+
+    def test_generic_2010_empty_type(self) -> None:
+        self.assertIsInstance(self.empty, set)
 
     def test_generic_2010_copy_helper_definition(self, a: ClassUnderTest) -> None:
         b = a.copy()
@@ -176,10 +182,16 @@ class dictKeysViewTests(KeysViewTests):
 
     empty = dict().keys()
 
+    def test_generic_2010_empty_type(self) -> None:
+        pass
+
 
 class dictItemsViewTests(ItemsViewTests):
 
     empty = dict().items()
+
+    def test_generic_2010_empty_type(self) -> None:
+        pass
 
 
 class dictValuesViewTests(ValuesViewTests):
@@ -193,6 +205,9 @@ class MappingProxyTypeTests(MappingTests):
     def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
         return types.MappingProxyType({a: b})
 
+    def test_generic_2010_empty_type(self) -> None:
+        self.assertIsInstance(self.empty, types.MappingProxyType)
+
 
 class dictTests(MutableMappingTests):
 
@@ -204,6 +219,9 @@ class dictTests(MutableMappingTests):
     def copy(self, a: ClassUnderTest) -> ClassUnderTest:
         return a.copy()
 
+    def test_generic_2010_empty_type(self) -> None:
+        self.assertIsInstance(self.empty, dict)
+
 
 class CounterTests(dictTests):
 
@@ -211,6 +229,9 @@ class CounterTests(dictTests):
 
     def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
         return collections.Counter({a: b})
+
+    def test_generic_2010_empty_type(self) -> None:
+        self.assertIsInstance(self.empty, collections.Counter)
 
     def test_generic_2505_update_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         a_copy = self.copy(a)
@@ -229,6 +250,9 @@ class OrderedDictTests(dictTests):
     def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
         return collections.OrderedDict([(a, b)])
 
+    def test_generic_2010_empty_type(self) -> None:
+        self.assertIsInstance(self.empty, collections.OrderedDict)
+
     # TODO: add tests for OrderedDict specific features and methods
 
 
@@ -244,6 +268,9 @@ class defaultdictTests(dictTests):
 
     def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
         return collections.defaultdict(self._default_factory, [(a, b)])
+
+    def test_generic_2010_empty_type(self) -> None:
+        self.assertIsInstance(self.empty, collections.defaultdict)
 
 
 __all__ = ('intTests', 'FractionTests', 'floatTests', 'complexTests',

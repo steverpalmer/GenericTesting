@@ -14,16 +14,22 @@ from hypothesis import assume
 from .core import GenericTests, ClassUnderTest
 
 
-class AdditiveMonoidTests(GenericTests):
+class AdditionMonoidTests(GenericTests):
     """
-    Tests of the simplest semantics of the __add__ operator;
+    Tests of the simplest (Monoid) semantics of the __add__ operator;
     essentially a list concatenation
+
+    See https://en.wikipedia.org/wiki/Monoid
     """
 
     @property
     @abc.abstractmethod
     def zero(self) -> ClassUnderTest:
         pass
+
+    @abc.abstractmethod
+    def test_generic_2020_zero_type(self) -> None:
+        self.fail("Need to define a test that the helper zero has the correct type")
 
     def test_generic_2220_addition_associativity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
         self.assertEqual(a + (b + c), (a + b) + c)
@@ -33,12 +39,35 @@ class AdditiveMonoidTests(GenericTests):
         self.assertEqual(self.zero + a, a)
 
 
-class RingTests(AdditiveMonoidTests):
+class AdditionGroupTests(AdditionMonoidTests):
     """
-    Extends AdditiveMonoid by:
-    * adding operators __neg__ and __mul__
-    * adding operators __sub__ and __pos__
-    * extending the sematics to a Ring.
+    Tests of the Group semantics of the __add__ operator
+
+    See https://en.wikipedia.org/wiki/Group_(mathematics)
+    """
+
+    def test_generic_2230_addition_inverse(self, a: ClassUnderTest) -> None:
+        self.assertEqual(a + (-a), self.zero)
+
+
+class AdditionAbelianGroupTests(AdditionGroupTests):
+    """
+    See https://en.wikipedia.org/wiki/Abelian_group
+    """
+
+    def test_generic_2231_addition_commutativity(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        self.assertEqual(a + b, b + a)
+
+
+AdditionCommutativeGroupTests = AdditionAbelianGroupTests
+
+
+class MultiplicationMonoidTests(GenericTests):
+    """
+    Tests of the simplest semantics of the __mul__ operator;
+    essentially a list concatenation
+
+    See https://en.wikipedia.org/wiki/Monoid
     """
 
     @property
@@ -46,17 +75,9 @@ class RingTests(AdditiveMonoidTests):
     def one(self) -> ClassUnderTest:
         pass
 
-    def test_generic_2230_addition_inverse(self, a: ClassUnderTest) -> None:
-        self.assertEqual(a + (-a), self.zero)
-
-    def test_generic_2231_addition_commutativity(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        self.assertEqual(a + b, b + a)
-
-    def test_generic_2232_pos_definition(self, a: ClassUnderTest) -> None:
-        self.assertEqual(+a, a)
-
-    def test_generic_2233_sub_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        self.assertEqual(a - b, a + (-b))
+    @abc.abstractmethod
+    def test_generic_2021_one_type(self) -> None:
+        self.fail("Need to define a test that the helper one has the correct type")
 
     def test_generic_2234_multiplication_associativity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
         self.assertEqual(a * (b * c), (a * b) * c)
@@ -64,6 +85,21 @@ class RingTests(AdditiveMonoidTests):
     def test_generic_2235_multiplicative_identity(self, a: ClassUnderTest) -> None:
         self.assertEqual(a * self.one, a)
         self.assertEqual(self.one * a, a)
+
+
+class RingTests(AdditionAbelianGroupTests, MultiplicationMonoidTests):
+    """
+    See https://en.wikipedia.org/wiki/Ring_(mathematics)
+    """
+
+    def test_generic_2105_not_zero_equal_one(self) -> None:
+        self.assertFalse(self.zero == self.one)
+
+    def test_generic_2232_pos_definition(self, a: ClassUnderTest) -> None:
+        self.assertEqual(+a, a)
+
+    def test_generic_2233_sub_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        self.assertEqual(a - b, a + (-b))
 
     def test_generic_2237_multiplication_addition_left_distributivity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
         self.assertEqual(a * (b + c), (a * b) + (a * c))
@@ -74,7 +110,7 @@ class RingTests(AdditiveMonoidTests):
 
 class CommutativeRingTests(RingTests):
     """
-    Extends Ring to a Commutative Ring.
+    See https://en.wikipedia.org/wiki/Commutative_ring
     """
 
     def test_generic_2236_multiplication_commutativity(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
@@ -83,7 +119,7 @@ class CommutativeRingTests(RingTests):
 
 class FieldTests(CommutativeRingTests):
     """
-    Extends Commutative Ring to a Field.
+    See https://en.wikipedia.org/wiki/Field_(mathematics)
     """
 
     def test_generic_2239_truediv_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
@@ -97,18 +133,21 @@ class FloorDivModTests(GenericTests):
     Discrete tests for __floordiv__, __mod__ and __divmod__
 
     It is assumed that these will be inherited along with
-    one of the above test, so don't bother redefining zero and one
+    one of the above test, so don't bother redefining zero and one.
+
+    I quietly assume that the result type of __floordiv__ can be used in mixed arithmetic
+    with the ClassUnderTest.
     """
 
     def test_generic_2240_mod_range(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         assume(not b == self.zero)
-        rem = a % b
+        mod = a % b
         if b <= self.zero:
-            self.assertGreaterEqual(self.zero, rem)
-            self.assertGreater(rem, b)
+            self.assertGreaterEqual(self.zero, mod)
+            self.assertGreater(mod, b)
         else:
-            self.assertLessEqual(self.zero, rem)
-            self.assertLess(rem, b)
+            self.assertLessEqual(self.zero, mod)
+            self.assertLess(mod, b)
 
     def test_generic_2241_floordiv_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         assume(not b == self.zero)
@@ -166,23 +205,22 @@ class AbsoluteValueTests(GenericTests):
     It is assumed that these will be inherited along with
     one of the above test, so don't bother redefining zero and one
 
-    However, since abs delivers a value of a different type,
-    we need a real value for zero.
+    However, since abs may deliver a value of a different type,
+    we need a zero value in the abs() type.
     """
 
     @property
-    @abc.abstractmethod
-    def real_zero(self) -> ClassUnderTest:
-        pass
+    def abs_zero(self) -> ClassUnderTest:
+        return abs(self.zero)
+
+    def test_generic_2030_abs_zero_type(self) -> None:
+        self.assertIsInstance(self.abs_zero, type(abs(self.zero)))
 
     def test_generic_2270_abs_not_negative(self, a: ClassUnderTest) -> None:
-        self.assertTrue(self.real_zero <= abs(a))
+        self.assertTrue(self.abs_zero <= abs(a))
 
     def test_generic_2271_abs_positve_definite(self, a: ClassUnderTest) -> None:
-        self.assertEqual(abs(a) == self.real_zero, a == self.zero)
-
-    def test_generic_2272_abs_one_is_one(self) -> None:
-        self.assertEqual(abs(self.one), self.one)
+        self.assertEqual(abs(a) == self.abs_zero, a == self.zero)
 
     def test_generic_2273_abs_is_multiplicitive(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         self.assertEqual(abs(a * b), abs(a) * abs(b))
@@ -191,5 +229,6 @@ class AbsoluteValueTests(GenericTests):
         self.assertLessEqual(abs(a + b), abs(a) + abs(b))
 
 
-__all__ = ('AdditiveMonoidTests', 'RingTests', 'CommutativeRingTests', 'FieldTests', 'FieldTests',
+__all__ = ('AdditionMonoidTests', 'AdditionGroupTests', 'AdditionAbelianGroupTests', 'AdditionCommutativeGroupTests',
+           'MultiplicationMonoidTests', 'RingTests', 'CommutativeRingTests', 'FieldTests',
            'FloorDivModTests', 'ExponentiationTests', 'AbsoluteValueTests')

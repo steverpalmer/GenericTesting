@@ -14,32 +14,26 @@ from src import *
 from modulo_n import ModuloN
 
 
-@Given(st.builds(ModuloN.bit, st.integers()))
-class Test_ModuloN_bit(EqualityTests, FieldTests, LatticeWithComplement):
-    zero = ModuloN.bit(0)
-    one = ModuloN.bit(1)
-    real_zero = float(zero)
-
-    bottom = zero
-    top = one
+# @Given(st.builds(ModuloN.bit, st.integers()))
+# class Test_ModuloN_bit(EqualityTests, FieldTests, LatticeWithComplement):
+#     zero = ModuloN.bit(0)
+#     one = ModuloN.bit(1)
+#     bottom = zero
+#     top = one
 
 
-@Given(st.builds(ModuloN.byte, st.integers()))
-class Test_ModuloN_byte(EqualityTests, FieldTests, LatticeWithComplement):
-    zero = ModuloN.byte(0)
-    one = ModuloN.byte(1)
-    real_zero = float(zero)
-
-    bottom = zero
-    top = ModuloN.byte(-1)
+# @Given(st.builds(ModuloN.byte, st.integers()))
+# class Test_ModuloN_byte(EqualityTests, FieldTests, LatticeWithComplement):
+#     zero = ModuloN.byte(0)
+#     one = ModuloN.byte(1)
+#     bottom = zero
+#     top = ModuloN.byte(-1)
 
 
 @Given(st.builds(ModuloN.word, st.integers()))
-class Test_ModuloN_word(EqualityTests, FieldTests, LatticeWithComplement):
+class Test_ModuloN_word(EqualityTests, FieldTests, FloorDivModTests, LatticeWithComplement):
     zero = ModuloN.word(0)
     one = ModuloN.word(1)
-    real_zero = float(zero)
-
     bottom = zero
     top = ModuloN.word(-1)
 
