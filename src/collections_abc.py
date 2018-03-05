@@ -59,28 +59,26 @@ class SizedTests(GenericTests):
 class ContainerTests(GenericTests):
     """
     The property test of collections.abc.Container.
+
+    In fact, the standard does *not* say that the __contains__ method must return a bool.
+    It only says that it returns a true or false (not even True or False).
+    However, if this is property was not true, I think it would be a surprise, so it is included.
+    If this is not true for your contained, then simply skip this test.
     """
 
     def test_generic_2420_contains_returns_a_boolean(self, a: ElementT, b: ClassUnderTest) -> None:
-        """
-        In fact, the standard does *not* say that the __contains__ method must return a bool.
-        It only says that it returns a true or false (not even True or False).
-        However, if this is property was not true, I think it would be a surprise, so it is included.
-        If this is not true for your contained, then simply skip this test.
-        """
         self.assertIsInstance(a in b, bool)
 
 
 class SizedOverIterableTests(SizedTests, IterableTests):
     """
     The property tests of an class that is both collections.abc.Sized and collections.abc.Iterable.
+
+    In fact, this is *not* required, but it would be a surprise if it were not true.
+    If this is not true for your contained, then simply skip this test.
     """
 
     def test_generic_2411_len_iterations(self, a: ClassUnderTest) -> None:
-        """
-        In fact, this is *not* required, but it would be a surprise if it were not true.
-        If this is not true for your contained, then simply skip this test.
-        """
         a_len = len(a)
         iter_count = 0
         for _ in a:
@@ -93,13 +91,12 @@ class SizedOverIterableTests(SizedTests, IterableTests):
 class ContainerOverIterableTests(IterableTests, ContainerTests):
     """
     The property tests of an class that is both collections.abc.Iterable and collections.abc.Container.
+
+    See Language Reference Manual §3.3.6 "The membership test operators (in and not in) are normally
+    implemented as an iteration ..."
     """
 
     def test_generic_2421_contains_over_iterable_definition(self, a: ElementT, b: ClassUnderTest) -> None:
-        """
-        See Language Reference Manual §3.3.6 "The membership test operators (in and not in) are normally
-        implemented as an iteration ..."
-        """
         contains = False
         for x in b:
             if x == a:
@@ -283,23 +280,10 @@ class MutableMappingTests(MappingTests):
         of the container before it is mutated.
         """
 
-#     @abc.abstractmethod
-#     def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
-#         """
-#         Since we have comprehensive test of Mapping operations,
-#         it is useful to have a helper to construct a dict from a single value pair.
-#         """
-
     def test_generic_2040_copy_helper_definition(self, a: ClassUnderTest) -> None:
         a_copy = self.copy(a)
         self.assertNotEqual(id(a), id(a_copy))
         self.assertEqual(a, a_copy)
-
-#     def test_generic_2041_singleton_constructor_helper_definition(self, a: ElementT, b: ValueT):
-#         map_singleton = self.singleton_constructor(a, b)
-#         self.assertIsInstance(map_singleton, collections.abc.Mapping)
-#         self.assertEqual(map_singleton[a], b)
-#         self.assertEqual(len(map_singleton), 1)
 
     def test_generic_2500_setitem_definition(self, a: ClassUnderTest, b: ElementT, c: ValueT) -> None:
         a_copy = self.copy(a)
