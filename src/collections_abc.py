@@ -13,6 +13,7 @@ from hypothesis import assume, strategies as st
 from .core import GenericTests, ClassUnderTest
 from .relations import EqualityTests, PartialOrderingTests
 from .lattices import BoundedBelowLatticeTests
+from .augmented_assignment import LatticeWithComplementAugmentedTests
 
 
 ElementT = 'ElementT'
@@ -192,7 +193,7 @@ class ValuesViewTests(MappingViewTests, ContainerOverIterableTests):
 
 
 
-class MutableSetTests(SetTests):
+class MutableSetTests(SetTests, LatticeWithComplementAugmentedTests):
     """
     The property tests of collections.abc.MutableSet.
     """
