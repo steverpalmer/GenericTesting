@@ -52,7 +52,7 @@ class SizedTests(GenericTests):
         self.assertIsInstance(a_len, int)
         self.assertGreaterEqual(a_len, 0)
 
-    def test_generic_2419_bool_convention(self, a: ClassUnderTest) -> None:
+    def test_generic_2800_bool_convention(self, a: ClassUnderTest) -> None:
         self.assertEqual(len(a) != 0, bool(a))
 
 
@@ -143,14 +143,14 @@ class SetTests(SizedIterableContainerWithEmpty, EqualityTests, PartialOrderingTe
     def test_generic_2000_bottom_type(self) -> None:
         pass
 
-    def test_generic_2150_less_or_equal_orientation(self, a: ClassUnderTest) -> None:
-        self.assertLessEqual(self.empty, a)
-
     def test_generic_2151_ordering_consistent_with_lattice(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         union = a | b
         intersection = a & b
         self.assertTrue(intersection <= a <= union)
         self.assertTrue(intersection <= b <= union)
+
+    def test_generic_2152_less_or_equal_orientation(self, a: ClassUnderTest) -> None:
+        self.assertLessEqual(self.empty, a)
 
     def test_generic_2430_disjoint_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         self.assertEqual(a.isdisjoint(b), a & b == self.empty)

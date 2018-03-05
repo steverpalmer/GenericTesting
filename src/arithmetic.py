@@ -34,7 +34,7 @@ class AdditionMonoidTests(GenericTests):
     def test_generic_2220_addition_associativity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
         self.assertEqual(a + (b + c), (a + b) + c)
 
-    def test_generic_2221_additive_identity(self, a: ClassUnderTest) -> None:
+    def test_generic_2221_addition_identity(self, a: ClassUnderTest) -> None:
         self.assertEqual(a + self.zero, a)
         self.assertEqual(self.zero + a, a)
 
@@ -82,7 +82,7 @@ class MultiplicationMonoidTests(GenericTests):
     def test_generic_2234_multiplication_associativity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
         self.assertEqual(a * (b * c), (a * b) * c)
 
-    def test_generic_2235_multiplicative_identity(self, a: ClassUnderTest) -> None:
+    def test_generic_2235_multiplication_identity(self, a: ClassUnderTest) -> None:
         self.assertEqual(a * self.one, a)
         self.assertEqual(self.one * a, a)
 

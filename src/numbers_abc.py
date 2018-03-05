@@ -23,7 +23,7 @@ class _ComplexTests(EqualityTests, FieldTests, AbsoluteValueTests):
     The property tests of numbers.Complex that are shared with derived classes.
     """
 
-    def test_generic_2105_bool_definition(self, a: ClassUnderTest) -> None:
+    def test_generic_2800_bool_convention(self, a: ClassUnderTest) -> None:
         self.assertEqual(bool(a), not a == self.zero)
 
 
@@ -89,13 +89,13 @@ class _RealTests(_ComplexTests, TotalOrderingTests, FloorDivModTests, Exponentia
     def test_generic_2030_abs_zero_type(self) -> None:
         pass
 
-    def test_generic_2150_less_or_equal_orientation(self) -> None:
+    def test_generic_2152_less_or_equal_orientation(self) -> None:
         self.assertTrue(self.zero <= self.one)
 
-    def test_generic_2330_less_or_equal_consistent_with_addition(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
+    def test_generic_2353_less_or_equal_consistent_with_addition(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
         self.assertEqual(a <= b, a + c <= b + c)
 
-    def test_generic_2331_less_or_equal_consistent_with_multiplication(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2354_less_or_equal_consistent_with_multiplication(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         self.assertImplies(self.zero <= a and self.zero <= b, self.zero <= a * b)
 
 
@@ -119,10 +119,10 @@ class RealTests(_RealTests):
     def test_generic_2023_root_two_type(self) -> None:
         self.fail("Need to define a test that the helper root_two has the correct type")
 
-    def test_generic_2332_root_two_times_root_two_is_two(self) -> None:
+    def test_generic_2330_root_two_times_root_two_is_two(self) -> None:
         self.assertEqual(self.root_two * self.root_two, self.one + self.one)
 
-    def test_generic_2333_float_function(self) -> None:
+    def test_generic_2331_float_function(self) -> None:
         self.assertEqual(0.0, float(self.zero))
         self.assertEqual(1.0, float(self.one))
         self.assertEqual(1.414213562, float(self.root_two))
@@ -237,4 +237,5 @@ class IntegralTests(_RationalTests, LatticeWithComplement):
             self.assertEqual(a >> b, a // pow(2, b))
 
 
-__all__ = ('ComplexTests', 'RealTests', 'RationalTests', 'IntegralTests')
+__all__ = ('ComplexTests', 'RealTests', 'RationalTests', 'IntegralTests',
+           '_ComplexTests', '_RealTests', '_RationalTests')

@@ -145,48 +145,7 @@ class setTests(MutableSetTests, frozensetTests):
     def test_generic_2010_empty_type(self) -> None:
         self.assertIsInstance(self.empty, set)
 
-    def test_generic_2610_update_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        a_copy = a.copy()
-        a_nother = a.copy()
-        a |= b
-        self.assertEqual(a, a_copy | b)
-        a_nother.update(b)
-        self.assertEqual(a, a_nother)
-
-    def test_generic_2611_intersection_update_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        a_copy = a.copy()
-        a_nother = a.copy()
-        a &= b
-        self.assertEqual(a, a_copy & b)
-        a_nother.intersection_update(b)
-        self.assertEqual(a, a_nother)
-
-    def test_generic_2612_difference_update_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        a_copy = a.copy()
-        a_nother = a.copy()
-        a -= b
-        self.assertEqual(a, a_copy - b)
-        a_nother.difference_update(b)
-        self.assertEqual(a, a_nother)
-
-    def test_generic_2613_symmetric_difference_update_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        a_copy = a.copy()
-        a_nother = a.copy()
-        a ^= b
-        self.assertEqual(a, a_copy ^ b)
-        a_nother.symmetric_difference_update(b)
-        self.assertEqual(a, a_nother)
-
-    def test_generic_2614_remove_definition(self, a: ClassUnderTest, b: ElementT) -> None:
-        a.add(b)
-        a_copy = a.copy()
-        a.remove(b)
-        a_copy.discard(b)
-        self.assertEqual(a, a_copy)
-        with self.assertRaises(KeyError):
-            a.remove(b)
-
-    def test_generic_2615_pop_definition(self, a: ClassUnderTest) -> None:
+    def test_generic_2502_pop_definition(self, a: ClassUnderTest) -> None:
         if a:
             a_copy = a.copy()
             b = a.pop()
@@ -198,9 +157,50 @@ class setTests(MutableSetTests, frozensetTests):
             with self.assertRaises(KeyError):
                 a.pop()
 
-    def test_generic_2616_clear_definition(self, a: ClassUnderTest) -> None:
+    def test_generic_2504_clear_definition(self, a: ClassUnderTest) -> None:
         a.clear()
         self.assertEqual(a, self.empty)
+
+    def test_generic_2505_update_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        a_copy = a.copy()
+        a_nother = a.copy()
+        a |= b
+        self.assertEqual(a, a_copy | b)
+        a_nother.update(b)
+        self.assertEqual(a, a_nother)
+
+    def test_generic_2610_intersection_update_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        a_copy = a.copy()
+        a_nother = a.copy()
+        a &= b
+        self.assertEqual(a, a_copy & b)
+        a_nother.intersection_update(b)
+        self.assertEqual(a, a_nother)
+
+    def test_generic_2611_difference_update_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        a_copy = a.copy()
+        a_nother = a.copy()
+        a -= b
+        self.assertEqual(a, a_copy - b)
+        a_nother.difference_update(b)
+        self.assertEqual(a, a_nother)
+
+    def test_generic_2612_symmetric_difference_update_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        a_copy = a.copy()
+        a_nother = a.copy()
+        a ^= b
+        self.assertEqual(a, a_copy ^ b)
+        a_nother.symmetric_difference_update(b)
+        self.assertEqual(a, a_nother)
+
+    def test_generic_2613_remove_definition(self, a: ClassUnderTest, b: ElementT) -> None:
+        a.add(b)
+        a_copy = a.copy()
+        a.remove(b)
+        a_copy.discard(b)
+        self.assertEqual(a, a_copy)
+        with self.assertRaises(KeyError):
+            a.remove(b)
 
 
 class dictKeysViewTests(KeysViewTests):
