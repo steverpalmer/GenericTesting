@@ -8,6 +8,8 @@ A library of generic test for the augmented assignment operators...
 
 import abc
 
+from hypothesis import assume
+
 from .core import GenericTests, ClassUnderTest
 
 
@@ -55,6 +57,7 @@ class ComplexAugmentedAssignmentTests(GenericTests):
         self.assertEqual(a, a_expected)
 
     def test_generic_2286_itruediv_definition(self, a: ClassUnderTest, b: ClassUnderTest):
+        assume(not b == self.zero)
         a_expected = a / b
         a /= b
         self.assertEqual(a, a_expected)
@@ -63,37 +66,33 @@ class ComplexAugmentedAssignmentTests(GenericTests):
 class FloorDivAugmentedAssignmentTests(GenericTests):
 
     def test_generic_2287_ifloordiv_definition(self, a: ClassUnderTest, b: ClassUnderTest):
+        assume(not b == self.zero)
         a_expected = a // b
         a //= b
         self.assertEqual(a, a_expected)
 
     def test_generic_2288_imod_definition(self, a: ClassUnderTest, b: ClassUnderTest):
+        assume(not b == self.zero)
         a_expected = a % b
-        a &= b
-        self.assertEqual(a, a_expected)
-
-
-class ExponentiationAugmentedAssignmentTests(GenericTests):
-
-    def test_generic_2289_ipow_definition(self, a: ClassUnderTest, b: ClassUnderTest):
-        a_expected = a ** b
-        a **= b
+        a %= b
         self.assertEqual(a, a_expected)
 
 
 class IntegralAugmentedAssignmentTests(ComplexAugmentedAssignmentTests):
 
     def test_generic_2290_ilshift_definition(self, a: ClassUnderTest, b: ClassUnderTest):
+        assume(self.zero <= b)
         a_expected = a << b
         a <<= b
         self.assertEqual(a, a_expected)
 
     def test_generic_2291_irshift_definition(self, a: ClassUnderTest, b: ClassUnderTest):
+        assume(self.zero <= b)
         a_expected = a >> b
         a >>= b
         self.assertEqual(a, a_expected)
 
 
 __all__ = ('LatticeAugmentedAssignmentTests', 'LatticeWithComplementAugmentedTests',
-           'ComplexAugmentedAssignmentTests', 'FloorDivAugmentedAssignmentTests', 'ExponentiationAugmentedAssignmentTests',
+           'ComplexAugmentedAssignmentTests', 'FloorDivAugmentedAssignmentTests',
            'IntegralAugmentedAssignmentTests')

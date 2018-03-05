@@ -229,12 +229,12 @@ class IntegralTests(_RationalTests, LatticeWithComplement):
         self.assertEqual(1, int(self.one))
 
     def test_generic_2390_lshift_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        if 0 <= b <= 64:
-            self.assertEqual(a << b, a * pow(2, b))
+        assume(self.zero <= b)
+        self.assertEqual(a << b, a * pow(2, b))
 
     def test_generic_2391_rshift_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        if 0 <= b <= 64:
-            self.assertEqual(a >> b, a // pow(2, b))
+        assume(self.zero <= b)
+        self.assertEqual(a >> b, a // pow(2, b))
 
 
 __all__ = ('ComplexTests', 'RealTests', 'RationalTests', 'IntegralTests',

@@ -16,9 +16,11 @@ from .core import ClassUnderTest
 from .numbers_abc import IntegralTests, RationalTests, RealTests, ComplexTests
 from .collections_abc import (ElementT, ValueT, SetTests, KeysViewTests, ItemsViewTests, ValuesViewTests,
                               MutableSetTests, MappingTests, MutableMappingTests)
+from .augmented_assignment import (ComplexAugmentedAssignmentTests, FloorDivAugmentedAssignmentTests,
+                                   IntegralAugmentedAssignmentTests, LatticeWithComplementAugmentedTests) 
 
 
-class intTests(IntegralTests):
+class intTests(IntegralTests, IntegralAugmentedAssignmentTests, FloorDivAugmentedAssignmentTests, LatticeWithComplementAugmentedTests):
     zero = 0
     one = 1
 
@@ -28,10 +30,22 @@ class intTests(IntegralTests):
     def test_generic_2021_one_type(self):
         self.assertIsInstance(self.one, int)
 
+    def test_generic_2290_ilshift_definition(self, a: ClassUnderTest, b: ClassUnderTest):
+        super().test_generic_2290_ilshift_definition(a, b & 63)
+
+    def test_generic_2291_irshift_definition(self, a: ClassUnderTest, b: ClassUnderTest):
+        super().test_generic_2291_irshift_definition(a, b & 63)
+
+    def test_generic_2390_lshift_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        super().test_generic_2390_lshift_definition(a, b & 63)
+
+    def test_generic_2391_rshift_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        super().test_generic_2391_rshift_definition(a, b & 63)
+
     # TODO: tests for bit_length, to_bytes, from_bytes
 
 
-class FractionTests(RationalTests):
+class FractionTests(RationalTests, ComplexAugmentedAssignmentTests, FloorDivAugmentedAssignmentTests):
     zero = fractions.Fraction(0)
     one = fractions.Fraction(1)
     half = fractions.Fraction(1, 2)
@@ -46,7 +60,7 @@ class FractionTests(RationalTests):
         self.assertIsInstance(self.half, fractions.Fraction)
 
 
-class floatTests(RealTests):
+class floatTests(RealTests, ComplexAugmentedAssignmentTests, FloorDivAugmentedAssignmentTests):
     zero = 0.0
     one = 1.0
     root_two = 2.0 ** 0.5
@@ -76,7 +90,7 @@ class floatTests(RealTests):
     # TODO: tests for as_integer_ratio, is_integer, hex, fromhex
 
 
-class complexTests(ComplexTests):
+class complexTests(ComplexTests, ComplexAugmentedAssignmentTests):
     zero = complex(0)
     one = complex(1)
     i = complex(0, 1)
