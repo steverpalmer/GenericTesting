@@ -23,6 +23,9 @@ class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):
         if methodName is None:
             methodName = 'runTest'
         super().__init__(methodName)
+
+        # some types are based on floating point approximations,
+        # so equality on these types need to be IsClose.
         self.isclose = IsClose()
         self.addTypeEqualityFunc(float, self.assertIsClose)
         self.addTypeEqualityFunc(complex, self.assertIsClose)
