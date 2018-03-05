@@ -20,8 +20,7 @@ from .arithmetic import FieldTests, AbsoluteValueTests, FloorDivModTests, Expone
 
 class _ComplexTests(EqualityTests, FieldTests, AbsoluteValueTests):
     """
-    These is the property test of Complex numbers that are shared with
-    derived classes.
+    The property tests of numbers.Complex that are shared with derived classes.
     """
 
     def test_generic_2105_bool_definition(self, a: ClassUnderTest) -> None:
@@ -30,25 +29,22 @@ class _ComplexTests(EqualityTests, FieldTests, AbsoluteValueTests):
 
 class ComplexTests(_ComplexTests):
     """
-    These are the property test specific to the base class numbers.Complex.
+    The property tests specific to the base class numbers.Complex.
+
+    I assume that the type of z.imag is the same as abs(z).
     """
 
     @property
     @abc.abstractmethod
     def i(self) -> ClassUnderTest:
-        pass
+        """
+        A defining characteristic of Complex numbers is that there should be a
+        number "i" representing the square root of -1.
+        """
 
-    def test_generic_2020_zero_type(self):
-        self.assertIsInstance(self.zero, numbers.Complex)
-
-    def test_generic_2021_one_type(self):
-        self.assertIsInstance(self.one, numbers.Complex)
-
+    @abc.abstractmethod
     def test_generic_2024_i_type(self) -> None:
-        self.assertIsInstance(self.i, numbers.Complex)
-
-    def test_generic_2030_abs_zero_type(self) -> None:
-        self.assertIsInstance(self.abs_zero, numbers.Real)
+        self.fail("Need to define a test that the helper i has the correct type")
 
     def test_generic_2300_i_times_i_is_minus_one(self) -> None:
         self.assertEqual(self.i * self.i, -self.one)
@@ -74,7 +70,7 @@ class ComplexTests(_ComplexTests):
         self.assertEqual(a.conjugate().imag, -a.imag)
 
     def test_generic_2315_imag_is_zero_iff_conjugate_equals_self(self, a: ClassUnderTest) -> None:
-        self.assertEqual(a == a.conjugate(), a.imag == self.real_zero)
+        self.assertEqual(a == a.conjugate(), a.imag == self.abs_zero)
 
     def test_generic_2316_absolute_value_real_and_imag_values(self, a: ClassUnderTest) -> None:
         self.assertEqual(abs(a) * abs(a), a.real * a.real + a.imag * a.imag)
@@ -82,8 +78,7 @@ class ComplexTests(_ComplexTests):
 
 class _RealTests(_ComplexTests, TotalOrderingTests, FloorDivModTests, ExponentiationTests):
     """
-    These is the property test of Real numbers that are shared with
-    derived classes.
+    The property tests of numbers.Real that are shared with derived classes.
     """
 
     @property
@@ -106,25 +101,23 @@ class _RealTests(_ComplexTests, TotalOrderingTests, FloorDivModTests, Exponentia
 
 class RealTests(_RealTests):
     """
-    These are the property test specific to the base class numbers.Real.
+    The property tests specific to the base class numbers.Real.
 
     Although not a strict requirement, I assume that abs() on a number.Real returns a numbers.Real,
-    as opposed to float() which should return the build-in float type.
+    and not necessarilty a float.
     """
 
     @property
     @abc.abstractmethod
     def root_two(self) -> ClassUnderTest:
-        pass
+        """
+        A defining characteristic of Real numbers is that there should be a
+        number representing, for example, the square root of 2.
+        """
 
-    def test_generic_2020_zero_type(self):
-        self.assertIsInstance(self.zero, numbers.Real)
-
-    def test_generic_2021_one_type(self):
-        self.assertIsInstance(self.one, numbers.Real)
-
+    @abc.abstractmethod
     def test_generic_2023_root_two_type(self) -> None:
-        self.assertIsInstance(self.root_two, numbers.Real)
+        self.fail("Need to define a test that the helper root_two has the correct type")
 
     def test_generic_2332_root_two_times_root_two_is_two(self) -> None:
         self.assertEqual(self.root_two * self.root_two, self.one + self.one)
@@ -176,14 +169,13 @@ class RealTests(_RealTests):
 
 class _RationalTests(_RealTests):
     """
-    These is the property test of Rational numbers that are shared with
-    derived classes.
+    The property tests of numbers.Rational that are shared with derived classes.
     """
 
 
 class RationalTests(_RationalTests):
     """
-    These are the property test specific to the base class numbers.Rational.
+    The property tests specific to the base class numbers.Rational.
     """
 
     @property
@@ -191,14 +183,9 @@ class RationalTests(_RationalTests):
     def half(self) -> ClassUnderTest:
         pass
 
-    def test_generic_2020_zero_type(self):
-        self.assertIsInstance(self.zero, numbers.Rational)
-
-    def test_generic_2021_one_type(self):
-        self.assertIsInstance(self.one, numbers.Rational)
-
+    @abc.abstractmethod
     def test_generic_2022_half_type(self) -> None:
-        self.assertIsInstance(self.half, numbers.Rational)
+        self.fail("Need to define a test that the helper half has the correct type")
 
     def test_generic_2360_half_plus_half_is_one(self) -> None:
         self.assertEqual(self.half + self.half, self.one)
@@ -217,6 +204,9 @@ class RationalTests(_RationalTests):
 
 
 class IntegralTests(_RationalTests, LatticeWithComplement):
+    """
+    The property tests specific to the base class numbers.Integral.
+    """
 
     @property
     def bottom(self) -> ClassUnderTest:
@@ -233,12 +223,6 @@ class IntegralTests(_RationalTests, LatticeWithComplement):
     @unittest.skip("top is -one")
     def test_generic_2001_top_type(self):
         pass
-
-    def test_generic_2020_zero_type(self):
-        self.assertIsInstance(self.zero, numbers.Integral)
-
-    def test_generic_2021_one_type(self):
-        self.assertIsInstance(self.one, numbers.Integral)
 
     def test_generic_2380_int_function(self) -> None:
         self.assertEqual(0, int(self.zero))

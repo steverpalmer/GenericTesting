@@ -21,7 +21,12 @@ from .collections_abc import (ElementT, ValueT, SetTests, KeysViewTests, ItemsVi
 class intTests(IntegralTests):
     zero = 0
     one = 1
-    real_zero = float(0)
+
+    def test_generic_2020_zero_type(self):
+        self.assertIsInstance(self.zero, int)
+
+    def test_generic_2021_one_type(self):
+        self.assertIsInstance(self.one, int)
 
     # TODO: tests for bit_length, to_bytes, from_bytes
 
@@ -29,14 +34,31 @@ class intTests(IntegralTests):
 class FractionTests(RationalTests):
     zero = fractions.Fraction(0)
     one = fractions.Fraction(1)
-    real_zero = float(fractions.Fraction(0))
     half = fractions.Fraction(1, 2)
+
+    def test_generic_2020_zero_type(self):
+        self.assertIsInstance(self.zero, fractions.Fraction)
+
+    def test_generic_2021_one_type(self):
+        self.assertIsInstance(self.one, fractions.Fraction)
+
+    def test_generic_2022_half_type(self):
+        self.assertIsInstance(self.half, fractions.Fraction)
 
 
 class floatTests(RealTests):
     zero = 0.0
     one = 1.0
     root_two = 2.0 ** 0.5
+
+    def test_generic_2020_zero_type(self):
+        self.assertIsInstance(self.zero, float)
+
+    def test_generic_2021_one_type(self):
+        self.assertIsInstance(self.one, float)
+
+    def test_generic_2023_root_two_type(self):
+        self.assertIsInstance(self.root_two, float)
 
     def test_generic_2220_addition_associativity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
         assume(not self.isclose(a, b) and not self.isclose(b, c))
@@ -57,8 +79,16 @@ class floatTests(RealTests):
 class complexTests(ComplexTests):
     zero = complex(0)
     one = complex(1)
-    real_zero = 0.0
     i = complex(0, 1)
+
+    def test_generic_2020_zero_type(self):
+        self.assertIsInstance(self.zero, complex)
+
+    def test_generic_2021_one_type(self):
+        self.assertIsInstance(self.one, complex)
+
+    def test_generic_2024_i_type(self):
+        self.assertIsInstance(self.i, complex)
 
     def test_generic_2237_multiplication_addition_left_distributivity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
         # :FUDGE: this consistently fails when b is close to -c due to the limitations of floating point numbers.
