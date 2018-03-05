@@ -145,11 +145,6 @@ class setTests(MutableSetTests, frozensetTests):
     def test_generic_2010_empty_type(self) -> None:
         self.assertIsInstance(self.empty, set)
 
-    def test_generic_2010_copy_helper_definition(self, a: ClassUnderTest) -> None:
-        b = a.copy()
-        self.assertNotEqual(id(a), id(b))
-        self.assertEqual(a, b)
-
     def test_generic_2610_update_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         a_copy = a.copy()
         a_nother = a.copy()
