@@ -6,11 +6,11 @@ Generate a complete list of test numbers and names
 """
 
 import collections
-from pprint import pprint
 
 import src
 
 TestRecord = collections.namedtuple('TestRecord', ['class_', 'testname', 'test_number'])
+
 
 class Main:
 
@@ -23,7 +23,8 @@ class Main:
                         test_num = int(name2[13:17])
                         alltests.append(TestRecord(name, name2, test_num))
         alltests.sort(key=lambda tr: "{tr.test_number:04d}{tr.testname}{tr.class_}".format(tr=tr))
-        pprint(alltests)
+        for tr in alltests:
+            print("TestRecord(test_number={tr.test_number:04d}, class_={tr.class_:30s}, testname={tr.testname})".format(tr=tr))
 
 if __name__ == '__main__':
     Main()
