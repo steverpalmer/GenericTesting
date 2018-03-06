@@ -14,7 +14,7 @@ from src import *
 from modulo_n import ModuloN, ModuloPow2
 
 
-class ModuloNTests(EqualityTests, FieldTests, FloorDivModTests):
+class ModuloNTests(EqualityTests, TotalOrderingTests, FieldTests, FloorDivModTests):
 
     def test_generic_2020_zero_type(self):
         self.assertIsInstance(self.zero, ModuloN)
