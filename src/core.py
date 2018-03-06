@@ -37,7 +37,7 @@ class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):
         """
         if not isinstance(obj, type_):
             if msg is None:
-                msg = "{obj} has type {obj_type}, not {type} as expected".format(obj=obj, obj_type=type(obj), type=type_)
+                msg = "{obj} has type {obj_type}, not a subclass of {type} as expected".format(obj=obj, obj_type=type(obj), type=type_)
             raise self.failureException(msg)
 
     def assertImplies(self, antecedent, consequent, msg: str=None):
@@ -62,7 +62,7 @@ class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):
         """
         assertNotIsClose is to assertIsClose as assertNotAlmostEqual is to assertAlmostEqual - completeness
         """
-        if not self.isclose(a, b):
+        if self.isclose(a, b):
             if msg is None:
                 msg = "{a} is not close enough to {b}".format(a=a, b=b)
             raise self.failureException(msg)
@@ -83,37 +83,35 @@ class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):
 ClassUnderTest = 'ClassUnderTest'
 
 
-def Given(strategy=None, *, testMethodPrefix='test_generic', data_arg='data'):
+def Given(strategy_dict=None, *, testMethodPrefix='test_generic', data_arg='data'):
     """
-    Decorator for BaseTest derived test cases
+    Decorator for GenericTests derived test cases
+    It binds hypothesis strategies to the test_generic methods using the strategy_dict.
     """
-    if strategy is None:
-        strategy = dict()
-    elif not isinstance(strategy, dict):
-        strategy = {ClassUnderTest: strategy}
+    if strategy_dict is None:
+        strategy_dict = dict()
+    elif not isinstance(strategy_dict, dict):
+        strategy_dict = {ClassUnderTest: strategy_dict}
 
-#    apply_given = all(isinstance(value, strategies) for value in strategy.values())
-    def result(cls):
+    def result(cls: type) -> type:
         if not issubclass(cls, GenericTests):
-            raise TypeError("should operate on classes inheriting from BaseTest")
+            raise TypeError("should operate on classes inheriting from GenericTests")
         for name, method in inspect.getmembers(cls):
             if name.startswith(testMethodPrefix) and callable(method):
-                signature = inspect.signature(method)
-                parameters = signature.parameters
+                parameters = inspect.signature(method).parameters
                 args = {arg: param for arg, param in parameters.items() if arg != 'self'}
                 if len(args) > 0:
                     given_args = dict()
                     for arg, param in args.items():
                         annotation = None if param.annotation == inspect.Parameter.empty else param.annotation
-                        if annotation in strategy:
-                            strat = strategy[annotation]
+                        if annotation in strategy_dict:
+                            strat = strategy_dict[annotation]
                         elif arg == data_arg:
                             strat = st.data()
                         else:
                             strat = None
                         given_args[arg] = strat
-                    attr = given(**given_args)(method)
-                    setattr(cls, name, attr)
+                    setattr(cls, name, given(**given_args)(method))
         return cls
     return result
 
