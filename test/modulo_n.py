@@ -117,7 +117,7 @@ class ModuloN(numbers.Integral):
         return specials.get(self._modulus, "{self.__class__.__name__}({self._modulus}, {self._value})").format(self=self)
 
     def __str__(self) -> str:
-        return str(self._value)
+        return "{self._value}(%{self._modulus})".format(self=self)
 
     def __bytes__(self) -> bytes:
         return bytes(self._value)
@@ -125,17 +125,32 @@ class ModuloN(numbers.Integral):
     def __format(self, format_spec) -> str:
         return format(self._value, format_spec)
 
-    __le__ = None
-    __ge__ = None
-    __lt__ = None
-    __gt__ = None
-
     def __eq__(self, other) -> bool:
         if isinstance(other, ModuloN):
             result = self._modulus == other._modulus and self._value == other._value
         else:
             result = int(self) == other
         return result
+
+    def __le__(self, other) -> bool:
+        if isinstance(other, ModuloN):
+            result = self._modulus == other._modulus and self._value <= other._value
+        else:
+            result = int(self) <= other
+        return result
+
+    def __ge__(self, other) -> bool:
+        return other.__le__(self)
+
+    def __lt__(self, other) -> bool:
+        if isinstance(other, ModuloN):
+            result = self._modulus == other._modulus and self._value < other._value
+        else:
+            result = int(self) <= other
+        return result
+
+    def __gt__(self, other) -> bool:
+        return other.__lt__(self)
 
     def __hash__(self) -> int:
         # Since __eq__ above allows ModuloN values to be equal to the open integers,

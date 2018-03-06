@@ -14,7 +14,7 @@ from src import *
 from modulo_n import ModuloN, ModuloPow2
 
 
-class ModuloNTests(EqualityTests, FieldTests):
+class ModuloNTests(EqualityTests, FieldTests, FloorDivModTests):
 
     def test_generic_2020_zero_type(self):
         self.assertIsInstance(self.zero, ModuloN)
@@ -74,5 +74,5 @@ if __name__ == '__main__':
     for name, value in locals().items():
         if name.startswith('Test_'):
             SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(value))
-    TR = unittest.TextTestRunner(verbosity=2)
+    TR = unittest.TextTestRunner(verbosity=1)
     TR.run(SUITE)
