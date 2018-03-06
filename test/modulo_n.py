@@ -211,7 +211,8 @@ class ModuloN(numbers.Integral):
     def __pos__(self) -> 'ModuloN':
         return type(self)(self._modulus, self._value, is_trusted=True)
 
-    __abs__ = None
+    def __abs__(self) -> int:
+        return self._value
 
     def __invert__(self) -> 'ModuloN':
         return type(self)(self._modulus, ~self._value, is_trusted=True)

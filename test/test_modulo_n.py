@@ -14,13 +14,17 @@ from src import *
 from modulo_n import ModuloN, ModuloPow2
 
 
-class ModuloNTests(EqualityTests, TotalOrderingTests, FieldTests, FloorDivModTests):
+class ModuloNTests(EqualityTests, TotalOrderingTests, FieldTests, FloorDivModTests, AbsoluteValueTests):
 
     def test_generic_2020_zero_type(self):
         self.assertIsInstance(self.zero, ModuloN)
 
     def test_generic_2021_one_type(self):
         self.assertIsInstance(self.one, ModuloN)
+
+    @unittest.skip("abs is not multiplicitive in this class")
+    def test_generic_2273_abs_is_multiplicitive(self):
+        pass
 
 
 @Given(st.builds(ModuloN.digit, st.integers()))
