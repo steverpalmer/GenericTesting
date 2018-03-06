@@ -56,39 +56,6 @@ class Test_IntSetDecorator(defaultGenericTestLoader.discover(IntSetDecorator)):
         self.assertEqual(isd.total(), 9)
 
 
-class BitSet:
-    """
-    An embrionic class describing a set of ints, stored as bitmasks.
-    """
-
-    def __init__(self, values: List[int]) -> None:
-        self._value = reduce((lambda x, y: (x | pow(2, y))), values, 0)
-
-    def __eq__(self, other: 'BitSet'):
-        return self._value == other._value
-
-    def __contains__(self, value: int):
-        return bool(self._value & pow(2, value))
-
-#         def _iterator(self):
-#             result = 1
-#             while result <= self._value:
-#                 if result in self:
-#                     yield result
-#                 result *= 2
-#
-#         def __iter__(self):
-#             return self._iterator()
-
-
-element_st = st.integers(min_value=0, max_value=63)
-
-
-@Given({core.ClassUnderTest: st.builds(BitSet, st.lists(element_st)), collections_abc.ElementT: element_st})
-class Test_BitSet(defaultGenericTestLoader.discover(BitSet)):
-    pass
-
-
 if __name__ == '__main__':
     # Run the tests
     import unittest
