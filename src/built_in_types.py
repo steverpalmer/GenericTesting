@@ -8,6 +8,7 @@ A library of generic test for the python built-in types.
 import fractions
 import types
 import collections
+from functools import wraps
 
 from hypothesis import assume
 
@@ -33,15 +34,19 @@ class intTests(IntegralTests, IntegralAugmentedAssignmentTests, FloorDivAugmente
     # To avoid << and >> related test killing performance,
     # restrict the test range on b or [0 .. 63]
 
+    @wraps(IntegralTests.test_generic_2390_lshift_definition)
     def test_generic_2390_lshift_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         super().test_generic_2390_lshift_definition(a, b & 63)
 
+    @wraps(IntegralTests.test_generic_2391_rshift_definition)
     def test_generic_2391_rshift_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         super().test_generic_2391_rshift_definition(a, b & 63)
 
+    @wraps(IntegralAugmentedAssignmentTests.test_generic_2392_ilshift_definition)
     def test_generic_2392_ilshift_definition(self, a: ClassUnderTest, b: ClassUnderTest):
         super().test_generic_2392_ilshift_definition(a, b & 63)
 
+    @wraps(IntegralAugmentedAssignmentTests.test_generic_2393_irshift_definition)
     def test_generic_2393_irshift_definition(self, a: ClassUnderTest, b: ClassUnderTest):
         super().test_generic_2393_irshift_definition(a, b & 63)
 
@@ -77,16 +82,19 @@ class floatTests(RealTests, ComplexAugmentedAssignmentTests, FloorDivAugmentedAs
     def test_generic_2023_root_two_type(self):
         self.assertIsInstance(self.root_two, float)
 
+    @wraps(RealTests.test_generic_2220_addition_associativity)
     def test_generic_2220_addition_associativity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
         assume(not self.isclose(a, b) and not self.isclose(b, c))
         super().test_generic_2220_addition_associativity(a, b, c)
 
+    @wraps(RealTests.test_generic_2237_multiplication_addition_left_distributivity)
     def test_generic_2237_multiplication_addition_left_distributivity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
         # :FUDGE: this consistently fails when b is close to -c due to the limitations of floating point numbers.
         # Therefore, continue the test only when the b is not close of -c
         assume(not IsClose.over_numbers(b, -c, rel_tol=self.isclose.rel_tol ** 0.5, abs_tol=self.isclose.abs_tol * 100.0))
         super().test_generic_2237_multiplication_addition_left_distributivity(a, b, c)
 
+    @wraps(RealTests.test_generic_2274_abs_is_subadditive)
     def test_generic_2274_abs_is_subadditive(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         self.assertCloseOrLessThan(abs(a + b), abs(a) + abs(b))
 
@@ -107,18 +115,21 @@ class complexTests(ComplexTests, ComplexAugmentedAssignmentTests):
     def test_generic_2024_i_type(self):
         self.assertIsInstance(self.i, complex)
 
+    @wraps(ComplexTests.test_generic_2237_multiplication_addition_left_distributivity)
     def test_generic_2237_multiplication_addition_left_distributivity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
         # :FUDGE: this consistently fails when b is close to -c due to the limitations of floating point numbers.
         # Therefore, continue the test only when the b is not close of -c
         assume(not IsClose.over_numbers(b, -c, rel_tol=self.isclose.rel_tol ** 0.5, abs_tol=self.isclose.abs_tol * 100.0))
         super().test_generic_2237_multiplication_addition_left_distributivity(a, b, c)
 
+    @wraps(ComplexTests.test_generic_2238_multiplication_addition_right_distributivity)
     def test_generic_2238_multiplication_addition_right_distributivity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
         # :FUDGE: this consistently fails when b is close to -c due to the limitations of floating point numbers.
         # Therefore, continue the test only when the b is not close of -c
         assume(not IsClose.over_numbers(b, -c, rel_tol=self.isclose.rel_tol ** 0.5, abs_tol=self.isclose.abs_tol * 100.0))
         super().test_generic_2238_multiplication_addition_right_distributivity(a, b, c)
 
+    @wraps(ComplexTests.test_generic_2274_abs_is_subadditive)
     def test_generic_2274_abs_is_subadditive(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         self.assertCloseOrLessThan(abs(a + b), abs(a) + abs(b))
 
@@ -131,21 +142,27 @@ class frozensetTests(SetTests):
         self.assertIsInstance(self.empty, frozenset)
 
     def test_generic_2600_issubset_defintion(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        "a.issubset(b) ⇔ a <= b"
         self.assertEqual(a.issubset(b), a <= b)
 
     def test_generic_2601_isuperset_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        self.assertEqual(a.issuperset(b), a >= b)
+        "a.issuperset(b) ⇔ b <= a"
+        self.assertEqual(a.issuperset(b), b <= a)
 
     def test_generic_2602_union_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        "a.union(b) == a | b"
         self.assertEqual(a.union(b), a | b)
 
     def test_generic_2603_intersection_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        "a.intersection(b) == a & b"
         self.assertEqual(a.intersection(b), a & b)
 
     def test_generic_2604_difference_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        "a.difference(b) == a - b"
         self.assertEqual(a.difference(b), a - b)
 
     def test_generic_2605_symmetric_difference_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        "a.symmetric_difference(b) == a ^ b"
         self.assertEqual(a.symmetric_difference(b), a ^ b)
 
 

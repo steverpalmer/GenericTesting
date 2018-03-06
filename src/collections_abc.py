@@ -49,11 +49,13 @@ class SizedTests(GenericTests):
     """
 
     def test_generic_2410_len_returns_a_non_negative_int(self, a: ClassUnderTest) -> None:
+        "0 <= len(a)"
         a_len = len(a)
         self.assertIsInstance(a_len, int)
         self.assertGreaterEqual(a_len, 0)
 
     def test_generic_2800_bool_convention(self, a: ClassUnderTest) -> None:
+        "bool(a) ⇔ len(a) != 0"
         self.assertEqual(len(a) != 0, bool(a))
 
 
@@ -125,9 +127,11 @@ class SizedIterableContainerWithEmpty(SizedOverIterableTests, ContainerOverItera
             next(iter(self.empty))
 
     def test_generic_2412_len_empty_is_zero(self) -> None:
+        "len(∅) == 0"
         self.assertEqual(len(self.empty), 0)
 
     def test_generic_2422_empty_contains_nothing(self, a: ElementT) -> None:
+        "a not in ∅"
         self.assertFalse(a in self.empty)
 
 
@@ -145,23 +149,28 @@ class SetTests(SizedIterableContainerWithEmpty, EqualityTests, PartialOrderingTe
         pass
 
     def test_generic_2151_ordering_consistent_with_lattice(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        "(a & b <= a <= a | b) and (a & b <= b <= a | b)"
         union = a | b
         intersection = a & b
         self.assertTrue(intersection <= a <= union)
         self.assertTrue(intersection <= b <= union)
 
     def test_generic_2152_less_or_equal_orientation(self, a: ClassUnderTest) -> None:
+        "∅ <= a"
         self.assertLessEqual(self.empty, a)
 
     def test_generic_2430_disjoint_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        "a.isdisjoint(b) ⇔ a & b == ∅"
         self.assertEqual(a.isdisjoint(b), a & b == self.empty)
 
     def test_generic_2431_sub_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        "(a - b <= a) and (a - b) & b == ∅"
         c = a - b
         self.assertTrue(c <= a)
         self.assertTrue(c.isdisjoint(b))
 
     def test_generic_2432_xor_defintion(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        "a ^ b == (a | b) - (a & b)"
         self.assertEqual(a ^ b, (a | b) - (a & b))
 
 
@@ -327,7 +336,7 @@ class MutableMappingTests(MappingTests):
 
     def test_generic_2504_clear_definition(self, a: ClassUnderTest) -> None:
         a.clear()
-        self.assertFalse(bool(a))
+        self.assertTrue(a == self.empty)
 
     def test_generic_2505_update_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         a_copy = self.copy(a)

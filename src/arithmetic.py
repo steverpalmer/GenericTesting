@@ -32,9 +32,11 @@ class AdditionMonoidTests(GenericTests):
         self.fail("Need to define a test that the helper zero has the correct type")
 
     def test_generic_2220_addition_associativity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
+        "a + (b + c) == (a + b) + c"
         self.assertEqual(a + (b + c), (a + b) + c)
 
     def test_generic_2221_addition_identity(self, a: ClassUnderTest) -> None:
+        "a + 0 == a == 0 + a"
         self.assertEqual(a + self.zero, a)
         self.assertEqual(self.zero + a, a)
 
@@ -47,6 +49,7 @@ class AdditionGroupTests(AdditionMonoidTests):
     """
 
     def test_generic_2230_addition_inverse(self, a: ClassUnderTest) -> None:
+        "a + (-a) == 0"
         self.assertEqual(a + (-a), self.zero)
 
 
@@ -56,6 +59,7 @@ class AdditionAbelianGroupTests(AdditionGroupTests):
     """
 
     def test_generic_2231_addition_commutativity(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        "a + b == b + a"
         self.assertEqual(a + b, b + a)
 
 
@@ -80,9 +84,11 @@ class MultiplicationMonoidTests(GenericTests):
         self.fail("Need to define a test that the helper one has the correct type")
 
     def test_generic_2234_multiplication_associativity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
+        "a * (b * c) == (a * b) * c"
         self.assertEqual(a * (b * c), (a * b) * c)
 
     def test_generic_2235_multiplication_identity(self, a: ClassUnderTest) -> None:
+        "a * 1 == 1 == 1 * a"
         self.assertEqual(a * self.one, a)
         self.assertEqual(self.one * a, a)
 
@@ -93,18 +99,23 @@ class RingTests(AdditionAbelianGroupTests, MultiplicationMonoidTests):
     """
 
     def test_generic_2105_not_zero_equal_one(self) -> None:
+        "0 != 1"
         self.assertFalse(self.zero == self.one)
 
     def test_generic_2232_pos_definition(self, a: ClassUnderTest) -> None:
+        "+a == a"
         self.assertEqual(+a, a)
 
     def test_generic_2233_sub_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        "a - b == a + (-b)"
         self.assertEqual(a - b, a + (-b))
 
     def test_generic_2237_multiplication_addition_left_distributivity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
+        "a * (b + c) == (a * b) + (a * c)"
         self.assertEqual(a * (b + c), (a * b) + (a * c))
 
     def test_generic_2238_multiplication_addition_right_distributivity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
+        "(a + b) * c = (a * c) + (b * c)"
         self.assertEqual((a + b) * c, (a * c) + (b * c))
 
 
@@ -114,6 +125,7 @@ class CommutativeRingTests(RingTests):
     """
 
     def test_generic_2236_multiplication_commutativity(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        "a * b == b * a"
         self.assertEqual(a * b, b * a)
 
 
@@ -123,6 +135,7 @@ class FieldTests(CommutativeRingTests):
     """
 
     def test_generic_2239_truediv_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        "b != 0 ⇒ (a / b) * b == a"
         assume(not b == self.zero)
         calc = (a / b) * b
         self.assertEqual(calc, type(calc)(a))
@@ -140,6 +153,7 @@ class FloorDivModTests(GenericTests):
     """
 
     def test_generic_2240_mod_range(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        "b != 0 ⇒ a % b ∈ [0 .. b)"
         assume(not b == self.zero)
         mod = a % b
         if b <= self.zero:
@@ -150,10 +164,12 @@ class FloorDivModTests(GenericTests):
             self.assertLess(mod, b)
 
     def test_generic_2241_floordiv_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        "b != 0 ⇒ (a // b) * b + (a % b) == a"
         assume(not b == self.zero)
         self.assertEqual((a // b) * b + a % b, a)
 
     def test_generic_2242_divmod_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        "b != 0 ⇒ divmod(a, b) == (a // b, a % b)"
         assume(not b == self.zero)
         self.assertEqual(divmod(a, b), (a // b, a % b))
 
@@ -178,22 +194,27 @@ class ExponentiationTests(GenericTests):
     """
 
     def test_generic_2250_exponentiation_zero_by_zero(self) -> None:
+        "0 ** 0 == 1"
         # By Python defintion (Standard Library §4.4 note 5)
         self.assertEqual(self.zero ** self.zero, self.one)
 
     def test_generic_2251_exponentiation_by_zero(self, a: ClassUnderTest) -> None:
+        "not a == 0 ⇒ a ** 0 == 1"
         assume(not a == self.zero)
         self.assertEqual(a ** self.zero, self.one)
 
     def test_generic_2252_exponentiation_with_base_zero(self, a: ClassUnderTest) -> None:
+        "a > 0 ⇒ 0 ** a == 0"
         assume(a > self.zero)
         self.assertEqual(self.zero ** a, self.zero)
 
     def test_generic_2253_exponentiation_with_base_one(self, a: ClassUnderTest) -> None:
+        "not a == 0 ⇒ 1 ** a == 1"
         assume(not a == self.zero)
         self.assertEqual(self.one ** a, self.one)
 
     def test_generic_2254_exponentiation_by_one(self, a: ClassUnderTest) -> None:
+        "not a == 0 ⇒ a ** 1 == a"
         assume(not a == self.zero)
         self.assertEqual(a ** self.one, a)
 
@@ -218,15 +239,19 @@ class AbsoluteValueTests(GenericTests):
         self.assertIsInstance(self.abs_zero, type(abs(self.zero)))
 
     def test_generic_2270_abs_not_negative(self, a: ClassUnderTest) -> None:
+        "0 <= abs(a)"
         self.assertTrue(self.abs_zero <= abs(a))
 
     def test_generic_2271_abs_positve_definite(self, a: ClassUnderTest) -> None:
+        "abs(a) == 0 ⇔ a == 0"
         self.assertEqual(abs(a) == self.abs_zero, a == self.zero)
 
     def test_generic_2273_abs_is_multiplicitive(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        "abs(a * b) == abs(a) * abs(b)"
         self.assertEqual(abs(a * b), abs(a) * abs(b))
 
     def test_generic_2274_abs_is_subadditive(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        "abs(a + b) <= abs(a) + abs(b)"
         self.assertLessEqual(abs(a + b), abs(a) + abs(b))
 
 

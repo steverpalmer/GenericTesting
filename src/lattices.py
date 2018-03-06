@@ -18,24 +18,31 @@ class LatticeTests(GenericTests):
     """
 
     def test_generic_2200_or_commutativity(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        "a | b == b | a"
         self.assertEqual(a | b, b | a)
 
     def test_generic_2201_or_associativity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
+        "a | (b | c) == (a | b) | c"
         self.assertEqual(a | (b | c), (a | b) | c)
 
     def test_generic_2203_or_and_absorption(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        "a | (a & b) == a"
         self.assertEqual(a | (a & b), a)
 
     def test_generic_2205_and_commutativity(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        "a & b == b & a"
         self.assertEqual(a & b, b & a)
 
     def test_generic_2206_and_associativity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
+        "a & (b & c) == (a & b) & c"
         self.assertEqual(a & (b & c), (a & b) & c)
 
     def test_generic_2208_and_or_absorption(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        "a & (a | b) == a"
         self.assertEqual(a & (a | b), a)
 
     def test_generic_2209_and_or_distributive(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
+        "a & (b | c) == (a & b) | (a & c)"
         self.assertEqual(a & (b | c), a & b | a & c)
 
 
@@ -54,6 +61,7 @@ class BoundedBelowLatticeTests(LatticeTests):
         self.fail("Need to define a test that the helper bottom has the correct type")
 
     def test_generic_2202_or_identity(self, a: ClassUnderTest) -> None:
+        "a | ⊥ == a"
         self.assertEqual(a | self.bottom, a)
 
 
@@ -72,6 +80,7 @@ class BoundedLatticeTests(BoundedBelowLatticeTests):
         self.fail("Need to define a test that the helper top has the correct type")
 
     def test_generic_2207_and_identity(self, a: ClassUnderTest) -> None:
+        "a & ⊤ = a"
         self.assertEqual(a & self.top, a)
 
 
@@ -84,12 +93,15 @@ class LatticeWithComplement(BoundedLatticeTests):
     """
 
     def test_generic_2210_or_complementation(self, a: ClassUnderTest) -> None:
+        "a | ~a == T"
         self.assertEqual(a | ~a, self.top)
 
     def test_generic_2211_and_complementation(self, a: ClassUnderTest) -> None:
+        "a & ~a == ⊥"
         self.assertEqual(a & ~a, self.bottom)
 
     def test_generic_2215_xor_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        "a ^ b == (a | b) & ~(a & b)"
         self.assertEqual(a ^ b, (a | b) & ~(a & b))
 
 
