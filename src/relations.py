@@ -1,13 +1,6 @@
-"""
-Copyright 2018 Steve Palmer
+# Copyright 2018 Steve Palmer
 
-A library of generic test for the elementary relationships...
- * __eq__
- * __ne__ (in terms of __eq__)
- * __le__
- * __ge__, __lt__, __gt__ (in terms of __le__)
-"""
-
+"""A library of generic test for the elementary relationships."""
 
 from .core import GenericTests, ClassUnderTest
 

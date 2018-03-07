@@ -1,7 +1,6 @@
-#!/usr/bin/env python3
-"""
-Copyright 2018 Steve Palmer
-"""
+# Copyright 2018 Steve Palmer
+
+"""Fundemental tools in the GenericTesting library."""
 
 import abc
 import unittest

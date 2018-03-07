@@ -1,9 +1,7 @@
-#!/usr/bin/env python3
-"""
-Copyright 2018 Steve Palmer
+# Copyright 2018 Steve Palmer
 
-Merge generic_testing into a single namespace
-"""
+"""Merge generic_testing into a single namespace."""
+
 from .isclose import IsClose
 
 from .core import *

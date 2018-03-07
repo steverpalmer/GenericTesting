@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
-"""
-Copyright 2018 Steve Palmer
+# Copyright 2018 Steve Palmer
 
-Generate a complete list of test numbers and names
-"""
+"""Generate a complete list of test numbers and names."""
 
 import collections
 

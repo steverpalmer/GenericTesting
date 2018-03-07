@@ -1,9 +1,6 @@
-#!/usr/bin/env python3
-"""
-Copyright 2018 Steve Palmer
+# Copyright 2018 Steve Palmer
 
-A library of generic test for the python built-in types.
-"""
+"""A library of generic test for the python built-in types."""
 
 import fractions
 import types

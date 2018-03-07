@@ -1,8 +1,6 @@
-"""
-Copyright 2018 Steve Palmer
+# Copyright 2018 Steve Palmer
 
-A library of generic test for the base classes in the collections.abc library
-"""
+"""A library of generic test for the base classes in the collections.abc library."""
 
 import abc
 import collections

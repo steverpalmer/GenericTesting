@@ -1,12 +1,6 @@
-"""
-Copyright 2018 Steve Palmer
+# Copyright 2018 Steve Palmer
 
-A library of generic test for the augmented assignment operators...
- * __ior__, __iand__
- * __iadd__, __isub__, __imul__, __itruediv__, etc
-"""
-
-import abc
+"""A library of generic test for the augmented assignment operators."""
 
 from hypothesis import assume
 

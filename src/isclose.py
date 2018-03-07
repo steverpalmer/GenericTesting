@@ -1,8 +1,6 @@
-#!/usr/bin/env python3
-"""
-Copyright 2018 Steve Palmer
-"""
+# Copyright 2018 Steve Palmer
 
+"""Extension to math.isclose and cmath.isclose."""
 
 import numbers
 import math

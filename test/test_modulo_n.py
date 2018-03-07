@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
-"""
-Copyright 2018 Steve Palmer
+# Copyright 2018 Steve Palmer
 
-A test of the generic_test against the simplistic ModuloN class
-"""
+"""A test of the generic_test against the simplistic ModuloN class."""
 
 import unittest
 

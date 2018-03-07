@@ -1,11 +1,6 @@
-"""
-Copyright 2018 Steve Palmer
+# Copyright 2018 Steve Palmer
 
-A library of generic test for the elementary operators...
- * __or__, __and__
- * __invert__, __xor__ (in terms of __or__ and __and__)
-"""
-
+"""A library of generic test for the elementary bitwise operators."""
 
 import abc
 

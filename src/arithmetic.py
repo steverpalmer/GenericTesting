@@ -1,6 +1,6 @@
-"""
-Copyright 2018 Steve Palmer
+# Copyright 2018 Steve Palmer
 
+"""
 A library of generic test for the elementary operators...
  * __add__
  * __neg__, __sub__, __pos__ and __mul__

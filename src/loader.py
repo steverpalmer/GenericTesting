@@ -1,9 +1,6 @@
-#!/usr/bin/env python3
-"""
-Copyright 2018 Steve Palmer
+# Copyright 2018 Steve Palmer
 
-Find the right generic test for a given class
-"""
+"""Determine the generic test base class for a given class_under_test."""
 
 import enum
 import collections

@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
-"""
-Copyright 2018 Steve Palmer
+# Copyright 2018 Steve Palmer
 
-A test of the generic_test.loader.
-"""
+"""A test of the generic_test.loader using the type inheritance."""
 
 from typing import List
 import collections

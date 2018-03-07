@@ -1,3 +1,8 @@
+#!/usr/bin/env python3
+# Copyright 2018 Steve Palmer
+
+"""A test of the generic_test.loader using the defined methods."""
+
 import unittest
 import collections
 import functools

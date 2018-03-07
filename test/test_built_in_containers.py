@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
-"""
-Copyright 2018 Steve Palmer
+# Copyright 2018 Steve Palmer
 
-A test of the generic_test.built_in_tests using the built-in types.
-(I don't know when I've used the work "test" more often in a single sentence.:-)
-"""
+"""A test of the generic_test.built_in_tests using the built-in container types."""
 
 import unittest
 import collections

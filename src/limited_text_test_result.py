@@ -1,6 +1,6 @@
-"""
-Copyright 2018 Steve Palmer
-"""
+# Copyright 2018 Steve Palmer
+
+"""An unittest extension to stop testing after too many failures or errors found."""
 
 import unittest
 
