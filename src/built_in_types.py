@@ -15,7 +15,7 @@ from .numbers_abc import IntegralTests, RationalTests, RealTests, ComplexTests
 from .collections_abc import (ElementT, ValueT, SetTests, KeysViewTests, ItemsViewTests, ValuesViewTests,
                               MutableSetTests, MappingTests, MutableMappingTests)
 from .augmented_assignment import (ComplexAugmentedAssignmentTests, FloorDivAugmentedAssignmentTests,
-                                   IntegralAugmentedAssignmentTests, LatticeWithComplementAugmentedTests) 
+                                   IntegralAugmentedAssignmentTests, LatticeWithComplementAugmentedTests)
 
 
 class intTests(IntegralTests, IntegralAugmentedAssignmentTests, FloorDivAugmentedAssignmentTests, LatticeWithComplementAugmentedTests):

@@ -36,15 +36,15 @@ class ModuloPow2Tests(ModuloNTests, LatticeWithComplement):
     @property
     def bottom(self):
         return self.zero
- 
+
     @property
     def top(self):
         return -self.one
- 
+
     @unittest.skip("bottom is zero")
     def test_generic_2000_bottom_type(self):
         pass
- 
+
     @unittest.skip("top is -one")
     def test_generic_2001_top_type(self):
         pass

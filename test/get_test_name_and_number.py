@@ -24,5 +24,6 @@ class Main:
         for tr in alltests:
             print("TestRecord(test_number={tr.test_number:04d}, class_={tr.class_:30s}, testname={tr.testname})".format(tr=tr))
 
+
 if __name__ == '__main__':
     Main()

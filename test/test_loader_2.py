@@ -245,5 +245,5 @@ class Main:
         tr = unittest.TextTestRunner(verbosity=2)
         tr.run(suite)
 
-Main()
 
+Main()

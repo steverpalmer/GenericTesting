@@ -199,12 +199,10 @@ class ValuesViewTests(MappingViewTests, ContainerOverIterableTests):
     """
 
 
-
 class MutableSetTests(SetTests, LatticeWithComplementAugmentedTests):
     """
     The property tests of collections.abc.MutableSet.
     """
-
 
     @abc.abstractmethod
     def copy(self, a: ClassUnderTest) -> ClassUnderTest:

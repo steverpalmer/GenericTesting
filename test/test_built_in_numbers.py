@@ -5,8 +5,6 @@
 
 import unittest
 import fractions
-import collections
-import types
 
 from hypothesis import strategies as st
 

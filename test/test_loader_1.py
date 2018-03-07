@@ -5,7 +5,6 @@
 
 from typing import List
 import collections
-from functools import reduce
 
 from hypothesis import strategies as st
 
