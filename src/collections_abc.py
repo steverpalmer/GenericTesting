@@ -19,14 +19,14 @@ ValueT = 'ValueT'
 
 
 class IterableTests(GenericTests):
-    """
-    The property test of collections.abc.Iterables.
-    """
+    """The property test of collections.abc.Iterables."""
 
     def test_generic_2400_iter_returns_an_iterator(self, a: ClassUnderTest) -> None:
+        """Test __iter__ method."""
         self.assertIsInstance(iter(a), collections.abc.Iterator)
 
     def test_generic_2401_iterator_protocol_observed(self, a: ClassUnderTest) -> None:
+        """Test iterator protocol."""
         a_iter = iter(a)
         try:
             next(a_iter)
@@ -40,8 +40,7 @@ class IterableTests(GenericTests):
 
 
 class SizedTests(GenericTests):
-    """
-    The property test of collections.abc.Sized.
+    """The property test of collections.abc.Sized.
 
     I assume that the len() function returns a value that can be compared to an int.
     """
@@ -58,8 +57,7 @@ class SizedTests(GenericTests):
 
 
 class ContainerTests(GenericTests):
-    """
-    The property test of collections.abc.Container.
+    """The property test of collections.abc.Container.
 
     In fact, the standard does *not* say that the __contains__ method must return a bool.
     It only says that it returns a true or false (not even True or False).
@@ -72,8 +70,7 @@ class ContainerTests(GenericTests):
 
 
 class SizedOverIterableTests(SizedTests, IterableTests):
-    """
-    The property tests of an class that is both collections.abc.Sized and collections.abc.Iterable.
+    """The property tests of an class that is both collections.abc.Sized and collections.abc.Iterable.
 
     In fact, this is *not* required, but it would be a surprise if it were not true.
     If this is not true for your contained, then simply skip this test.
@@ -90,8 +87,7 @@ class SizedOverIterableTests(SizedTests, IterableTests):
 
 
 class ContainerOverIterableTests(IterableTests, ContainerTests):
-    """
-    The property tests of an class that is both collections.abc.Iterable and collections.abc.Container.
+    """The property tests of an class that is both collections.abc.Iterable and collections.abc.Container.
 
     See Language Reference Manual §3.3.6 "The membership test operators (in and not in) are normally
     implemented as an iteration ..."
@@ -107,9 +103,7 @@ class ContainerOverIterableTests(IterableTests, ContainerTests):
 
 
 class SizedIterableContainerWithEmpty(SizedOverIterableTests, ContainerOverIterableTests):
-    """
-    These test common properties of almost all containers.
-    """
+    """These test common properties of almost all containers."""
 
     @property
     @abc.abstractmethod
@@ -134,9 +128,7 @@ class SizedIterableContainerWithEmpty(SizedOverIterableTests, ContainerOverItera
 
 
 class SetTests(SizedIterableContainerWithEmpty, EqualityTests, PartialOrderingTests, BoundedBelowLatticeTests):
-    """
-    The property tests of collections.abc.Set.
-    """
+    """The property tests of collections.abc.Set."""
 
     @property
     def bottom(self) -> ClassUnderTest:
@@ -173,8 +165,7 @@ class SetTests(SizedIterableContainerWithEmpty, EqualityTests, PartialOrderingTe
 
 
 class MappingViewTests(SizedTests):
-    """
-    The property tests of collections.abc.MappingView.
+    """The property tests of collections.abc.MappingView.
 
     :TODO: Maybe could try to test the dynamic nature of mapping views here.
     """
@@ -182,38 +173,32 @@ class MappingViewTests(SizedTests):
 
 
 class KeysViewTests(MappingViewTests, SetTests):
-    """
-    The property tests of collections.abc.KeysView.
-    """
+    """The property tests of collections.abc.KeysView."""
 
 
 class ItemsViewTests(MappingViewTests, SetTests):
-    """
-    The property tests of collections.abc.ItemsView.
-    """
+    """The property tests of collections.abc.ItemsView."""
 
 
 class ValuesViewTests(MappingViewTests, ContainerOverIterableTests):
-    """
-    The property tests of collections.abc.ValuesView.
-    """
+    """The property tests of collections.abc.ValuesView."""
 
 
 class MutableSetTests(SetTests, LatticeWithComplementAugmentedTests):
-    """
-    The property tests of collections.abc.MutableSet.
-    """
+    """The property tests of collections.abc.MutableSet."""
 
     @abc.abstractmethod
     def copy(self, a: ClassUnderTest) -> ClassUnderTest:
-        """
-        To test Mutable containers, it is useful to have a helper that takes a copy
-        of the container before it is mutated.
+        """ Copy Helper function.
+        
+        To test Mutable containers, it is useful to have a helper that takes
+        a copy of the container before it is mutated.
         """
 
     @abc.abstractmethod
     def singleton_constructor(self, a: ElementT) -> ClassUnderTest:
-        """
+        """Singleton Constructor Helper function.
+        
         Since we have comprehensive test of set operations,
         it is useful to have a helper to construct a set from a single value.
         """
@@ -229,12 +214,14 @@ class MutableSetTests(SetTests, LatticeWithComplementAugmentedTests):
         self.assertEqual(len(a_singleton), 1)
 
     def test_generic_2460_add_definition(self, a: ClassUnderTest, b: ElementT) -> None:
+        """Test add method."""
         a_copy = self.copy(a)
         b_singleton = self.singleton_constructor(b)
         a.add(b)
         self.assertEqual(a, a_copy | b_singleton)
 
     def test_generic_2461_discard_definition(self, a: ClassUnderTest, b: ElementT) -> None:
+        """Test discard method."""
         a_copy = self.copy(a)
         b_singleton = self.singleton_constructor(b)
         a.discard(b)
@@ -242,6 +229,7 @@ class MutableSetTests(SetTests, LatticeWithComplementAugmentedTests):
 
 
 class MappingTests(SizedIterableContainerWithEmpty, EqualityTests):
+    """The property tests of collections.abc.Mapping."""
 
     def test_generic_2110_equality_definition(self, a: ClassUnderTest, b: ClassUnderTest):
         self.assertEqual(a == b, a.keys() == b.keys() and all(a[k] == b[k] for k in a))
@@ -264,12 +252,15 @@ class MappingTests(SizedIterableContainerWithEmpty, EqualityTests):
             self.fail()
 
     def test_generic_2490_items_returns_an_ItemsView(self, a: ClassUnderTest) -> None:
+        """Test items method."""
         self.assertIsInstance(a.items(), collections.abc.ItemsView)
 
     def test_generic_2491_values_returns_an_ValuesView(self, a: ClassUnderTest) -> None:
+        """Test values method."""
         self.assertIsInstance(a.values(), collections.abc.ValuesView)
 
     def test_generic_2492_get_definition(self, a: ClassUnderTest, b: ElementT, c: ValueT) -> None:
+        """Test get method."""
         if b in a:
             expected = a[b]
         else:
@@ -278,6 +269,7 @@ class MappingTests(SizedIterableContainerWithEmpty, EqualityTests):
 
 
 class MutableMappingTests(MappingTests):
+    """The property tests of collections.abc.MutableMapping."""
 
     @abc.abstractmethod
     def copy(self, a: ClassUnderTest) -> ClassUnderTest:
@@ -292,6 +284,7 @@ class MutableMappingTests(MappingTests):
         self.assertEqual(a, a_copy)
 
     def test_generic_2500_setitem_definition(self, a: ClassUnderTest, b: ElementT, c: ValueT) -> None:
+        """Test __setitem__ method."""
         a_copy = self.copy(a)
         a[b] = c
         self.assertEqual(a[b], c)
@@ -300,6 +293,7 @@ class MutableMappingTests(MappingTests):
                 self.assertEqual(a[key], a_copy[key])
 
     def test_generic_2501_delitem_definition(self, a: ClassUnderTest, data) -> None:
+        """Test __delitem__ method."""
         assume(len(a) > 0)
         a_copy = self.copy(a)
         key_to_forget = data.draw(st.sampled_from(list(a.keys())))
@@ -310,6 +304,7 @@ class MutableMappingTests(MappingTests):
                 self.assertEqual(a[other_key], a_copy[other_key])
 
     def test_generic_2502_pop_definition(self, a: ClassUnderTest, b: ElementT) -> None:
+        """Test pop method."""
         a_copy = self.copy(a)
         try:
             v = a.pop(b)
@@ -320,6 +315,7 @@ class MutableMappingTests(MappingTests):
         self.assertEqual(a, a_copy)
 
     def test_generic_2503_popitem_definition(self, a: ClassUnderTest) -> None:
+        """Test popitem method."""
         a_copy = self.copy(a)
         try:
             k, v = a.popitem()
@@ -331,10 +327,12 @@ class MutableMappingTests(MappingTests):
             self.assertFalse(bool(a_copy))
 
     def test_generic_2504_clear_definition(self, a: ClassUnderTest) -> None:
+        """Test clear method."""
         a.clear()
         self.assertTrue(a == self.empty)
 
     def test_generic_2505_update_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        """Test update method."""
         a_copy = self.copy(a)
         a.update(b)
         self.assertLessEqual(b.keys(), a.keys())
@@ -342,6 +340,7 @@ class MutableMappingTests(MappingTests):
             self.assertEqual(a[k], b[k] if k in b else a_copy[k])
 
     def test_generic_2506_setdefault_definition(self, a: ClassUnderTest, b: ElementT, c: ValueT) -> None:
+        """Test setdefault method."""
         a_copy = self.copy(a)
         v = a.setdefault(b, c)
         self.assertTrue(b in a)
