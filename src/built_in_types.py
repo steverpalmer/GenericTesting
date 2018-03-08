@@ -15,10 +15,12 @@ from .numbers_abc import IntegralTests, RationalTests, RealTests, ComplexTests
 from .collections_abc import (ElementT, ValueT, SetTests, KeysViewTests, ItemsViewTests, ValuesViewTests,
                               MutableSetTests, MappingTests, MutableMappingTests)
 from .augmented_assignment import (ComplexAugmentedAssignmentTests, FloorDivAugmentedAssignmentTests,
-                                   IntegralAugmentedAssignmentTests, LatticeWithComplementAugmentedTests) 
+                                   IntegralAugmentedAssignmentTests, LatticeWithComplementAugmentedTests)
 
 
 class intTests(IntegralTests, IntegralAugmentedAssignmentTests, FloorDivAugmentedAssignmentTests, LatticeWithComplementAugmentedTests):
+    """Tests of int class properties."""
+
     zero = 0
     one = 1
 
@@ -51,6 +53,8 @@ class intTests(IntegralTests, IntegralAugmentedAssignmentTests, FloorDivAugmente
 
 
 class FractionTests(RationalTests, ComplexAugmentedAssignmentTests, FloorDivAugmentedAssignmentTests):
+    """Tests of Fraction class properties."""
+
     zero = fractions.Fraction(0)
     one = fractions.Fraction(1)
     half = fractions.Fraction(1, 2)
@@ -66,6 +70,8 @@ class FractionTests(RationalTests, ComplexAugmentedAssignmentTests, FloorDivAugm
 
 
 class floatTests(RealTests, ComplexAugmentedAssignmentTests, FloorDivAugmentedAssignmentTests):
+    """Tests of float class properties."""
+
     zero = 0.0
     one = 1.0
     root_two = 2.0 ** 0.5
@@ -99,6 +105,8 @@ class floatTests(RealTests, ComplexAugmentedAssignmentTests, FloorDivAugmentedAs
 
 
 class complexTests(ComplexTests, ComplexAugmentedAssignmentTests):
+    """Tests of complex class properties."""
+
     zero = complex(0)
     one = complex(1)
     i = complex(0, 1)
@@ -132,6 +140,7 @@ class complexTests(ComplexTests, ComplexAugmentedAssignmentTests):
 
 
 class frozensetTests(SetTests):
+    """Tests of frozenset class properties."""
 
     empty = frozenset()
 
@@ -139,31 +148,32 @@ class frozensetTests(SetTests):
         self.assertIsInstance(self.empty, frozenset)
 
     def test_generic_2600_issubset_defintion(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        "a.issubset(b) ⇔ a <= b"
+        """a.issubset(b) ⇔ a <= b"""
         self.assertEqual(a.issubset(b), a <= b)
 
     def test_generic_2601_isuperset_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        "a.issuperset(b) ⇔ b <= a"
+        """a.issuperset(b) ⇔ b <= a"""
         self.assertEqual(a.issuperset(b), b <= a)
 
     def test_generic_2602_union_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        "a.union(b) == a | b"
+        """a.union(b) == a | b"""
         self.assertEqual(a.union(b), a | b)
 
     def test_generic_2603_intersection_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        "a.intersection(b) == a & b"
+        """a.intersection(b) == a & b"""
         self.assertEqual(a.intersection(b), a & b)
 
     def test_generic_2604_difference_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        "a.difference(b) == a - b"
+        """a.difference(b) == a - b"""
         self.assertEqual(a.difference(b), a - b)
 
     def test_generic_2605_symmetric_difference_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        "a.symmetric_difference(b) == a ^ b"
+        """a.symmetric_difference(b) == a ^ b"""
         self.assertEqual(a.symmetric_difference(b), a ^ b)
 
 
 class setTests(MutableSetTests, frozensetTests):
+    """Tests of set class properties."""
 
     empty = set()
 
@@ -177,6 +187,7 @@ class setTests(MutableSetTests, frozensetTests):
         self.assertIsInstance(self.empty, set)
 
     def test_generic_2502_pop_definition(self, a: ClassUnderTest) -> None:
+        """Test pop method"""
         if a:
             a_copy = a.copy()
             b = a.pop()
@@ -189,10 +200,12 @@ class setTests(MutableSetTests, frozensetTests):
                 a.pop()
 
     def test_generic_2504_clear_definition(self, a: ClassUnderTest) -> None:
+        """Test clear method"""
         a.clear()
         self.assertEqual(a, self.empty)
 
     def test_generic_2505_update_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        """Test update method"""
         a_copy = a.copy()
         a_nother = a.copy()
         a |= b
@@ -201,6 +214,7 @@ class setTests(MutableSetTests, frozensetTests):
         self.assertEqual(a, a_nother)
 
     def test_generic_2610_intersection_update_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        """Test intersection_update method"""
         a_copy = a.copy()
         a_nother = a.copy()
         a &= b
@@ -209,6 +223,7 @@ class setTests(MutableSetTests, frozensetTests):
         self.assertEqual(a, a_nother)
 
     def test_generic_2611_difference_update_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        """Test difference_update method"""
         a_copy = a.copy()
         a_nother = a.copy()
         a -= b
@@ -217,6 +232,7 @@ class setTests(MutableSetTests, frozensetTests):
         self.assertEqual(a, a_nother)
 
     def test_generic_2612_symmetric_difference_update_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        """Test symmetric_difference_update method"""
         a_copy = a.copy()
         a_nother = a.copy()
         a ^= b
@@ -225,6 +241,7 @@ class setTests(MutableSetTests, frozensetTests):
         self.assertEqual(a, a_nother)
 
     def test_generic_2613_remove_definition(self, a: ClassUnderTest, b: ElementT) -> None:
+        """Test remove method"""
         a.add(b)
         a_copy = a.copy()
         a.remove(b)
@@ -235,6 +252,7 @@ class setTests(MutableSetTests, frozensetTests):
 
 
 class dictKeysViewTests(KeysViewTests):
+    """Tests of dict KeysView class properties."""
 
     empty = dict().keys()
 
@@ -243,6 +261,7 @@ class dictKeysViewTests(KeysViewTests):
 
 
 class dictItemsViewTests(ItemsViewTests):
+    """Tests of dict ItemsView class properties."""
 
     empty = dict().items()
 
@@ -251,10 +270,11 @@ class dictItemsViewTests(ItemsViewTests):
 
 
 class dictValuesViewTests(ValuesViewTests):
-    pass
+    """Tests of dict ValuesView class properties."""
 
 
 class MappingProxyTypeTests(MappingTests):
+    """Tests of MappingProxyType class properties."""
 
     empty = types.MappingProxyType(dict())
 
@@ -266,6 +286,7 @@ class MappingProxyTypeTests(MappingTests):
 
 
 class dictTests(MutableMappingTests):
+    """Tests of dict class properties."""
 
     empty = dict()
 
@@ -280,6 +301,7 @@ class dictTests(MutableMappingTests):
 
 
 class CounterTests(dictTests):
+    """Tests of Counter class properties."""
 
     empty = collections.Counter()
 
@@ -290,6 +312,7 @@ class CounterTests(dictTests):
         self.assertIsInstance(self.empty, collections.Counter)
 
     def test_generic_2505_update_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        """Test Counter update method"""
         a_copy = self.copy(a)
         a.update(b)
         self.assertLessEqual(b.keys(), a.keys())
@@ -300,6 +323,7 @@ class CounterTests(dictTests):
 
 
 class OrderedDictTests(dictTests):
+    """Tests of OrderedDict class properties."""
 
     empty = collections.OrderedDict()
 
@@ -313,8 +337,10 @@ class OrderedDictTests(dictTests):
 
 
 class defaultdictTests(dictTests):
+    """Tests of defaultdict class properties."""
 
     def __init__(self, default_factory, methodName=None):
+        """add default_factory parameter to test constructor."""
         super().__init__(methodName)
         self._default_factory = default_factory
 

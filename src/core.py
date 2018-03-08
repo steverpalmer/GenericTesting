@@ -12,9 +12,15 @@ from .isclose import IsClose
 
 
 class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):
+    """Base class for all Generic Tests.
+
+    This extends the self.assert* methods on unittest.TestCase,
+    including an isclose tool for use on floating point types.
+    """
 
     def __init__(self, methodName=None):
-        """
+        """Constructor.
+
         unittest.TestCase defines the default methodName to be 'runtest'.
         Rather than repeat this through the code,
         GenericTests default the value to None, and then substitute 'runTest' here.
@@ -30,7 +36,8 @@ class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):
         self.addTypeEqualityFunc(complex, self.assertIsClose)
 
     def assertIsInstance(self, obj, type_, msg: str=None):
-        """
+        """Confirm type of object.
+
         I kept writing self.assertTrue(isinstance(obj, type_)),
         and getting little useful information back on failure!
         """
@@ -40,7 +47,8 @@ class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):
             raise self.failureException(msg)
 
     def assertImplies(self, antecedent, consequent, msg: str=None):
-        """
+        """Confirm implication.
+
         I like implies as an operator ... so shoot me.
         """
         if antecedent and not consequent:
@@ -49,7 +57,8 @@ class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):
             raise self.failureException(msg)
 
     def assertIsClose(self, a, b, msg: str=None):
-        """
+        """Confirm one number is close to another.
+
         Sort of like assertAlmostEqual, but defined in terms of IsClose.
         """
         if not self.isclose(a, b):
@@ -58,7 +67,8 @@ class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):
             raise self.failureException(msg)
 
     def assertNotIsClose(self, a, b, msg: str=None):
-        """
+        """Confirm one number is not close to another.
+
         assertNotIsClose is to assertIsClose as assertNotAlmostEqual is to assertAlmostEqual - completeness
         """
         if self.isclose(a, b):
@@ -67,12 +77,14 @@ class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):
             raise self.failureException(msg)
 
     def assertCloseOrLessThan(self, a, b, msg: str=None):
+        """Confirm one number is close or less than another."""
         if not (a < b or self.isclose(a, b)):
             if msg is None:
                 msg = "{a} is not sufficiently less than {b}".format(a=a, b=b)
             raise self.failureException(msg)
 
     def assertCloseOrGreaterThan(self, a, b, msg: str=None):
+        """Confirm one number is close or greater than another."""
         if not (a > b or self.isclose(a, b)):
             if msg is None:
                 msg = "{a} is not sufficiently less than {b}".format(a=a, b=b)
@@ -83,8 +95,8 @@ ClassUnderTest = 'ClassUnderTest'
 
 
 def Given(strategy_dict=None, *, testMethodPrefix='test_generic', data_arg='data'):
-    """
-    Decorator for GenericTests derived test cases
+    """Bind GenericTests to hypothesis strategies.
+
     It binds hypothesis strategies to the test_generic methods using the strategy_dict.
     """
     if strategy_dict is None:

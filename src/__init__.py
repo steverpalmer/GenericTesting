@@ -2,6 +2,8 @@
 
 """Merge generic_testing into a single namespace."""
 
+__version__ = "0.1"
+
 from .isclose import IsClose
 
 from .core import *

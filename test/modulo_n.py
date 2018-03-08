@@ -179,29 +179,17 @@ class ModuloN(numbers.Integral):
 
     __mod__, __rmod__ = _operator_fallbacks(operator.mod)
 
-    __pow__, __rpow__ = (None, None)
+    __pow__, __rpow__ = _operator_fallbacks(None)
 
-    # FIXME: This needs some thinging about
-#     def __pow__(self, other: Union['ModuloN', int]) -> Union['ModuloN', float]:
-#         other_value = self._other_value(other)
-#         if other_value > 0:
-#             result = ModuloN(self._modulus, pow(self._value, self._other_value(other), self._modulus))
-#         else:
-#             result = pow(self._value, self._other_value(other))
-#         return result
-# 
-#     def __rpow__(self, other: 'ModuloN', modulo: int=None) -> 'ModuloN':
-#         return self.__pow__(other, modulo)
+    __lshift__, __rlshift__ = _operator_fallbacks(None)  # operator.lshift)
 
-    __lshift__, __rlshift__ = _operator_fallbacks(None) # operator.lshift)
+    __rshift__, __rrshift__ = _operator_fallbacks(None)  # operator.rshift)
 
-    __rshift__, __rrshift__ = _operator_fallbacks(None) # operator.rshift)
+    __and__, __rand__ = _operator_fallbacks(None)  # operator.and_)
 
-    __and__, __rand__ = _operator_fallbacks(None) # operator.and_)
+    __xor__, __rxor__ = _operator_fallbacks(None)  # operator.xor)
 
-    __xor__, __rxor__ = _operator_fallbacks(None) # operator.xor)
-
-    __or__, __ror__ = _operator_fallbacks(None) # operator.or_)
+    __or__, __ror__ = _operator_fallbacks(None)  # operator.or_)
 
     def __neg__(self) -> 'ModuloN':
         return type(self)(self._modulus, -self._value, is_trusted=True)
@@ -282,7 +270,6 @@ class ModuloPow2(ModuloN):
     __xor__, __rxor__ = _operator_fallbacks(operator.xor)
 
     __or__, __ror__ = _operator_fallbacks(operator.or_)
-
 
 
 __all__ = ('ModuloN', 'ModuloPow2')

@@ -34,15 +34,19 @@ class _ContainerLikeFlags(enum.IntEnum):
 
 
 class GenericTestLoader:
+    """Generates Base Class for Property Test Class."""
 
     def __init__(self):
+        """Constructor."""
         self._superclass_mapping = collections.OrderedDict([(type(object), EqualityTests)])
 
     def register(self, T: type, T_Tests: GenericTests):
+        """Register a base class to test mapping."""
         self._superclass_mapping[T] = T_Tests
 
     @staticmethod
     def _is_user_defined(obj, mthd) -> bool:
+        """Is method on class not default."""
         attr = getattr(obj, mthd, None)
         return attr is not None and attr is not getattr(object, mthd, None)
 
@@ -56,6 +60,7 @@ class GenericTestLoader:
                             [ContainerOverIterableTests, SizedOverIterableTests])  # Sized, Iterable and Container
 
     def discover(self, T: type) -> GenericTests:
+        """Generate Base Case based on supplied class."""
         result = None
         for known_T in reversed(self._superclass_mapping):
             if issubclass(T, known_T):
