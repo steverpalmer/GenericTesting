@@ -5,6 +5,7 @@
 import abc
 import unittest
 import inspect
+import datetime
 
 from hypothesis import given, strategies as st
 
@@ -34,6 +35,7 @@ class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):
         self.isclose = IsClose()
         self.addTypeEqualityFunc(float, self.assertIsClose)
         self.addTypeEqualityFunc(complex, self.assertIsClose)
+        self.addTypeEqualityFunc(datetime.timedelta, self.assertIsClose)
 
     def assertIsInstance(self, obj, type_, msg: str=None):
         """Confirm type of object.
