@@ -5,6 +5,36 @@
 import numbers
 import math
 import cmath
+import datetime
+
+import networkx as nx
+
+def _most_specific_single_supertype(*args) -> type:
+    """Determine the most specific (least abstract) supertype of the args.
+
+    This is akin to the Lowest common ancestor problem,
+    but since it is a relatively small scale,
+    I don't try for an optimized algorithm.
+
+    Can be awkward if the args have more than one common superclass.
+    """
+    types = tuple(o if isinstance(o, type) else type(o) for o in args)
+    superclasses = nx.DiGraph()
+    common_superclasses = [set(T.__mro__) for T in types]
+    common_superclasses = common_superclasses[0].intersection(*common_superclasses[1:])
+    for T in common_superclasses:
+        for parent in T.__mro__:
+            if parent != T:
+                superclasses.add_edge(T, parent)
+    superclasses = nx.transitive_closure(superclasses)
+    while True:
+        sorted_superclasses = list(nx.topological_sort(superclasses))
+        result = sorted_superclasses[0]
+        if all(superclasses.has_edge(result, T) for T in sorted_superclasses[1:]):
+            break
+        common_superclasses &= set(superclasses.successors(result))
+        superclasses = superclasses.subgraph(common_superclasses)
+    return result
 
 
 class IsClose:
@@ -65,24 +95,27 @@ class IsClose:
         return result
 
     @staticmethod
-    def _over_numbers(a: numbers.Number, b: numbers.Number, rel_tol: float, abs_tol: float) -> bool:
+    def _polymorphic(a: numbers.Number, b: numbers.Number, rel_tol: float, abs_tol: float) -> bool:
         """Polymorphic isclose.
 
-        >>> IsClose._over_numbers("fred", 0, 0.0, 0.0)
-        Traceback (most recent call last):
-            ...
-        TypeError: IsClose should be used on numbers only
-        >>> IsClose._over_numbers(complex(1), float(1), 0.0, 0.0)
+        >>> IsClose._polymorphic(complex(1), float(1), 0.0, 0.0)
         True
-        >>> IsClose._over_numbers(float(1), complex(2), 0.0, 0.0)
+        >>> IsClose._polymorphic(float(1), complex(2), 0.0, 0.0)
         False
-        >>> IsClose._over_numbers(float(2), float(1), 0.0, 0.0)
+        >>> IsClose._polymorphic(float(2), float(1), 0.0, 0.0)
         False
-        >>> IsClose._over_numbers(1, float(1), 0.0, 0.0)
+        >>> IsClose._polymorphic(1, float(1), 0.0, 0.0)
+        True
+        >>> IsClose._polymorphic(datetime.timedelta(1), datetime.timedelta(1), 0.0, 0.0)
+        True
+        >>> IsClose._polymorphic(datetime.timedelta(1, microseconds=1), datetime.timedelta(1), 0.0, 0.0)
+        False
+        >>> IsClose._polymorphic(datetime.timedelta(1, microseconds=1), datetime.timedelta(1), 1e-9, 0.0)
         True
         """
         if not isinstance(a, numbers.Number) or not isinstance(b, numbers.Number):
-            raise TypeError("IsClose should be used on numbers only")
+            # try and do something reasonable
+            result = abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), _most_specific_single_supertype(a, b)(abs_tol))
         elif isinstance(a, numbers.Complex) or isinstance(b, numbers.Complex):
             result = cmath.isclose(complex(a), complex(b), rel_tol=rel_tol, abs_tol=abs_tol)
         else:
@@ -90,17 +123,17 @@ class IsClose:
         return result
 
     @staticmethod
-    def over_numbers(a: numbers.Number, b: numbers.Number, *, rel_tol: float=None, abs_tol: float=None) -> bool:
+    def polymorphic(a: numbers.Number, b: numbers.Number, *, rel_tol: float=None, abs_tol: float=None) -> bool:
         """Polymorphic isclose.
 
-        >>> IsClose.over_numbers(complex(1/3, 1/3), complex(0.3333333333333333333333, 0.33333333333333333333))
+        >>> IsClose.polymorphic(complex(1/3, 1/3), complex(0.3333333333333333333333, 0.33333333333333333333))
         True
-        >>> IsClose.over_numbers(float(2), float(1))
+        >>> IsClose.polymorphic(float(2), float(1))
         False
         """
         rel_tol = IsClose._rel_tol(rel_tol)
         abs_tol = IsClose._abs_tol(abs_tol)
-        return IsClose._over_numbers(a, b, rel_tol=rel_tol, abs_tol=abs_tol)
+        return IsClose._polymorphic(a, b, rel_tol=rel_tol, abs_tol=abs_tol)
 
     def __init__(self, rel_tol: numbers.Real=None, abs_tol: numbers.Real=None) -> None:
         """Define rel_tol and abs_tol default values."""
@@ -134,7 +167,7 @@ class IsClose:
         >>> myisclose(1.0, 1.0)
         True
         """
-        return IsClose._over_numbers(a, b, rel_tol=self._rel_tol, abs_tol=self._abs_tol)
+        return IsClose._polymorphic(a, b, rel_tol=self._rel_tol, abs_tol=self._abs_tol)
 
     def close(self):
         """close function.
