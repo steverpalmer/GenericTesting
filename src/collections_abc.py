@@ -110,10 +110,6 @@ class SizedIterableContainerWithEmpty(SizedOverIterableTests, ContainerOverItera
     def empty(self) -> ClassUnderTest:
         pass
 
-    @abc.abstractmethod
-    def test_generic_2010_empty_type(self) -> None:
-        self.fail("Need to define a test that the helper empty has the correct type")
-
     def test_generic_2402_zero_iterations_over_empty(self) -> None:
         with self.assertRaises(StopIteration):
             next(iter(self.empty))
@@ -133,10 +129,6 @@ class SetTests(SizedIterableContainerWithEmpty, EqualityTests, PartialOrderingTe
     @property
     def bottom(self) -> ClassUnderTest:
         return self.empty
-
-    @unittest.skip("bottom is empty")
-    def test_generic_2000_bottom_type(self) -> None:
-        pass
 
     def test_generic_2151_ordering_consistent_with_lattice(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         "(a & b <= a <= a | b) and (a & b <= b <= a | b)"

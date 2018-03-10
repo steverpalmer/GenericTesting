@@ -24,12 +24,6 @@ class intTests(IntegralTests, IntegralAugmentedAssignmentTests, FloorDivAugmente
     zero = 0
     one = 1
 
-    def test_generic_2020_zero_type(self):
-        self.assertIsInstance(self.zero, int)
-
-    def test_generic_2021_one_type(self):
-        self.assertIsInstance(self.one, int)
-
     # To avoid << and >> related test killing performance,
     # restrict the test range on b or [0 .. 63]
 
@@ -59,15 +53,6 @@ class FractionTests(RationalTests, ComplexAugmentedAssignmentTests, FloorDivAugm
     one = fractions.Fraction(1)
     half = fractions.Fraction(1, 2)
 
-    def test_generic_2020_zero_type(self):
-        self.assertIsInstance(self.zero, fractions.Fraction)
-
-    def test_generic_2021_one_type(self):
-        self.assertIsInstance(self.one, fractions.Fraction)
-
-    def test_generic_2022_half_type(self):
-        self.assertIsInstance(self.half, fractions.Fraction)
-
 
 class floatTests(RealTests, ComplexAugmentedAssignmentTests, FloorDivAugmentedAssignmentTests):
     """Tests of float class properties."""
@@ -75,15 +60,6 @@ class floatTests(RealTests, ComplexAugmentedAssignmentTests, FloorDivAugmentedAs
     zero = 0.0
     one = 1.0
     root_two = 2.0 ** 0.5
-
-    def test_generic_2020_zero_type(self):
-        self.assertIsInstance(self.zero, float)
-
-    def test_generic_2021_one_type(self):
-        self.assertIsInstance(self.one, float)
-
-    def test_generic_2023_root_two_type(self):
-        self.assertIsInstance(self.root_two, float)
 
     @wraps(RealTests.test_generic_2220_addition_associativity)
     def test_generic_2220_addition_associativity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
@@ -111,15 +87,6 @@ class complexTests(ComplexTests, ComplexAugmentedAssignmentTests):
     one = complex(1)
     i = complex(0, 1)
 
-    def test_generic_2020_zero_type(self):
-        self.assertIsInstance(self.zero, complex)
-
-    def test_generic_2021_one_type(self):
-        self.assertIsInstance(self.one, complex)
-
-    def test_generic_2024_i_type(self):
-        self.assertIsInstance(self.i, complex)
-
     @wraps(ComplexTests.test_generic_2237_multiplication_addition_left_distributivity)
     def test_generic_2237_multiplication_addition_left_distributivity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
         # :FUDGE: this consistently fails when b is close to -c due to the limitations of floating point numbers.
@@ -143,9 +110,6 @@ class frozensetTests(SetTests):
     """Tests of frozenset class properties."""
 
     empty = frozenset()
-
-    def test_generic_2010_empty_type(self) -> None:
-        self.assertIsInstance(self.empty, frozenset)
 
     def test_generic_2600_issubset_defintion(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         """a.issubset(b) ⇔ a <= b"""
@@ -182,9 +146,6 @@ class setTests(MutableSetTests, frozensetTests):
 
     def singleton_constructor(self, a: ElementT) -> ClassUnderTest:
         return set([a])
-
-    def test_generic_2010_empty_type(self) -> None:
-        self.assertIsInstance(self.empty, set)
 
     def test_generic_2502_pop_definition(self, a: ClassUnderTest) -> None:
         """Test pop method"""
@@ -256,17 +217,11 @@ class dictKeysViewTests(KeysViewTests):
 
     empty = dict().keys()
 
-    def test_generic_2010_empty_type(self) -> None:
-        pass
-
 
 class dictItemsViewTests(ItemsViewTests):
     """Tests of dict ItemsView class properties."""
 
     empty = dict().items()
-
-    def test_generic_2010_empty_type(self) -> None:
-        pass
 
 
 class dictValuesViewTests(ValuesViewTests):
@@ -281,9 +236,6 @@ class MappingProxyTypeTests(MappingTests):
     def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
         return types.MappingProxyType({a: b})
 
-    def test_generic_2010_empty_type(self) -> None:
-        self.assertIsInstance(self.empty, types.MappingProxyType)
-
 
 class dictTests(MutableMappingTests):
     """Tests of dict class properties."""
@@ -296,9 +248,6 @@ class dictTests(MutableMappingTests):
     def copy(self, a: ClassUnderTest) -> ClassUnderTest:
         return a.copy()
 
-    def test_generic_2010_empty_type(self) -> None:
-        self.assertIsInstance(self.empty, dict)
-
 
 class CounterTests(dictTests):
     """Tests of Counter class properties."""
@@ -307,9 +256,6 @@ class CounterTests(dictTests):
 
     def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
         return collections.Counter({a: b})
-
-    def test_generic_2010_empty_type(self) -> None:
-        self.assertIsInstance(self.empty, collections.Counter)
 
     def test_generic_2505_update_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         """Test Counter update method"""
@@ -330,9 +276,6 @@ class OrderedDictTests(dictTests):
     def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
         return collections.OrderedDict([(a, b)])
 
-    def test_generic_2010_empty_type(self) -> None:
-        self.assertIsInstance(self.empty, collections.OrderedDict)
-
     # TODO: add tests for OrderedDict specific features and methods
 
 
@@ -350,9 +293,6 @@ class defaultdictTests(dictTests):
 
     def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
         return collections.defaultdict(self._default_factory, [(a, b)])
-
-    def test_generic_2010_empty_type(self) -> None:
-        self.assertIsInstance(self.empty, collections.defaultdict)
 
 
 __all__ = ('intTests', 'FractionTests', 'floatTests', 'complexTests',

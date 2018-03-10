@@ -14,12 +14,6 @@ from modulo_n import ModuloN, ModuloPow2
 
 class ModuloNTests(EqualityTests, TotalOrderingTests, FieldTests, FloorDivModTests, AbsoluteValueTests):
 
-    def test_generic_2020_zero_type(self):
-        self.assertIsInstance(self.zero, ModuloN)
-
-    def test_generic_2021_one_type(self):
-        self.assertIsInstance(self.one, ModuloN)
-
     @unittest.skip("abs is not multiplicitive in this class")
     def test_generic_2273_abs_is_multiplicitive(self):
         pass
@@ -40,20 +34,6 @@ class ModuloPow2Tests(ModuloNTests, LatticeWithComplement):
     @property
     def top(self):
         return -self.one
-
-    @unittest.skip("bottom is zero")
-    def test_generic_2000_bottom_type(self):
-        pass
-
-    @unittest.skip("top is -one")
-    def test_generic_2001_top_type(self):
-        pass
-
-    def test_generic_2020_zero_type(self):
-        self.assertIsInstance(self.zero, ModuloPow2)
-
-    def test_generic_2021_one_type(self):
-        self.assertIsInstance(self.one, ModuloPow2)
 
 
 @Given(st.builds(ModuloPow2.bit, st.integers()))

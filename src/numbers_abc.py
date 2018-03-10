@@ -38,10 +38,6 @@ class ComplexTests(_ComplexTests):
         number "i" representing the square root of -1.
         """
 
-    @abc.abstractmethod
-    def test_generic_2024_i_type(self) -> None:
-        self.fail("Need to define a test that the helper i has the correct type")
-
     def test_generic_2300_i_times_i_is_minus_one(self) -> None:
         """i * i == -1"""
         self.assertEqual(self.i * self.i, -self.one)
@@ -87,10 +83,6 @@ class _RealTests(_ComplexTests, TotalOrderingTests, FloorDivModTests, Exponentia
     def abs_zero(self):
         return self.zero
 
-    @unittest.skip("abs_zero is zero")
-    def test_generic_2030_abs_zero_type(self) -> None:
-        pass
-
     def test_generic_2152_less_or_equal_orientation(self) -> None:
         """0 <= 1"""
         self.assertTrue(self.zero <= self.one)
@@ -119,10 +111,6 @@ class RealTests(_RealTests):
         A defining characteristic of Real numbers is that there should be a
         number representing, for example, the square root of 2.
         """
-
-    @abc.abstractmethod
-    def test_generic_2023_root_two_type(self) -> None:
-        self.fail("Need to define a test that the helper root_two has the correct type")
 
     def test_generic_2330_root_two_times_root_two_is_two(self) -> None:
         """√2 * √2 == 2"""
@@ -191,10 +179,6 @@ class RationalTests(_RationalTests):
     def half(self) -> ClassUnderTest:
         pass
 
-    @abc.abstractmethod
-    def test_generic_2022_half_type(self) -> None:
-        self.fail("Need to define a test that the helper half has the correct type")
-
     def test_generic_2360_half_plus_half_is_one(self) -> None:
         """½ + ½ == 1"""
         self.assertEqual(self.half + self.half, self.one)
@@ -225,14 +209,6 @@ class IntegralTests(_RationalTests, LatticeWithComplement):
     @property
     def top(self) -> ClassUnderTest:
         return -self.one
-
-    @unittest.skip("bottom is zero")
-    def test_generic_2000_bottom_type(self):
-        pass
-
-    @unittest.skip("top is -one")
-    def test_generic_2001_top_type(self):
-        pass
 
     def test_generic_2380_int_function(self) -> None:
         self.assertEqual(0, int(self.zero))

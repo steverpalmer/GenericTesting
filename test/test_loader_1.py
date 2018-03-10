@@ -45,9 +45,6 @@ class IntSetDecorator(collections.abc.Set):
 class Test_IntSetDecorator(defaultGenericTestLoader.discover(IntSetDecorator)):
     empty = IntSetDecorator([])
 
-    def test_generic_2010_empty_type(self):
-        self.assertIsInstance(self.empty, IntSetDecorator)
-
     def test_total(self):
         isd = IntSetDecorator([1, 3, 5])
         self.assertEqual(isd.total(), 9)

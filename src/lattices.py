@@ -48,10 +48,6 @@ class BoundedBelowLatticeTests(LatticeTests):
         """Lowest bound value."""
         pass
 
-    @abc.abstractmethod
-    def test_generic_2000_bottom_type(self):
-        self.fail("Need to define a test that the helper bottom has the correct type")
-
     def test_generic_2202_or_identity(self, a: ClassUnderTest) -> None:
         """a | ⊥ == a"""
         self.assertEqual(a | self.bottom, a)
@@ -65,10 +61,6 @@ class BoundedLatticeTests(BoundedBelowLatticeTests):
     def top(self) -> ClassUnderTest:
         """Highest bound value."""
         pass
-
-    @abc.abstractmethod
-    def test_generic_2001_top_type(self):
-        self.fail("Need to define a test that the helper top has the correct type")
 
     def test_generic_2207_and_identity(self, a: ClassUnderTest) -> None:
         """a & ⊤ = a"""

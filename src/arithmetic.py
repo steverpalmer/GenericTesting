@@ -8,6 +8,8 @@ from hypothesis import assume
 
 from .core import GenericTests, ClassUnderTest
 
+ScalarT = 'ScalarT'
+
 
 class AdditionMonoidTests(GenericTests):
     """Tests of the simplest (Monoid) semantics of the __add__ operator.
@@ -21,10 +23,6 @@ class AdditionMonoidTests(GenericTests):
     def zero(self) -> ClassUnderTest:
         """Addition Identity Value."""
         pass
-
-    @abc.abstractmethod
-    def test_generic_2020_zero_type(self) -> None:
-        self.fail("Need to define a test that the helper zero has the correct type")
 
     def test_generic_2220_addition_associativity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
         """a + (b + c) == (a + b) + c"""
@@ -74,10 +72,6 @@ class MultiplicationMonoidTests(GenericTests):
         """Multiplication Identity Value."""
         pass
 
-    @abc.abstractmethod
-    def test_generic_2021_one_type(self) -> None:
-        self.fail("Need to define a test that the helper one has the correct type")
-
     def test_generic_2234_multiplication_associativity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
         """a * (b * c) == (a * b) * c"""
         self.assertEqual(a * (b * c), (a * b) * c)
@@ -88,15 +82,9 @@ class MultiplicationMonoidTests(GenericTests):
         self.assertEqual(self.one * a, a)
 
 
-class RingTests(AdditionAbelianGroupTests, MultiplicationMonoidTests):
-    """Tests of the Ring semantics of the basic arithmetic operators.
-
-    See https://en.wikipedia.org/wiki/Ring_(mathematics)
+class AdditionExtensionsTests:
+    """Discrete tests of the __pos__ and __sub__ methods."
     """
-
-    def test_generic_2105_not_zero_equal_one(self) -> None:
-        """0 != 1"""
-        self.assertFalse(self.zero == self.one)
 
     def test_generic_2232_pos_definition(self, a: ClassUnderTest) -> None:
         """+a == a"""
@@ -105,6 +93,17 @@ class RingTests(AdditionAbelianGroupTests, MultiplicationMonoidTests):
     def test_generic_2233_sub_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         """a - b == a + (-b)"""
         self.assertEqual(a - b, a + (-b))
+
+
+class RingTests(AdditionAbelianGroupTests, AdditionExtensionsTests, MultiplicationMonoidTests):
+    """Tests of the Ring semantics of the basic arithmetic operators.
+
+    See https://en.wikipedia.org/wiki/Ring_(mathematics)
+    """
+
+    def test_generic_2105_not_zero_equal_one(self) -> None:
+        """0 != 1"""
+        self.assertFalse(self.zero == self.one)
 
     def test_generic_2237_multiplication_addition_left_distributivity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
         """a * (b + c) == (a * b) + (a * c)"""
@@ -121,9 +120,43 @@ class CommutativeRingTests(RingTests):
     See https://en.wikipedia.org/wiki/Commutative_ring
     """
 
-    def test_generic_2236_multiplication_commutativity(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2239_multiplication_commutativity(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         """a * b == b * a"""
         self.assertEqual(a * b, b * a)
+
+
+class RModuleTests(AdditionAbelianGroupTests):
+    """Test of the R-Module Semantics of the __add__ and __mul__ operators.
+
+    A distinction in this case is the the __mul__ operator takes a scalar and a value
+    This a generalization of a Vector Space used for types like timedelta.
+    See https://en.wikipedia.org/wiki/Module_(mathematics)
+    """
+
+    @property
+    @abc.abstractmethod
+    def scalar_one(self) -> ScalarT:
+        """Multiplication Identity Value."""
+
+    def test_generic_2234_multiplication_associativity(self, r: ScalarT, s: ScalarT, a: ClassUnderTest) -> None:
+        """(s * t) * a == (s * (t * a)"""
+        self.assertEqual((r * s) * a, r * (s * a))
+
+    def test_generic_2235_multiplication_identity(self, a: ClassUnderTest) -> None:
+        """1 * a == a"""
+        self.assertEqual(self.scalar_one * a, a)
+
+    def test_generic_2237_multiplication_addition_left_distributivity(self, r: ScalarT, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        """r * (a + b) == (r * a) + (r * b)"""
+        self.assertEqual(r * (a + b), r * a + r * b)
+
+    def test_generic_2239_multiplication_commutativity(self, r: ScalarT, a: ClassUnderTest) -> None:
+        """r * a == a * r"""
+        self.assertEqual(r * a, a * r)
+
+    def test_generic_2240_r_module_multiplication_addition_left_distributivity(self, r: ScalarT, s: ScalarT, a: ClassUnderTest) -> None:
+        """(r + s) * a == (r * a) + (s * a)"""
+        self.assertEqual((r + s) * a, r * a + s * a)
 
 
 class FieldTests(CommutativeRingTests):
@@ -132,7 +165,7 @@ class FieldTests(CommutativeRingTests):
     See https://en.wikipedia.org/wiki/Field_(mathematics)
     """
 
-    def test_generic_2239_truediv_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2245_truediv_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         """b != 0 ⇒ (a / b) * b == a"""
         assume(not b == self.zero)
         calc = (a / b) * b
@@ -149,7 +182,7 @@ class FloorDivModTests(GenericTests):
     with the ClassUnderTest.
     """
 
-    def test_generic_2240_mod_range(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2246_mod_range(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         """b != 0 ⇒ a % b ∈ [0 .. b)"""
         assume(not b == self.zero)
         mod = a % b
@@ -160,12 +193,12 @@ class FloorDivModTests(GenericTests):
             self.assertLessEqual(self.zero, mod)
             self.assertLess(mod, b)
 
-    def test_generic_2241_floordiv_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2247_floordiv_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         """b != 0 ⇒ (a // b) * b + (a % b) == a"""
         assume(not b == self.zero)
         self.assertEqual((a // b) * b + a % b, a)
 
-    def test_generic_2242_divmod_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2248_divmod_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         """b != 0 ⇒ divmod(a, b) == (a // b, a % b)"""
         assume(not b == self.zero)
         self.assertEqual(divmod(a, b), (a // b, a % b))
@@ -231,9 +264,6 @@ class AbsoluteValueTests(GenericTests):
         """abs(0)"""
         return abs(self.zero)
 
-    def test_generic_2030_abs_zero_type(self) -> None:
-        self.assertIsInstance(self.abs_zero, type(abs(self.zero)))
-
     def test_generic_2270_abs_not_negative(self, a: ClassUnderTest) -> None:
         """0 <= abs(a)"""
         self.assertTrue(self.abs_zero <= abs(a))
@@ -251,6 +281,27 @@ class AbsoluteValueTests(GenericTests):
         self.assertLessEqual(abs(a + b), abs(a) + abs(b))
 
 
+class VectorSpaceTests(RModuleTests, AdditionExtensionsTests):
+    """Tests of the Vector Space semantics of the basic arithmetic operators.
+
+    See https://en.wikipedia.org/wiki/Vector_space
+
+    Strictly, a vector space multiplication need not be commutative (r * a) == (a * r),
+    but in the programming world, most examples are (e.g. timedelta).
+    """
+
+    @property
+    def scalar_zero(self) -> ScalarT:
+        """A zero in scalar type."""
+        return self.scalar_one - self.scalar_one
+
+    def test_generic_2245_truediv_definition(self, r: ScalarT, a: ClassUnderTest) -> None:
+        """r != 0 ⇒ (a / r) == (1 / r) * a"""
+        assume(not r == self.scalar_zero)
+        self.assertEqual(a / r, (self.scalar_one / r) * a)
+
+
 __all__ = ('AdditionMonoidTests', 'AdditionGroupTests', 'AdditionAbelianGroupTests', 'AdditionCommutativeGroupTests',
            'MultiplicationMonoidTests', 'RingTests', 'CommutativeRingTests', 'FieldTests',
-           'FloorDivModTests', 'ExponentiationTests', 'AbsoluteValueTests')
+           'FloorDivModTests', 'ExponentiationTests', 'AbsoluteValueTests',
+           'AdditionExtensionsTests', 'RModuleTests', 'VectorSpaceTests')
