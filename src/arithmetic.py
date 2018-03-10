@@ -139,7 +139,7 @@ class RModuleTests(AdditionAbelianGroupTests):
         """Multiplication Identity Value."""
 
     def test_generic_2234_multiplication_associativity(self, r: ScalarT, s: ScalarT, a: ClassUnderTest) -> None:
-        """(s * t) * a == (s * (t * a)"""
+        """(r * s) * a == (r * (s * a)"""
         self.assertEqual((r * s) * a, r * (s * a))
 
     def test_generic_2235_multiplication_identity(self, a: ClassUnderTest) -> None:
@@ -301,7 +301,46 @@ class VectorSpaceTests(RModuleTests, AdditionExtensionsTests):
         self.assertEqual(a / r, (self.scalar_one / r) * a)
 
 
+VectorSpaceT = 'VectorSpaceT'
+
+
+class AffineSpaceTests(AdditionExtensionsTests):
+    """Tests of the Affine Space semantics of the basic operators.
+
+    See https://en.wikipedia.org/wiki/Affine_space
+    """
+
+    @property
+    @abc.abstractmethod
+    def vector_space_zero(self) -> VectorSpaceT:
+        """Addition Identity Value."""
+        pass
+
+    def test_generic_2220_addition_associativity(self, a: ClassUnderTest, b: VectorSpaceT, c: VectorSpaceT) -> None:
+        """a + (b + c) == (a + b) + c"""
+        self.assertEqual(a + (b + c), (a + b) + c)
+
+    def test_generic_2221_addition_identity(self, a: ClassUnderTest) -> None:
+        """a + 0 == a"""
+        self.assertEqual(a + self.vector_space_zero, a)
+
+    # This may be derivable from the others, but I don't see how
+    def test_generic_2290_sub_distributivity(self, a: ClassUnderTest, b: ClassUnderTest, v: VectorSpaceT, w: VectorSpaceT) -> None:
+        """(a + v) - (b + w) == (a - b) + (v - w)"""
+        self.assertEqual((a + v) - (b + w), (a - b) + (v - w))
+
+    # This may be derivable from the others, but I don't see how
+    def test_generic_2291_sub_special_case_1(self, a: ClassUnderTest) -> None:
+        """a - a == 0"""
+        self.assertEqual(a - a, self.vector_space_zero)
+
+    def test_generic_2292_sub_special_case_2(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        """a + (b - a) == b"""
+        self.assertEqual(a + (b - a), b)
+
+
 __all__ = ('AdditionMonoidTests', 'AdditionGroupTests', 'AdditionAbelianGroupTests', 'AdditionCommutativeGroupTests',
            'MultiplicationMonoidTests', 'RingTests', 'CommutativeRingTests', 'FieldTests',
            'FloorDivModTests', 'ExponentiationTests', 'AbsoluteValueTests',
-           'AdditionExtensionsTests', 'RModuleTests', 'VectorSpaceTests')
+           'AdditionExtensionsTests', 'ScalarT', 'RModuleTests', 'VectorSpaceTests',
+           'VectorSpaceT', 'AffineSpaceTests')
