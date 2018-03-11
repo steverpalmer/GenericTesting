@@ -6,15 +6,15 @@ import numbers
 import math
 import cmath
 
-import networkx as nx
-
+# import networkx as nx
+#
 # def _most_specific_single_supertype(*args) -> type:
 #     """Determine the most specific (least abstract) supertype of the args.
-# 
+#
 #     This is akin to the Lowest common ancestor problem,
 #     but since it is a relatively small scale,
 #     I don't try for an optimized algorithm.
-# 
+#
 #     Can be awkward if the args have more than one common superclass.
 #     """
 #     types = tuple(o if isinstance(o, type) else type(o) for o in args)

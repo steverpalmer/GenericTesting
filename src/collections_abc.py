@@ -4,7 +4,6 @@
 
 import abc
 import collections
-import unittest
 
 from hypothesis import assume, strategies as st
 

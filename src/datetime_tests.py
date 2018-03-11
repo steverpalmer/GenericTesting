@@ -9,6 +9,7 @@ from hypothesis import strategies as st
 
 from src import *
 
+
 class timedeltaTests(EqualityTests, TotalOrderingTests, VectorSpaceTests):
     """Tests of timedelta class properties."""
 

@@ -12,7 +12,7 @@ from hypothesis import assume
 from .isclose import IsClose
 from .core import ClassUnderTest
 from .numbers_abc import IntegralTests, RationalTests, RealTests, ComplexTests
-from .collections_abc import (ElementT, ValueT, SetTests, KeysViewTests, ItemsViewTests, ValuesViewTests,
+from .collections_abc import (ElementT, SetTests, KeysViewTests, ItemsViewTests, ValuesViewTests,
                               MutableSetTests, MappingTests, MutableMappingTests)
 from .augmented_assignment import (ComplexAugmentedAssignmentTests, FloorDivAugmentedAssignmentTests,
                                    IntegralAugmentedAssignmentTests, LatticeWithComplementAugmentedTests)
