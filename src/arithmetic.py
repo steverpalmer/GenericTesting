@@ -304,7 +304,7 @@ class VectorSpaceTests(RModuleTests, AdditionExtensionsTests):
 VectorSpaceT = 'VectorSpaceT'
 
 
-class AffineSpaceTests(AdditionExtensionsTests):
+class AffineSpaceTests:
     """Tests of the Affine Space semantics of the basic operators.
 
     See https://en.wikipedia.org/wiki/Affine_space

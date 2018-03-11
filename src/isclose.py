@@ -5,36 +5,35 @@
 import numbers
 import math
 import cmath
-import datetime
 
 import networkx as nx
 
-def _most_specific_single_supertype(*args) -> type:
-    """Determine the most specific (least abstract) supertype of the args.
-
-    This is akin to the Lowest common ancestor problem,
-    but since it is a relatively small scale,
-    I don't try for an optimized algorithm.
-
-    Can be awkward if the args have more than one common superclass.
-    """
-    types = tuple(o if isinstance(o, type) else type(o) for o in args)
-    superclasses = nx.DiGraph()
-    common_superclasses = [set(T.__mro__) for T in types]
-    common_superclasses = common_superclasses[0].intersection(*common_superclasses[1:])
-    for T in common_superclasses:
-        for parent in T.__mro__:
-            if parent != T:
-                superclasses.add_edge(T, parent)
-    superclasses = nx.transitive_closure(superclasses)
-    while True:
-        sorted_superclasses = list(nx.topological_sort(superclasses))
-        result = sorted_superclasses[0]
-        if all(superclasses.has_edge(result, T) for T in sorted_superclasses[1:]):
-            break
-        common_superclasses &= set(superclasses.successors(result))
-        superclasses = superclasses.subgraph(common_superclasses)
-    return result
+# def _most_specific_single_supertype(*args) -> type:
+#     """Determine the most specific (least abstract) supertype of the args.
+# 
+#     This is akin to the Lowest common ancestor problem,
+#     but since it is a relatively small scale,
+#     I don't try for an optimized algorithm.
+# 
+#     Can be awkward if the args have more than one common superclass.
+#     """
+#     types = tuple(o if isinstance(o, type) else type(o) for o in args)
+#     superclasses = nx.DiGraph()
+#     common_superclasses = [set(T.__mro__) for T in types]
+#     common_superclasses = common_superclasses[0].intersection(*common_superclasses[1:])
+#     for T in common_superclasses:
+#         for parent in T.__mro__:
+#             if parent != T:
+#                 superclasses.add_edge(T, parent)
+#     superclasses = nx.transitive_closure(superclasses)
+#     while True:
+#         sorted_superclasses = list(nx.topological_sort(superclasses))
+#         result = sorted_superclasses[0]
+#         if all(superclasses.has_edge(result, T) for T in sorted_superclasses[1:]):
+#             break
+#         common_superclasses &= set(superclasses.successors(result))
+#         superclasses = superclasses.subgraph(common_superclasses)
+#     return result
 
 
 class IsClose:
@@ -115,7 +114,31 @@ class IsClose:
         """
         if not isinstance(a, numbers.Number) or not isinstance(b, numbers.Number):
             # try and do something reasonable
-            result = abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), _most_specific_single_supertype(a, b)(abs_tol))
+            result = False
+            if a == b:
+                result = True
+            else:
+                try:
+                    difference = abs(a - b)
+                except BaseException:
+                    pass
+                else:
+                    try:
+                        if difference < rel_tol * max(abs(a), abs(b)):
+                            result = True
+                    except BaseException:
+                        pass
+                    if not result:
+                        if type(a) == type(b):
+                            try:
+                                abs_tol = type(a)(abs_tol)
+                            except BaseException:
+                                pass
+                        try:
+                            if difference <= abs_tol:
+                                result = True
+                        except BaseException:
+                            pass
         elif isinstance(a, numbers.Complex) or isinstance(b, numbers.Complex):
             result = cmath.isclose(complex(a), complex(b), rel_tol=rel_tol, abs_tol=abs_tol)
         else:
