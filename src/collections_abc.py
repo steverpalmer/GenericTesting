@@ -146,14 +146,20 @@ class SetTests(SizedIterableContainerWithEmpty, EqualityTests, PartialOrderingTe
         self.assertEqual(a.isdisjoint(b), a & b == self.empty)
 
     def test_generic_2431_sub_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        "(a - b <= a) and (a - b) & b == ∅"
+        "x in a - b ⇔ x in a and x not in b"
         c = a - b
-        self.assertTrue(c <= a)
-        self.assertTrue(c.isdisjoint(b))
+        universe = a | b
+        self.assertLessEqual(c, universe)
+        for x in universe:
+            self.assertEqual(x in c, x in a and x not in b)
 
     def test_generic_2432_xor_defintion(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        "a ^ b == (a | b) - (a & b)"
-        self.assertEqual(a ^ b, (a | b) - (a & b))
+        "x in a ^ b ⇔ x in a and x not in b or x not in a and x in b"
+        c = a ^ b
+        universe = a | b
+        self.assertLessEqual(c, universe)
+        for x in universe:
+            self.assertEqual(x in c, x in a and x not in b or x not in a and x in b)
 
 
 class MappingViewTests(SizedTests):
@@ -182,17 +188,9 @@ class MutableSetTests(SetTests, LatticeWithComplementAugmentedTests):
     @abc.abstractmethod
     def copy(self, a: ClassUnderTest) -> ClassUnderTest:
         """ Copy Helper function.
-        
+
         To test Mutable containers, it is useful to have a helper that takes
         a copy of the container before it is mutated.
-        """
-
-    @abc.abstractmethod
-    def singleton_constructor(self, a: ElementT) -> ClassUnderTest:
-        """Singleton Constructor Helper function.
-        
-        Since we have comprehensive test of set operations,
-        it is useful to have a helper to construct a set from a single value.
         """
 
     def test_generic_2040_copy_helper_definition(self, a: ClassUnderTest) -> None:
@@ -200,24 +198,21 @@ class MutableSetTests(SetTests, LatticeWithComplementAugmentedTests):
         self.assertNotEqual(id(a), id(a_copy))
         self.assertEqual(a, a_copy)
 
-    def test_generic_2041_singleton_constructor_helper_definition(self, a: ElementT) -> None:
-        a_singleton = self.singleton_constructor(a)
-        self.assertTrue(a in a_singleton)
-        self.assertEqual(len(a_singleton), 1)
-
     def test_generic_2460_add_definition(self, a: ClassUnderTest, b: ElementT) -> None:
-        """Test add method."""
+        """a.add(b); x in a ⇔ x in a₀ or x == b"""
         a_copy = self.copy(a)
-        b_singleton = self.singleton_constructor(b)
         a.add(b)
-        self.assertEqual(a, a_copy | b_singleton)
+        universe = a | a_copy
+        for x in universe:
+            self.assertEqual(x in a, x in a_copy or x == b)
 
     def test_generic_2461_discard_definition(self, a: ClassUnderTest, b: ElementT) -> None:
-        """Test discard method."""
+        """a.discard(b); x in a ⇔ x in a₀ and not x == b"""
         a_copy = self.copy(a)
-        b_singleton = self.singleton_constructor(b)
         a.discard(b)
-        self.assertEqual(a, a_copy - b_singleton)
+        universe = a | a_copy
+        for x in universe:
+            self.assertEqual(x in a, x in a_copy and not x == b)
 
 
 class MappingTests(SizedIterableContainerWithEmpty, EqualityTests):
@@ -276,13 +271,12 @@ class MutableMappingTests(MappingTests):
         self.assertEqual(a, a_copy)
 
     def test_generic_2500_setitem_definition(self, a: ClassUnderTest, b: ElementT, c: ValueT) -> None:
-        """Test __setitem__ method."""
+        """a[b] = c; a[k] == c if k == b else a₀[k]"""
         a_copy = self.copy(a)
         a[b] = c
-        self.assertEqual(a[b], c)
-        for key in a_copy:
-            if key != b:
-                self.assertEqual(a[key], a_copy[key])
+        universe = a_copy.keys() | a.keys()
+        for key in universe:
+            self.assertEqual(a[key], c if key == b else a_copy[key])
 
     def test_generic_2501_delitem_definition(self, a: ClassUnderTest, data) -> None:
         """Test __delitem__ method."""
@@ -291,9 +285,10 @@ class MutableMappingTests(MappingTests):
         key_to_forget = data.draw(st.sampled_from(list(a.keys())))
         del a[key_to_forget]
         self.assertTrue(key_to_forget not in a)
-        for other_key in a_copy:
-            if other_key != key_to_forget:
-                self.assertEqual(a[other_key], a_copy[other_key])
+        universe = a_copy.keys() | a.keys()
+        universe.remove(key_to_forget)
+        for key in universe:
+            self.assertEqual(a[key], a_copy[key])
 
     def test_generic_2502_pop_definition(self, a: ClassUnderTest, b: ElementT) -> None:
         """Test pop method."""

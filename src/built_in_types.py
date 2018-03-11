@@ -144,9 +144,6 @@ class setTests(MutableSetTests, frozensetTests):
     def copy(self, s: ClassUnderTest) -> ClassUnderTest:
         return s.copy()
 
-    def singleton_constructor(self, a: ElementT) -> ClassUnderTest:
-        return set([a])
-
     def test_generic_2502_pop_definition(self, a: ClassUnderTest) -> None:
         """Test pop method"""
         if a:
@@ -233,17 +230,11 @@ class MappingProxyTypeTests(MappingTests):
 
     empty = types.MappingProxyType(dict())
 
-    def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
-        return types.MappingProxyType({a: b})
-
 
 class dictTests(MutableMappingTests):
     """Tests of dict class properties."""
 
     empty = dict()
-
-    def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
-        return {a: b}
 
     def copy(self, a: ClassUnderTest) -> ClassUnderTest:
         return a.copy()
@@ -253,9 +244,6 @@ class CounterTests(dictTests):
     """Tests of Counter class properties."""
 
     empty = collections.Counter()
-
-    def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
-        return collections.Counter({a: b})
 
     def test_generic_2505_update_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         """Test Counter update method"""
@@ -273,9 +261,6 @@ class OrderedDictTests(dictTests):
 
     empty = collections.OrderedDict()
 
-    def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
-        return collections.OrderedDict([(a, b)])
-
     # TODO: add tests for OrderedDict specific features and methods
 
 
@@ -290,9 +275,6 @@ class defaultdictTests(dictTests):
     @property
     def empty(self):
         return collections.defaultdict(self._default_factory)
-
-    def singleton_constructor(self, a: ElementT, b: ValueT) -> ClassUnderTest:
-        return collections.defaultdict(self._default_factory, [(a, b)])
 
 
 __all__ = ('intTests', 'FractionTests', 'floatTests', 'complexTests',
