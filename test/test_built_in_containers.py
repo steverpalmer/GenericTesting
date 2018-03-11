@@ -146,11 +146,11 @@ __all__ = ('Test_frozenset', 'Test_set',
 
 if __name__ == '__main__':
     SUITE = unittest.TestSuite()
-    name = None  # :TRICK: need to introdcue 'name' before iterating through locals
-    value = None  # :TRICK: need to introdcue 'value' before iterating through locals
-    for name, value in locals().items():
-        if name.startswith('Test_'):
-            SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(value))
-#     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_list))
+#     name = None  # :TRICK: need to introdcue 'name' before iterating through locals
+#     value = None  # :TRICK: need to introdcue 'value' before iterating through locals
+#     for name, value in locals().items():
+#         if name.startswith('Test_'):
+#             SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(value))
+    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_list))
     TR = unittest.TextTestRunner(verbosity=2)
     TR.run(SUITE)

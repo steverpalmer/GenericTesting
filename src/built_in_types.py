@@ -11,9 +11,11 @@ from hypothesis import assume
 
 from .isclose import IsClose
 from .core import ClassUnderTest
+from .relations import EqualityTests, TotalOrderingTests
+from .arithmetic import AdditionMonoidTests
 from .numbers_abc import IntegralTests, RationalTests, RealTests, ComplexTests
 from .collections_abc import (ElementT, SetTests, KeysViewTests, ItemsViewTests, ValuesViewTests,
-                              MutableSetTests, MappingTests, MutableMappingTests, SequenceTests)
+                              MutableSetTests, MappingTests, MutableMappingTests, SequenceTests, MutableSequenceTests)
 from .augmented_assignment import (ComplexAugmentedAssignmentTests, FloorDivAugmentedAssignmentTests,
                                    IntegralAugmentedAssignmentTests, LatticeWithComplementAugmentedTests)
 
@@ -277,17 +279,23 @@ class defaultdictTests(dictTests):
         return collections.defaultdict(self._default_factory)
 
 
-class tupleTests(SequenceTests):
+class tupleTests(EqualityTests, TotalOrderingTests, SequenceTests, AdditionMonoidTests):
     """Tests of tuple class properties."""
 
     empty = tuple()
 
+    @property
+    def zero(self):
+        return self.empty
 
-class listTests(SequenceTests):
+
+class listTests(tupleTests, MutableSequenceTests):
     """Tests of list class properties."""
 
     empty = list()
 
+    def copy(self, a:ClassUnderTest) -> ClassUnderTest:
+        return a[:]
 
 __all__ = ('intTests', 'FractionTests', 'floatTests', 'complexTests',
            'frozensetTests', 'setTests',

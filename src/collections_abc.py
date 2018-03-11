@@ -387,6 +387,46 @@ class SequenceTests(SizedIterableContainerWithEmpty):
 class MutableSequenceTests(SequenceTests):
     """The property tests of collections.abc.MutableSequence."""
 
+    @abc.abstractmethod
+    def copy(self, a: ClassUnderTest) -> ClassUnderTest:
+        """
+        To test Mutable containers, it is useful to have a helper that takes a copy
+        of the container before it is mutated.
+        """
+
+    def test_generic_2040_copy_helper_definition(self, a: ClassUnderTest) -> None:
+        a_copy = self.copy(a)
+        self.assertNotEqual(id(a), id(a_copy))
+        self.assertEqual(a, a_copy)
+
+    def test_generic_2550_setitem_definition(self, a: ClassUnderTest, b: ValueT, data) -> None:
+        """a[i] = b; a[j] == b if j == i else a₀[j]"""
+        assume(len(a) > 0)
+        a_copy = self.copy(a)
+        i = data.draw(st.sampled_from(list(range(len(a)))))
+        a[i] = b
+        for j in range(max(len(a_copy), len(a))):
+            self.assertEqual(a[j], b if j == i else a_copy[j])
+
+    def test_generic_2551_delitem_definition(self, a: ClassUnderTest, data) -> None:
+        """del a[i]; a[j] == a₀[j] if j < i else a₀[j+1]"""
+        assume(len(a) > 0)
+        a_copy = self.copy(a)
+        i = data.draw(st.sampled_from(list(range(len(a)))))
+        del a[i]
+        self.assertEqual(len(a), len(a_copy) - 1)
+        for j in range(len(a)):
+            self.assertEqual(a[j], a_copy[j] if j < i else a_copy[j+1])
+
+    def test_generic_2551_insert_definition(self, a: ClassUnderTest, b: ValueT, data) -> None:
+        """a.insert(i, b); a[j] == a₀[j] if j < i else b if j == i else a₀[j-1]"""
+        assume(len(a) > 0)
+        a_copy = self.copy(a)
+        i = data.draw(st.sampled_from(list(range(len(a)))))
+        a.insert(i, b)
+        self.assertEqual(len(a), len(a_copy) + 1)
+        for j in range(len(a)):
+            self.assertEqual(a[j], a_copy[j] if j < i else b if j == i else a_copy[j-1])
 
 
 __all__ = ('ElementT', 'ValueT',
