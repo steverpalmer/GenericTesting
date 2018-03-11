@@ -337,8 +337,60 @@ class MutableMappingTests(MappingTests):
         self.assertEqual(a, a_copy)
 
 
+class SequenceTests(SizedIterableContainerWithEmpty):
+    """The property tests of collections.abc.Sequence."""
+
+    def test_generic_2530_getitem_on_empty_raises_IndexError(self, i: ElementT) -> None:
+        with self.assertRaises(IndexError):
+            self.empty[i]
+
+    def test_generic_2531_getitem_over_all_indices_succeeds(self, a: ClassUnderTest) -> None:
+        for i in range(len(a)):
+            a[i]
+        with self.assertRaises(IndexError):
+            a[len(a)]
+
+    def test_generic_2532_getitem_over_negative_indices_definition(self, a: ClassUnderTest) -> None:
+        a_len = len(a)
+        for i in range(1, a_len+1):
+            self.assertEqual(a[-i], a[a_len-i])
+        with self.assertRaises(IndexError):
+            a[-a_len-1]
+
+    # :TODO: slices
+
+    def test_generic_2535_reversed_definition(self, a: ClassUnderTest) -> None:
+        i = -1
+        for x in reversed(a):
+            self.assertEqual(x, a[i])
+            i -= 1
+
+    def test_generic_2536_index_definition(self, a: ClassUnderTest, data) -> None:
+        # :TODO: index extra parameters
+        assume(len(a) > 0)
+        value_to_find = data.draw(st.sampled_from(a))
+        i = 0
+        while a[i] != value_to_find:
+            i += 1
+        self.assertEqual(i, a.index(value_to_find))
+
+    def test_generic_2537_count_definition(self, a: ClassUnderTest, data) -> None:
+        assume(len(a) > 0)
+        value_to_count = data.draw(st.sampled_from(a))
+        count = 0
+        for x in a:
+            if x == value_to_count:
+                count += 1
+        self.assertEqual(count, a.count(value_to_count))
+
+
+class MutableSequenceTests(SequenceTests):
+    """The property tests of collections.abc.MutableSequence."""
+
+
+
 __all__ = ('ElementT', 'ValueT',
            'IterableTests', 'SizedTests', 'ContainerTests',
            'SizedOverIterableTests', 'ContainerOverIterableTests', 'SizedIterableContainerWithEmpty',
            'SetTests', 'MappingViewTests', 'KeysViewTests', 'ItemsViewTests', 'ValuesViewTests', 'MutableSetTests',
-           'MappingTests', 'MutableMappingTests')
+           'MappingTests', 'MutableMappingTests', 'SequenceTests', 'MutableSequenceTests')

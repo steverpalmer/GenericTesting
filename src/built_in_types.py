@@ -13,7 +13,7 @@ from .isclose import IsClose
 from .core import ClassUnderTest
 from .numbers_abc import IntegralTests, RationalTests, RealTests, ComplexTests
 from .collections_abc import (ElementT, SetTests, KeysViewTests, ItemsViewTests, ValuesViewTests,
-                              MutableSetTests, MappingTests, MutableMappingTests)
+                              MutableSetTests, MappingTests, MutableMappingTests, SequenceTests)
 from .augmented_assignment import (ComplexAugmentedAssignmentTests, FloorDivAugmentedAssignmentTests,
                                    IntegralAugmentedAssignmentTests, LatticeWithComplementAugmentedTests)
 
@@ -277,7 +277,19 @@ class defaultdictTests(dictTests):
         return collections.defaultdict(self._default_factory)
 
 
+class tupleTests(SequenceTests):
+    """Tests of tuple class properties."""
+
+    empty = tuple()
+
+
+class listTests(SequenceTests):
+    """Tests of list class properties."""
+
+    empty = list()
+
+
 __all__ = ('intTests', 'FractionTests', 'floatTests', 'complexTests',
            'frozensetTests', 'setTests',
            'dictKeysViewTests', 'dictItemsViewTests', 'dictValuesViewTests', 'MappingProxyTypeTests',
-           'dictTests', 'CounterTests', 'OrderedDictTests', 'defaultdictTests')
+           'dictTests', 'CounterTests', 'OrderedDictTests', 'defaultdictTests', 'tupleTests', 'listTests')

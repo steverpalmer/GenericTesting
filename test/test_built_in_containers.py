@@ -118,10 +118,30 @@ class Test_defaultdict(defaultdictTests):
         super().__init__(factory(), methodName)
 
 
+values_st = st.integers()
+
+
+@Given({ClassUnderTest: st.lists(values_st).map(lambda l: tuple(l)),
+        ElementT: st.integers(),
+        ValueT: values_st})
+class Test_tuple(tupleTests):
+    pass
+
+
+values_st = st.integers()
+
+
+@Given({ClassUnderTest: st.lists(values_st),
+        ElementT: st.integers(),
+        ValueT: values_st})
+class Test_list(listTests):
+    pass
+
+
 __all__ = ('Test_frozenset', 'Test_set',
            'Test_dict_KeysView', 'Test_dict_ItemsView', 'Test_dict_ValuesView',
            'Test_MappingProxyType', 'Test_dict',
-           'Test_Counter', 'Test_OrderedDict', 'Test_defaultdict')
+           'Test_Counter', 'Test_OrderedDict', 'Test_defaultdict', 'Test_tuple', 'Test_list')
 
 
 if __name__ == '__main__':
@@ -131,5 +151,6 @@ if __name__ == '__main__':
     for name, value in locals().items():
         if name.startswith('Test_'):
             SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(value))
+#     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_list))
     TR = unittest.TextTestRunner(verbosity=2)
     TR.run(SUITE)
