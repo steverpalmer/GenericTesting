@@ -153,6 +153,6 @@ if __name__ == '__main__':
     for name, value in locals().items():
         if name.startswith('Test_'):
             SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(value))
-#     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_tuple))
+#     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_frozenset))
     TR = unittest.TextTestRunner(verbosity=2)
     TR.run(SUITE)

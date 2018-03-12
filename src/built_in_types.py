@@ -302,8 +302,8 @@ class tupleTests(EqualityTests, TotalOrderingTests, SequenceTests, AdditionMonoi
                 i += 1
         self.assertEqual(a == b, expected)
 
-    def test_generic_2151_less_or_equal_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        """ a <= b ⇔ a[j] <= b[j] and for i < j: a[i] == b[i]"""
+    def test_generic_2145_less_or_equal_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        """a <= b ⇔ a[j] <= b[j] and for i < j: a[i] == b[i]"""
         a_len = len(a)
         b_len = len(b)
         i_max = a_len if a_len <= b_len else b_len

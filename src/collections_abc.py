@@ -129,16 +129,31 @@ class SetTests(SizedIterableContainerWithEmpty, EqualityTests, PartialOrderingTe
     def bottom(self) -> ClassUnderTest:
         return self.empty
 
+    def test_generic_2110_equality_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        """a == b ⇔ (x in a ⇔ x in b)"""
+        expected = True
+        universe = a | b
+        for x in universe:
+            if (x in a) != (x in b):
+                expected = False
+                break
+        self.assertEqual(a == b, expected)
+
+    def test_generic_2145_less_or_equal_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        """a <= b ⇔ (x in a ⇒ x in b)"""
+        expected = True
+        for x in a:
+            if x not in b:
+                expected = False
+                break
+        self.assertEqual(a <= b, expected)
+
     def test_generic_2151_ordering_consistent_with_lattice(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         "(a & b <= a <= a | b) and (a & b <= b <= a | b)"
         union = a | b
         intersection = a & b
         self.assertTrue(intersection <= a <= union)
         self.assertTrue(intersection <= b <= union)
-
-    def test_generic_2152_less_or_equal_orientation(self, a: ClassUnderTest) -> None:
-        "∅ <= a"
-        self.assertLessEqual(self.empty, a)
 
     def test_generic_2430_disjoint_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         "a.isdisjoint(b) ⇔ a & b == ∅"
