@@ -123,7 +123,8 @@ values_st = st.integers()
 
 @Given({ClassUnderTest: st.lists(values_st).map(lambda l: tuple(l)),
         ElementT: st.integers(min_value=-(2**30), max_value=2**30),
-        ValueT: values_st})
+        ValueT: values_st,
+        ScalarT: st.integers(min_value=-1, max_value=10)})
 class Test_tuple(tupleTests):
     pass
 
@@ -133,7 +134,8 @@ values_st = st.integers()
 
 @Given({ClassUnderTest: st.lists(values_st),
         ElementT: st.integers(min_value=-(2**30), max_value=2**30),
-        ValueT: values_st})
+        ValueT: values_st,
+        ScalarT: st.integers(min_value=-1, max_value=10)})
 class Test_list(listTests):
     pass
 
@@ -151,6 +153,6 @@ if __name__ == '__main__':
     for name, value in locals().items():
         if name.startswith('Test_'):
             SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(value))
-#     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_list))
+#     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_tuple))
     TR = unittest.TextTestRunner(verbosity=2)
     TR.run(SUITE)

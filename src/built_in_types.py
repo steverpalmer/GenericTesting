@@ -12,7 +12,7 @@ from hypothesis import assume
 from .isclose import IsClose
 from .core import ClassUnderTest
 from .relations import EqualityTests, TotalOrderingTests
-from .arithmetic import AdditionMonoidTests
+from .arithmetic import AdditionMonoidTests, ScalarT
 from .numbers_abc import IntegralTests, RationalTests, RealTests, ComplexTests
 from .collections_abc import (ElementT, SetTests, KeysViewTests, ItemsViewTests, ValuesViewTests,
                               MutableSetTests, MappingTests, MutableMappingTests, SequenceTests, MutableSequenceTests)
@@ -287,6 +287,59 @@ class tupleTests(EqualityTests, TotalOrderingTests, SequenceTests, AdditionMonoi
     @property
     def zero(self):
         return self.empty
+
+    def test_generic_2239_multiplication_commutativity(self, r: ScalarT, a: ClassUnderTest) -> None:
+        """r * a == a * r"""
+        self.assertEqual(r * a, a * r)
+
+    def test_generic_2620_add_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        """(a + b)[i] == a[i] if i < len(a) else b[i - len(a)]"""
+        a_len = len(a)
+        c = a + b
+        self.assertEqual(len(c), a_len + len(b))
+        i = 0
+        for x in c:
+            self.assertEqual(x, a[i] if i < a_len else b[i - a_len])
+            i += 1
+
+    def test_generic_2621_mul_definition(self, a: ClassUnderTest, b: ScalarT) -> None:
+        """(a * b)[i] == a[i % len(a)]"""
+        a_len = len(a)
+        c = a * b
+        b = max(b, 0)  # clipped
+        self.assertEqual(len(c), a_len * b)
+        i = 0
+        for x in c:
+            self.assertEqual(x, a[i % a_len])
+            i += 1
+
+    def test_generic_2622_min_definition(self, a: ClassUnderTest) -> None:
+        """min(a) in a and min(a) <= a[i]"""
+        if len(a) > 0:
+            try:
+                a_min = min(a)
+            except TypeError:
+                return  # min not accept the supplied types
+            self.assertTrue(a_min in a)
+            for x in a:
+                self.assertLessEqual(a_min, x)
+        else:
+            with self.assertRaises(ValueError):
+                min(a)
+
+    def test_generic_2623_max_definition(self, a: ClassUnderTest) -> None:
+        """max(a) in a and a[i] <= max(a)"""
+        if len(a) > 0:
+            try:
+                a_max = max(a)
+            except TypeError:
+                return  # max not accept the supplied types
+            self.assertTrue(a_max in a)
+            for x in a:
+                self.assertLessEqual(x, a_max)
+        else:
+            with self.assertRaises(ValueError):
+                min(a)
 
 
 class listTests(tupleTests, MutableSequenceTests):
