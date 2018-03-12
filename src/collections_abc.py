@@ -344,11 +344,13 @@ class SequenceTests(SizedIterableContainerWithEmpty):
         with self.assertRaises(IndexError):
             self.empty[i]
 
-    def test_generic_2531_getitem_over_all_indices_succeeds(self, a: ClassUnderTest) -> None:
-        for i in range(len(a)):
-            a[i]
+    def test_generic_2531_getitem_has_same_order_as_iterator(self, a: ClassUnderTest) -> None:
+        i = 0
+        for x in a:
+            self.assertEqual(x, a[i])
+            i += 1
         with self.assertRaises(IndexError):
-            a[len(a)]
+            a[i]
 
     def test_generic_2532_getitem_over_negative_indices_definition(self, a: ClassUnderTest) -> None:
         a_len = len(a)
@@ -364,24 +366,38 @@ class SequenceTests(SizedIterableContainerWithEmpty):
         for x in reversed(a):
             self.assertEqual(x, a[i])
             i -= 1
+        with self.assertRaises(IndexError):
+            a[i]
 
-    def test_generic_2536_index_definition(self, a: ClassUnderTest, data) -> None:
+    def test_generic_2536_index_definition(self, a: ClassUnderTest, b: ValueT) -> None:
         # :TODO: index extra parameters
-        assume(len(a) > 0)
-        value_to_find = data.draw(st.sampled_from(a))
-        i = 0
-        while a[i] != value_to_find:
-            i += 1
-        self.assertEqual(i, a.index(value_to_find))
+        try:
+            i = a.index(b)
+            self.assertEqual(a[i], b)
+            j = 0
+            while j < i:
+                self.assertNotEqual(a[j], b)
+                j += 1
+        except ValueError:
+            self.assertFalse(b in a)
 
-    def test_generic_2537_count_definition(self, a: ClassUnderTest, data) -> None:
+    def test_generic_2537_index_definition_extra_tests(self, a: ClassUnderTest, data) -> None:
         assume(len(a) > 0)
-        value_to_count = data.draw(st.sampled_from(a))
+        b = data.draw(st.sampled_from(a))
+        self.assertTrue(b in a)
+        SequenceTests.test_generic_2536_index_definition(self, a, b)
+
+    def test_generic_2538_count_definition(self, a: ClassUnderTest, b: ValueT) -> None:
         count = 0
         for x in a:
-            if x == value_to_count:
+            if x == b:
                 count += 1
-        self.assertEqual(count, a.count(value_to_count))
+        self.assertEqual(count, a.count(b))
+
+    def test_generic_2539_count_definition_extra_tests(self, a: ClassUnderTest, data) -> None:
+        assume(len(a) > 0)
+        b = data.draw(st.sampled_from(a))
+        SequenceTests.test_generic_2538_count_definition(self, a, b)
 
 
 class MutableSequenceTests(SequenceTests):
@@ -399,34 +415,50 @@ class MutableSequenceTests(SequenceTests):
         self.assertNotEqual(id(a), id(a_copy))
         self.assertEqual(a, a_copy)
 
-    def test_generic_2550_setitem_definition(self, a: ClassUnderTest, b: ValueT, data) -> None:
-        """a[i] = b; a[j] == b if j == i else a₀[j]"""
-        assume(len(a) > 0)
-        a_copy = self.copy(a)
-        i = data.draw(st.sampled_from(list(range(len(a)))))
-        a[i] = b
-        for j in range(max(len(a_copy), len(a))):
-            self.assertEqual(a[j], b if j == i else a_copy[j])
+    def test_generic_2550_setitem_definition(self, a: ClassUnderTest, b: ElementT, c: ValueT) -> None:
+        """a[b] = c; a[i] == c if i == b else a₀[i]"""
+        a_len = len(a)
+        if -a_len <= b < a_len:
+            a_copy = self.copy(a)
+            a[b] = c
+            self.assertEqual(len(a), a_len)
+            if b < 0: b += a_len
+            i = 0
+            for x in a:
+                self.assertEqual(x, c if i == b else a_copy[i])
+                i += 1
+        else:
+            with self.assertRaises(IndexError):
+                a[b] = c
 
-    def test_generic_2551_delitem_definition(self, a: ClassUnderTest, data) -> None:
-        """del a[i]; a[j] == a₀[j] if j < i else a₀[j+1]"""
-        assume(len(a) > 0)
-        a_copy = self.copy(a)
-        i = data.draw(st.sampled_from(list(range(len(a)))))
-        del a[i]
-        self.assertEqual(len(a), len(a_copy) - 1)
-        for j in range(len(a)):
-            self.assertEqual(a[j], a_copy[j] if j < i else a_copy[j+1])
+    def test_generic_2552_delitem_definition(self, a: ClassUnderTest, b: ElementT) -> None:
+        """del a[b]; a[i] == a₀[i] if i < b else a₀[i+1]"""
+        a_len = len(a)
+        if -a_len <= b < a_len:
+            a_copy = self.copy(a)
+            del a[b]
+            self.assertEqual(len(a), a_len-1)
+            if b < 0: b += a_len
+            i = 0
+            for x in a:
+                self.assertEqual(x, a_copy[i] if i < b else a_copy[i + 1])
+                i += 1
+        else:
+            with self.assertRaises(IndexError):
+                del a[b]
 
-    def test_generic_2551_insert_definition(self, a: ClassUnderTest, b: ValueT, data) -> None:
-        """a.insert(i, b); a[j] == a₀[j] if j < i else b if j == i else a₀[j-1]"""
-        assume(len(a) > 0)
+    def test_generic_2554_insert_definition(self, a: ClassUnderTest, b: ElementT, c: ValueT) -> None:
+        """a.insert(b, c); a[i] == c if i == b else a₀[i-int(i > b)]"""
         a_copy = self.copy(a)
-        i = data.draw(st.sampled_from(list(range(len(a)))))
-        a.insert(i, b)
-        self.assertEqual(len(a), len(a_copy) + 1)
-        for j in range(len(a)):
-            self.assertEqual(a[j], a_copy[j] if j < i else b if j == i else a_copy[j-1])
+        a_len = len(a)
+        a.insert(b, c)
+        self.assertEqual(len(a), a_len + 1)
+        if b < 0: b += a_len
+        b = max(0, min(a_len, b))  # clip b
+        i = 0
+        for x in a:
+            self.assertEqual(x, c if i == b else a_copy[i-int(i > b)])
+            i += 1
 
 
 __all__ = ('ElementT', 'ValueT',
