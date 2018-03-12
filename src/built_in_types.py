@@ -348,7 +348,25 @@ class listTests(tupleTests, MutableSequenceTests):
     empty = list()
 
     def copy(self, a:ClassUnderTest) -> ClassUnderTest:
-        return a[:]
+        return a.copy()
+
+    def test_generic_2630_clear_definition(self, a: ClassUnderTest) -> None:
+        """a.clear(); a == list()"""
+        a.clear()
+        self.assertEqual(a, self.empty)
+
+    def test_generic_2631_copy_definition(self, a: ClassUnderTest) -> None:
+        """a_copy = a.copy(); a_copy == a and id(a_copy) != id(a)"""
+        a_copy = a.copy()
+        self.assertEqual(a_copy, a)
+        self.assertNotEqual(id(a_copy), id(a))
+
+    def test_generic_2632_imul_definition(self, a: ClassUnderTest, b: ScalarT) -> None:
+        """a *= b; a == a₀ * b"""
+        a_copy = self.copy(a)
+        a *= b
+        self.assertEqual(a, a_copy * b)
+
 
 __all__ = ('intTests', 'FractionTests', 'floatTests', 'complexTests',
            'frozensetTests', 'setTests',
