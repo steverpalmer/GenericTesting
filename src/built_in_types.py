@@ -65,7 +65,8 @@ class floatTests(RealTests, ComplexAugmentedAssignmentTests, FloorDivAugmentedAs
 
     @wraps(RealTests.test_generic_2220_addition_associativity)
     def test_generic_2220_addition_associativity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
-        assume(not self.isclose(a, b) and not self.isclose(b, c))
+        isclose = IsClose(rel_tol=self.isclose.rel_tol * 100.0)
+        assume(not isclose(abs(a), abs(b)) and not isclose(abs(b), abs(c)))
         super().test_generic_2220_addition_associativity(a, b, c)
 
     @wraps(RealTests.test_generic_2237_multiplication_addition_left_distributivity)
