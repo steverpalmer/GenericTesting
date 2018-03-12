@@ -432,7 +432,7 @@ class MutableSequenceTests(SequenceTests):
                 a[b] = c
 
     def test_generic_2552_delitem_definition(self, a: ClassUnderTest, b: ElementT) -> None:
-        """del a[b]; a[i] == a₀[i] if i < b else a₀[i+1]"""
+        """del a[b]; a[i] == a₀[i + int(b <= i)]"""
         a_len = len(a)
         if -a_len <= b < a_len:
             a_copy = self.copy(a)
@@ -441,16 +441,16 @@ class MutableSequenceTests(SequenceTests):
             if b < 0: b += a_len
             i = 0
             for x in a:
-                self.assertEqual(x, a_copy[i] if i < b else a_copy[i + 1])
+                self.assertEqual(x, a_copy[i + int(b <= i)])
                 i += 1
         else:
             with self.assertRaises(IndexError):
                 del a[b]
 
     def test_generic_2554_insert_definition(self, a: ClassUnderTest, b: ElementT, c: ValueT) -> None:
-        """a.insert(b, c); a[i] == c if i == b else a₀[i-int(i > b)]"""
-        a_copy = self.copy(a)
+        """a.insert(b, c); a[i] == c if i == b else a₀[i - int(i > b)]"""
         a_len = len(a)
+        a_copy = self.copy(a)
         a.insert(b, c)
         self.assertEqual(len(a), a_len + 1)
         if b < 0: b += a_len
@@ -458,6 +458,83 @@ class MutableSequenceTests(SequenceTests):
         i = 0
         for x in a:
             self.assertEqual(x, c if i == b else a_copy[i-int(i > b)])
+            i += 1
+
+    def test_generic_2560_append_definition(self, a: ClassUnderTest, b: ValueT) -> None:
+        """a.append(b); a[i] == a₀[i]; a[-1] == b"""
+        a_len = len(a)
+        a_copy = self.copy(a)
+        a.append(b)
+        self.assertEqual(len(a), a_len + 1)
+        i = 0
+        for x in a:
+            self.assertEqual(x, b if i == a_len else a_copy[i])
+            i += 1
+
+    def test_generic_2561_reverse_definition(self, a: ClassUnderTest) -> None:
+        """a.reverse(); a[i] == a₀[-i-1]"""
+        a_len = len(a)
+        a_copy = self.copy(a)
+        a.reverse()
+        self.assertEqual(len(a), a_len)
+        i = 0
+        for x in a:
+            self.assertEqual(x, a_copy[-i-1])
+            i += 1
+
+    def test_generic_2562_extend_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        """a.extend(b); a[i] == a₀[i] if i < len(a₀) else b[i - len(a₀)]"""
+        a_len = len(a)
+        a_copy = self.copy(a)
+        a.extend(b)
+        self.assertEqual(len(a), a_len + len(b))
+        i = 0
+        for x in a:
+            self.assertEqual(x, a_copy[i] if i < a_len else b[i-a_len])
+            i += 1
+
+    def test_generic_2563_pop_definition(self, a: ClassUnderTest, b: ElementT) -> None:
+        """v = a.pop(b); v == a₀[b] and (a[i] == a₀[i + int(b <= i)])"""
+        a_len = len(a)
+        if -a_len <= b < a_len:
+            a_copy = self.copy(a)
+            v = a.pop(b)
+            self.assertEqual(v, a_copy[b])
+            self.assertEqual(len(a), a_len - 1)
+            if b < 0: b += a_len
+            i = 0
+            for x in a:
+                self.assertEqual(x, a_copy[i + int(b <= i)])
+                i += 1
+        else:
+            with self.assertRaises(IndexError):
+                a.pop(b)
+
+    def test_generic_2564_remove_defintion(self, a: ClassUnderTest, b: ValueT) -> None:
+        """a.remove(b); a[j] == a₀[j + int(a₀.index(b) < j]"""
+        if b in a:
+            a_len = len(a)
+            a_copy = self.copy(a)
+            i = a.index(b)
+            a.remove(b)
+            self.assertEqual(len(a), a_len - 1)
+            j = 0
+            for x in a:
+                self.assertEqual(x, a_copy[j + int(i <= j)])
+                j += 1
+        else:
+            with self.assertRaises(ValueError):
+                a.remove(b)
+
+    def test_generic_2565_iadd_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        """a += b; a[i] == a₀[i] if i < len(a₀) else b[i - len(a₀)]"""
+        a_len = len(a)
+        a_copy = self.copy(a)
+        a += b
+        self.assertEqual(len(a), a_len + len(b))
+        i = 0
+        for x in a:
+            self.assertEqual(x, a_copy[i] if i < a_len else b[i-a_len])
             i += 1
 
 
