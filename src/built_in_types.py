@@ -288,6 +288,38 @@ class tupleTests(EqualityTests, TotalOrderingTests, SequenceTests, AdditionMonoi
     def zero(self):
         return self.empty
 
+    def test_generic_2110_equality_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        """a == b ⇔ a[i] == b[i]"""
+        expected = True
+        if len(a) != len(b):
+            expected = False
+        else:
+            i = 0
+            while i < len(a):
+                if a[i] != b[i]:
+                    expected = False
+                    break
+                i += 1
+        self.assertEqual(a == b, expected)
+
+    def test_generic_2151_less_or_equal_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        """ a <= b ⇔ a[j] <= b[j] and for i < j: a[i] == b[i]"""
+        a_len = len(a)
+        b_len = len(b)
+        i_max = a_len if a_len <= b_len else b_len
+        i = 0
+        while i < i_max:
+            if not a[i] == b[i]:
+                break
+            i += 1
+        if i == a_len:
+            expected = True
+        elif i == b_len:
+            expected = False
+        else:
+            expected = a[i] <= b[i]
+        self.assertEqual(a <= b, expected)
+
     def test_generic_2239_multiplication_commutativity(self, r: ScalarT, a: ClassUnderTest) -> None:
         """r * a == a * r"""
         self.assertEqual(r * a, a * r)
