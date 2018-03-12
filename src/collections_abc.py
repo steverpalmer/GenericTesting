@@ -356,6 +356,7 @@ class SequenceTests(SizedIterableContainerWithEmpty):
     """The property tests of collections.abc.Sequence."""
 
     def test_generic_2530_getitem_on_empty_raises_IndexError(self, i: ElementT) -> None:
+        """Ø[i] raises IndexError"""
         with self.assertRaises(IndexError):
             self.empty[i]
 
@@ -368,13 +369,30 @@ class SequenceTests(SizedIterableContainerWithEmpty):
             a[i]
 
     def test_generic_2532_getitem_over_negative_indices_definition(self, a: ClassUnderTest) -> None:
+        """a[-i] == a[len(a) - i]"""
         a_len = len(a)
-        for i in range(1, a_len+1):
+        i = 1
+        while i <= a_len:
             self.assertEqual(a[-i], a[a_len-i])
+            i += 1
         with self.assertRaises(IndexError):
             a[-a_len-1]
 
-    # :TODO: slices
+    def test_generic_2533_getitem_slice_definition(self, a:ClassUnderTest, data) -> None:
+        """a[start:stop:step][i] = a[start + i * step]"""
+        a_len = len(a)
+        if a_len > 0:
+            start = data.draw(st.integers(min_value=0, max_value=a_len-1))
+            stop = data.draw(st.integers(min_value=0, max_value=a_len-1))
+            step = data.draw(st.integers(min_value=1, max_value=a_len))
+            if start > stop: step = -step
+            a_slice = a[start:stop:step]
+            i = 0
+            j = start
+            while (j < stop if step >= 0 else j > stop):
+                self.assertEqual(a_slice[i], a[j])
+                i += 1
+                j += step
 
     def test_generic_2535_reversed_definition(self, a: ClassUnderTest) -> None:
         i = -1
