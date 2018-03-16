@@ -9,14 +9,20 @@ import math
 
 
 def _operator_fallbacks(fallback_operator, doc=""):
+    """Returns tuple of polymorphic binary operators.
+
+    Based on the pattern shown in Python Standard Library numbers module.
+    """
     if fallback_operator is None:
         return (None, None)
 
     def forward(a, b):
-        if isinstance(b, type(a)):
-            if a._modulus != b._modulus:
-                raise ValueError("inconsistent modulus values")
-            return type(a)(a._modulus, fallback_operator(a._value, b._value), is_trusted=True)
+        if type(a) == type(b):
+            if a._modulus == b._modulus:
+                return type(a)(a._modulus, fallback_operator(a._value, b._value), is_trusted=True)
+            else:
+                return fallback_operator(int(a), int(b))
+#                 raise ValueError("inconsistent modulus values")
         elif isinstance(b, int):
             return fallback_operator(int(a), b)
         elif isinstance(b, float):
@@ -29,10 +35,12 @@ def _operator_fallbacks(fallback_operator, doc=""):
     forward.__doc__ = doc
 
     def reverse(b, a):
-        if isinstance(a, ModuloN):
-            if a._modulus != b._modulus:
-                raise ValueError("inconsistent modulus values")
-            return type(a)(a._modulus, fallback_operator(a._value, b._value), is_trusted=True)
+        if type(a) == type(b):
+            if a._modulus == b._modulus:
+                return type(a)(a._modulus, fallback_operator(a._value, b._value), is_trusted=True)
+            else:
+                return fallback_operator(int(a), int(b))
+#                 raise ValueError("inconsistent modulus values")
         elif isinstance(a, numbers.Integral):
             return fallback_operator(int(a), int(b))
         elif isinstance(a, numbers.Real):
@@ -46,6 +54,8 @@ def _operator_fallbacks(fallback_operator, doc=""):
 
     return forward, reverse
 
+def _pow(a: 'ModuloN', b: 'ModuloN') -> 'ModuloN':
+    return type(a)(a._modulus, pow(a._value, int(b), a._modulus), is_trusted=True)
 
 class ModuloN(numbers.Integral):
 
@@ -66,6 +76,10 @@ class ModuloN(numbers.Integral):
                 raise ValueError("Modulus must be positive")
         self._modulus = modulus
         self._value = value
+
+    @property
+    def modulus(self) -> int:
+        return self._modulus
 
     @property
     def _value(self):
@@ -101,10 +115,6 @@ class ModuloN(numbers.Integral):
     def word(cls, value=None):
         return cls(4294967296, value, is_trusted=True)
 
-    @property
-    def modulus(self) -> int:
-        return self._modulus
-
     def __repr__(self) -> str:
         specials = {2: "{self.__class__.__name__}.bit({self._value})",
                     10: "{self.__class__.__name__}.digit({self._value})",
@@ -131,6 +141,7 @@ class ModuloN(numbers.Integral):
         return result
 
     def __le__(self, other) -> bool:
+        """Partial Ordering on ModulusN, but Total Ordering on ModulusN with a fixed modulus."""
         if isinstance(other, ModuloN):
             result = self._modulus == other._modulus and self._value <= other._value
         else:
@@ -158,11 +169,11 @@ class ModuloN(numbers.Integral):
     def __bool__(self) -> bool:
         return self._value != 0
 
-    __add__, __radd__ = _operator_fallbacks(operator.add)
+    __add__, __radd__ = _operator_fallbacks(operator.add, "a + b")
 
-    __sub__, __rsub__ = _operator_fallbacks(operator.sub)
+    __sub__, __rsub__ = _operator_fallbacks(operator.sub, "a - b")
 
-    __mul__, __rmul__ = _operator_fallbacks(operator.mul)
+    __mul__, __rmul__ = _operator_fallbacks(operator.mul, "a * b")
 
     def __truediv__(self, other) -> float:
         if isinstance(other, ModuloN):
@@ -175,21 +186,32 @@ class ModuloN(numbers.Integral):
         return other / self._value
 
     # FIXME: The following two could be better if modulus is prime!
-    __floordiv__, __rfloordiv__ = _operator_fallbacks(operator.floordiv)
+    __floordiv__, __rfloordiv__ = _operator_fallbacks(operator.floordiv, "a // b")
 
-    __mod__, __rmod__ = _operator_fallbacks(operator.mod)
+    __mod__, __rmod__ = _operator_fallbacks(operator.mod, "a % b")
 
-    __pow__, __rpow__ = _operator_fallbacks(None)
+    def __pow__(self, other):
+        if type(self) == type(other):
+            if self._modulus == other._modulus:
+                return type(self)(self._modulus, pow(self._value, int(other), self._modulus), is_trusted=True)
+            else:
+                return int(self) ** int(other)
+#                 raise ValueError("inconsistent modulus values")
+        else:
+            return int(self) ** other
 
-    __lshift__, __rlshift__ = _operator_fallbacks(None)  # operator.lshift)
+    def __rpow__(self, other):
+        return other ** int(self)
 
-    __rshift__, __rrshift__ = _operator_fallbacks(None)  # operator.rshift)
+    __lshift__, __rlshift__ = _operator_fallbacks(None)
 
-    __and__, __rand__ = _operator_fallbacks(None)  # operator.and_)
+    __rshift__, __rrshift__ = _operator_fallbacks(None)
 
-    __xor__, __rxor__ = _operator_fallbacks(None)  # operator.xor)
+    __and__, __rand__ = _operator_fallbacks(None)
 
-    __or__, __ror__ = _operator_fallbacks(None)  # operator.or_)
+    __xor__, __rxor__ = _operator_fallbacks(None)
+
+    __or__, __ror__ = _operator_fallbacks(None)
 
     def __neg__(self) -> 'ModuloN':
         return type(self)(self._modulus, -self._value, is_trusted=True)
@@ -248,8 +270,7 @@ class ModuloPow2(ModuloN):
             bits = math.log2(modulus)
             if not bits.is_integer() or bits < 0.0:
                 raise ValueError("Modulus must be positive power of two")
-        self._modulus = modulus
-        self._value = value
+        super().__init__(modulus, value, is_trusted=True)
 
     @property
     def _value(self):

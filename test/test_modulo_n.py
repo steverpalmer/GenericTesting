@@ -7,15 +7,14 @@ import unittest
 
 from hypothesis import strategies as st
 
-from generic_testing import EqualityTests, PartialOrderingTests, FieldTests, AbsoluteValueTests, \
-    Given, TotalOrderingTests, LatticeWithComplementTests, FloorDivModTests, BitShiftTests
+from generic_testing import ClassUnderTest, Given, EqualityTests, PartialOrderingTests, FieldTests, AbsoluteValueTests, \
+    TotalOrderingTests, LatticeWithComplementTests, FloorDivModTests, ExponentiationTests, BitShiftTests
 
 from modulo_n import ModuloN, ModuloPow2
 
 
 class ModuloNTests(EqualityTests, PartialOrderingTests, AbsoluteValueTests):
 
-    @unittest.skip("abs is not multiplicitive in this class")
     def test_generic_2273_abs_is_multiplicitive(self):
         pass
 
@@ -26,7 +25,7 @@ class Test_ModuloN(ModuloNTests):
     one = 1
 
 
-class ModuloNSingleModulusTests(ModuloNTests, TotalOrderingTests, FieldTests, FloorDivModTests):
+class ModuloNSingleModulusTests(ModuloNTests, TotalOrderingTests, FieldTests, FloorDivModTests, ExponentiationTests):
     pass
 
 
@@ -36,7 +35,7 @@ class Test_ModuloN_digit(ModuloNSingleModulusTests):
     one = ModuloN.digit(1)
 
 
-class ModuloSinglePow2Tests(ModuloNSingleModulusTests, LatticeWithComplementTests):
+class ModuloSinglePow2Tests(ModuloNSingleModulusTests, LatticeWithComplementTests, BitShiftTests):
 
     @property
     def bottom(self):
@@ -46,6 +45,8 @@ class ModuloSinglePow2Tests(ModuloNSingleModulusTests, LatticeWithComplementTest
     def top(self):
         return -self.one
 
+    def test_generic_2391_rshift_definition(self) -> None:
+        pass
 
 @Given(st.builds(ModuloPow2.bit, st.integers()))
 class Test_ModuloPow2_bit(ModuloSinglePow2Tests):

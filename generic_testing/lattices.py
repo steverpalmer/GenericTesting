@@ -94,12 +94,12 @@ class BitShiftTests(GenericTests):
     def test_generic_2390_lshift_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         """0 <= b ⇒ a << b == a * pow(2, b)"""
         assume(self.zero <= b)
-        self.assertEqual(a << b, a * pow(2, b))
+        self.assertEqual(a << b, a * pow(self.one + self.one, b))
 
     def test_generic_2391_rshift_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         """0 <= b ⇒ a >> b == a // pow(2, b)"""
         assume(self.zero <= b)
-        self.assertEqual(a >> b, a // pow(2, b))
+        self.assertEqual(a >> b, a // pow(self.one + self.one, b))
 
 
 __all__ = ('LatticeTests', 'BoundedBelowLatticeTests', 'BoundedLatticeTests', 'LatticeWithComplementTests',
