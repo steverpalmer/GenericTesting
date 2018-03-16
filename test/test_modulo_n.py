@@ -7,25 +7,36 @@ import unittest
 
 from hypothesis import strategies as st
 
-from generic_testing import *
+from generic_testing import EqualityTests, PartialOrderingTests, FieldTests, AbsoluteValueTests, \
+    Given, TotalOrderingTests, LatticeWithComplementTests, FloorDivModTests, BitShiftTests
 
 from modulo_n import ModuloN, ModuloPow2
 
 
-class ModuloNTests(EqualityTests, TotalOrderingTests, FieldTests, FloorDivModTests, AbsoluteValueTests):
+class ModuloNTests(EqualityTests, PartialOrderingTests, AbsoluteValueTests):
 
     @unittest.skip("abs is not multiplicitive in this class")
     def test_generic_2273_abs_is_multiplicitive(self):
         pass
 
 
+@Given(st.builds(ModuloN, st.integers(min_value=1), st.integers()))
+class Test_ModuloN(ModuloNTests):
+    zero = 0
+    one = 1
+
+
+class ModuloNSingleModulusTests(ModuloNTests, TotalOrderingTests, FieldTests, FloorDivModTests):
+    pass
+
+
 @Given(st.builds(ModuloN.digit, st.integers()))
-class Test_ModuloN_digit(ModuloNTests):
+class Test_ModuloN_digit(ModuloNSingleModulusTests):
     zero = ModuloN.digit(0)
     one = ModuloN.digit(1)
 
 
-class ModuloPow2Tests(ModuloNTests, LatticeWithComplement):
+class ModuloSinglePow2Tests(ModuloNSingleModulusTests, LatticeWithComplementTests):
 
     @property
     def bottom(self):
@@ -37,13 +48,13 @@ class ModuloPow2Tests(ModuloNTests, LatticeWithComplement):
 
 
 @Given(st.builds(ModuloPow2.bit, st.integers()))
-class Test_ModuloPow2_bit(ModuloPow2Tests):
+class Test_ModuloPow2_bit(ModuloSinglePow2Tests):
     zero = ModuloPow2.bit(0)
     one = ModuloPow2.bit(1)
 
 
 @Given(st.builds(ModuloPow2.short, st.integers()))
-class Test_ModuloPow2_short(ModuloPow2Tests):
+class Test_ModuloPow2_short(ModuloSinglePow2Tests):
     zero = ModuloPow2.short(0)
     one = ModuloPow2.short(1)
 
@@ -51,10 +62,9 @@ class Test_ModuloPow2_short(ModuloPow2Tests):
 if __name__ == '__main__':
     # Run the tests
     SUITE = unittest.TestSuite()
-    name = None  # :TRICK: need to introdcue 'name' before iterating through locals
-    value = None  # :TRICK: need to introdcue 'value' before iterating through locals
-    for name, value in locals().items():
-        if name.startswith('Test_'):
-            SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(value))
-    TR = unittest.TextTestRunner(verbosity=1)
+    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_ModuloN))
+    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_ModuloN_digit))
+    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_ModuloPow2_bit))
+    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_ModuloPow2_short))
+    TR = unittest.TextTestRunner(verbosity=2)
     TR.run(SUITE)
