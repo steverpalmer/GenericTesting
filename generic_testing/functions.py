@@ -47,6 +47,9 @@ class EnumTests(SurjectiveTests, EqualityTests):
     def __init__(self, cls, methodName=None):
         super().__init__(lambda e: e.value, cls.__call__, methodName=methodName)
 
+    def test_generic_2110_equality_definition(self, a: ClassUnderTest, b: ClassUnderTest):
+        self.assertEqual(a == b, a.value == b.value)
+
 
 import enum
 
