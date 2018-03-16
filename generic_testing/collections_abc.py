@@ -18,6 +18,16 @@ KeyT = 'KeyT'
 ValueT = 'ValueT'
 
 
+class HashableTests(GenericTests):
+    """The property tests of collections.abc.Hashable."""
+
+    def test_generic_xxxx_hash_returns_an_int(self, a: ClassUnderTest):
+        self.assertIsInstance(hash(a), int)
+
+    def test_generic_xxxx_hash_equal_on_equal_inputs(self, a: ClassUnderTest, b: ClassUnderTest):
+        self.assertImplies(a == b, hash(a) == hash(b))
+
+
 class IterableTests(GenericTests):
     """The property test of collections.abc.Iterables."""
 
@@ -584,7 +594,7 @@ class MutableSequenceTests(SequenceTests):
 
 
 __all__ = ('ElementT', 'KeyT', 'ValueT',
-           'IterableTests', 'SizedTests', 'ContainerTests',
+           'HashableTests', 'IterableTests', 'SizedTests', 'ContainerTests',
            'SizedOverIterableTests', 'ContainerOverIterableTests', 'SizedIterableContainerWithEmpty',
            'SetTests', 'MappingViewTests', 'KeysViewTests', 'ItemsViewTests', 'ValuesViewTests', 'MutableSetTests',
            'MappingTests', 'MutableMappingTests', 'SequenceTests', 'MutableSequenceTests')

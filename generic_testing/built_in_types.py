@@ -14,7 +14,7 @@ from generic_testing.core import ClassUnderTest
 from generic_testing.relations import EqualityTests, TotalOrderingTests
 from generic_testing.arithmetic import AdditionMonoidTests, ScalarT
 from generic_testing.numbers_abc import IntegralTests, RationalTests, RealTests, ComplexTests
-from generic_testing.collections_abc import (ElementT, SetTests, KeysViewTests, ItemsViewTests, ValuesViewTests,
+from generic_testing.collections_abc import (ElementT, HashableTests, SetTests, KeysViewTests, ItemsViewTests, ValuesViewTests,
                                              MutableSetTests, MappingTests, MutableMappingTests, SequenceTests, MutableSequenceTests)
 from generic_testing.augmented_assignment import (ComplexAugmentedAssignmentTests, FloorDivAugmentedAssignmentTests,
                                                   IntegralAugmentedAssignmentTests, LatticeWithComplementAugmentedTests)
@@ -109,8 +109,8 @@ class complexTests(ComplexTests, ComplexAugmentedAssignmentTests):
         self.assertCloseOrLessThan(abs(a + b), abs(a) + abs(b))
 
 
-class frozensetTests(SetTests):
-    """Tests of frozenset class properties."""
+class _frozensetTests(SetTests):
+    """Tests of frozenset class inheritable properties."""
 
     empty = frozenset()
 
@@ -139,7 +139,11 @@ class frozensetTests(SetTests):
         self.assertEqual(a.symmetric_difference(b), a ^ b)
 
 
-class setTests(MutableSetTests, frozensetTests):
+class frozensetTests(_frozensetTests, HashableTests):
+    """Tests of frozenset class properties."""
+
+
+class setTests(MutableSetTests, _frozensetTests):
     """Tests of set class properties."""
 
     empty = set()
@@ -280,8 +284,8 @@ class defaultdictTests(dictTests):
         return collections.defaultdict(self._default_factory)
 
 
-class tupleTests(EqualityTests, TotalOrderingTests, SequenceTests, AdditionMonoidTests):
-    """Tests of tuple class properties."""
+class _tupleTests(EqualityTests, TotalOrderingTests, SequenceTests, AdditionMonoidTests):
+    """Tests of tuple class inheritable properties."""
 
     empty = tuple()
 
@@ -375,7 +379,11 @@ class tupleTests(EqualityTests, TotalOrderingTests, SequenceTests, AdditionMonoi
                 min(a)
 
 
-class listTests(tupleTests, MutableSequenceTests):
+class tupleTests(_tupleTests, HashableTests):
+    """Tests of tuple class properties."""
+
+
+class listTests(_tupleTests, MutableSequenceTests):
     """Tests of list class properties."""
 
     empty = list()
