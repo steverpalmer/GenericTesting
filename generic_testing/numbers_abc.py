@@ -10,7 +10,7 @@ from hypothesis import assume
 
 from generic_testing.core import ClassUnderTest
 from generic_testing.relations import EqualityTests, TotalOrderingTests
-from generic_testing.lattices import LatticeWithComplement
+from generic_testing.lattices import LatticeWithComplementTests, BitShiftTests
 from generic_testing.arithmetic import FieldTests, AbsoluteValueTests, FloorDivModTests, ExponentiationTests
 
 
@@ -198,7 +198,7 @@ class RationalTests(_RationalTests):
         self.assertEqual(math.gcd(int(a.numerator), int(a.denominator)), 1)
 
 
-class IntegralTests(_RationalTests, LatticeWithComplement):
+class IntegralTests(_RationalTests, LatticeWithComplementTests, BitShiftTests):
     """The property tests specific to the base class numbers.Integral."""
 
     @property
@@ -212,16 +212,6 @@ class IntegralTests(_RationalTests, LatticeWithComplement):
     def test_generic_2380_int_function(self) -> None:
         self.assertEqual(0, int(self.zero))
         self.assertEqual(1, int(self.one))
-
-    def test_generic_2390_lshift_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        """0 <= b ⇒ a << b == a * pow(2, b)"""
-        assume(self.zero <= b)
-        self.assertEqual(a << b, a * pow(2, b))
-
-    def test_generic_2391_rshift_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        """0 <= b ⇒ a >> b == a // pow(2, b)"""
-        assume(self.zero <= b)
-        self.assertEqual(a >> b, a // pow(2, b))
 
 
 __all__ = ('ComplexTests', 'RealTests', 'RationalTests', 'IntegralTests',

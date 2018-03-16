@@ -4,6 +4,8 @@
 
 import abc
 
+from hypothesis import assume
+
 from generic_testing.core import GenericTests, ClassUnderTest
 
 
@@ -67,7 +69,7 @@ class BoundedLatticeTests(BoundedBelowLatticeTests):
         self.assertEqual(a & self.top, a)
 
 
-class LatticeWithComplement(BoundedLatticeTests):
+class LatticeWithComplementTests(BoundedLatticeTests):
     """Tests of the __invert__ and __xor__ operators.
 
     Since these tests are defined in terms of a Bounded Lattice,
@@ -87,4 +89,18 @@ class LatticeWithComplement(BoundedLatticeTests):
         self.assertEqual(a ^ b, (a | b) & ~(a & b))
 
 
-__all__ = ('LatticeTests', 'BoundedBelowLatticeTests', 'BoundedLatticeTests', 'LatticeWithComplement')
+class BitShiftTests(GenericTests):
+
+    def test_generic_2390_lshift_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        """0 <= b ⇒ a << b == a * pow(2, b)"""
+        assume(self.zero <= b)
+        self.assertEqual(a << b, a * pow(2, b))
+
+    def test_generic_2391_rshift_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        """0 <= b ⇒ a >> b == a // pow(2, b)"""
+        assume(self.zero <= b)
+        self.assertEqual(a >> b, a // pow(2, b))
+
+
+__all__ = ('LatticeTests', 'BoundedBelowLatticeTests', 'BoundedLatticeTests', 'LatticeWithComplementTests',
+           'BitShiftTests')
