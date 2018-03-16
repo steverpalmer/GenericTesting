@@ -37,6 +37,22 @@ class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):
         self.addTypeEqualityFunc(complex, self.assertIsClose)
         self.addTypeEqualityFunc(datetime.timedelta, self.assertIsClose)
 
+    @staticmethod
+    def relabel(annotation):
+        """Change the annotation on base class methods to another value.
+
+        This function is used by the Given class decorator below
+        to allow the class under test to relabel a type_hint.
+        An example of this is that ContainerTests uses the label ElementT
+        for the argument of its test_generic_2420_contains_returns_a_boolean
+        test.  When this is inherited by MappingTests, it relabels ElementT to
+        be KeyT, as appropriate for mappings.
+        On the other hand, when ContainerTests is inherited by SequenceTests,
+        it relabels ElementT to ValueT, as appropriate for sequences.
+        By default, no relabelling is applied.
+        """
+        return annotation
+
     def assertIsInstance(self, obj, type_, msg: str=None):
         """Confirm type of object.
 
@@ -116,13 +132,13 @@ def Given(strategy_dict=None, *, testMethodPrefix='test_generic', data_arg='data
                 if len(args) > 0:
                     given_args = dict()
                     for arg, param in args.items():
-                        annotation = None if param.annotation == inspect.Parameter.empty else param.annotation
+                        annotation = cls.relabel(None if param.annotation == inspect.Parameter.empty else param.annotation)
                         if annotation in strategy_dict:
                             strat = strategy_dict[annotation]
                         elif arg == data_arg:
                             strat = st.data()
                         else:
-                            strat = None
+                            raise TypeError("Cannot bind {}.{}.{} with annotation {} to strategy".format(cls.__name__, name, arg, annotation))
                         given_args[arg] = strat
                     setattr(cls, name, given(**given_args)(method))
         return cls

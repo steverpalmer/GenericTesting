@@ -15,7 +15,8 @@ from src import *
 element_st = st.integers()
 
 
-@Given({ClassUnderTest: st.frozensets(element_st), ElementT: element_st})
+@Given({ClassUnderTest: st.frozensets(element_st),
+        ElementT: element_st})
 class Test_frozenset(frozensetTests):
     pass
 
@@ -23,7 +24,8 @@ class Test_frozenset(frozensetTests):
 element_st = st.integers()
 
 
-@Given({ClassUnderTest: st.sets(element_st), ElementT: element_st})
+@Given({ClassUnderTest: st.sets(element_st),
+        ElementT: element_st})
 class Test_set(setTests):
     pass
 
@@ -32,7 +34,8 @@ key_st = st.integers()
 value_st = st.integers()
 
 
-@Given({ClassUnderTest: st.builds(lambda m: m.keys(), st.dictionaries(key_st, value_st)), ElementT: key_st})
+@Given({ClassUnderTest: st.builds(lambda m: m.keys(), st.dictionaries(key_st, value_st)),
+        ElementT: key_st})
 class Test_dict_KeysView(dictKeysViewTests):
     pass
 
@@ -41,7 +44,8 @@ key_st = st.integers()
 value_st = st.integers()
 
 
-@Given({ClassUnderTest: st.builds(lambda m: m.items(), st.dictionaries(key_st, value_st)), ElementT: key_st})
+@Given({ClassUnderTest: st.builds(lambda m: m.items(), st.dictionaries(key_st, value_st)),
+        ElementT: key_st})
 class Test_dict_ItemsView(dictItemsViewTests):
     pass
 
@@ -50,7 +54,8 @@ key_st = st.integers()
 value_st = st.integers()
 
 
-@Given({ClassUnderTest: st.builds(lambda m: m.values(), st.dictionaries(key_st, value_st)), ElementT: key_st})
+@Given({ClassUnderTest: st.builds(lambda m: m.values(), st.dictionaries(key_st, value_st)),
+        ElementT: key_st})
 class Test_dict_ValuesView(dictValuesViewTests):
     pass
 
@@ -60,7 +65,7 @@ value_st = st.integers()
 
 
 @Given({ClassUnderTest: st.builds((lambda d: types.MappingProxyType(d)), st.dictionaries(key_st, value_st)),
-        ElementT: key_st,
+        KeyT: key_st,
         ValueT: value_st})
 class Test_MappingProxyType(MappingProxyTypeTests):
     pass
@@ -70,7 +75,9 @@ key_st = st.integers()
 value_st = st.integers()
 
 
-@Given({ClassUnderTest: st.dictionaries(key_st, value_st), ElementT: key_st, ValueT: value_st})
+@Given({ClassUnderTest: st.dictionaries(key_st, value_st),
+        KeyT: key_st,
+        ValueT: value_st})
 class Test_dict(dictTests):
     pass
 
@@ -79,7 +86,9 @@ key_st = st.characters()
 value_st = st.integers(min_value=0)
 
 
-@Given({ClassUnderTest: st.builds(collections.Counter, st.text(key_st)), ElementT: key_st, ValueT: value_st})
+@Given({ClassUnderTest: st.builds(collections.Counter, st.text(key_st)),
+        KeyT: key_st,
+        ValueT: value_st})
 class Test_Counter(CounterTests):
     pass
 
@@ -89,7 +98,7 @@ value_st = st.integers()
 
 
 @Given({ClassUnderTest: st.builds(collections.OrderedDict, st.lists(st.tuples(key_st, value_st))),
-        ElementT: key_st,
+        KeyT: key_st,
         ValueT: value_st})
 class Test_OrderedDict(OrderedDictTests):
     pass
@@ -110,7 +119,7 @@ value_st = st.integers()
 
 
 @Given({ClassUnderTest: st.builds((lambda items: collections.defaultdict(factory(), items)), st.lists(st.tuples(key_st, value_st))),
-        ElementT: key_st,
+        KeyT: key_st,
         ValueT: value_st})
 class Test_defaultdict(defaultdictTests):
 
@@ -122,18 +131,30 @@ values_st = st.integers()
 
 
 @Given({ClassUnderTest: st.lists(values_st).map(lambda l: tuple(l)),
-        ElementT: st.integers(min_value=-(2**30), max_value=2**30),
+        KeyT: st.integers(min_value=-(2**30), max_value=2**30),
         ValueT: values_st,
         ScalarT: st.integers(min_value=-1, max_value=10)})
 class Test_tuple(tupleTests):
     pass
 
 
+alphabet_st = st.characters()
+
+
+@Given({ClassUnderTest: st.text(alphabet_st),
+        KeyT: st.integers(min_value=-(2**30), max_value=2**30),
+        ValueT: alphabet_st,
+        ScalarT: st.integers(min_value=-1, max_value=10)})
+class Test_str(tupleTests):
+
+    empty = ''
+
+
 values_st = st.integers()
 
 
 @Given({ClassUnderTest: st.lists(values_st),
-        ElementT: st.integers(min_value=-(2**30), max_value=2**30),
+        KeyT: st.integers(min_value=-(2**30), max_value=2**30),
         ValueT: values_st,
         ScalarT: st.integers(min_value=-1, max_value=10)})
 class Test_list(listTests):
@@ -153,5 +174,6 @@ if __name__ == '__main__':
     for name, value in locals().items():
         if name.startswith('Test_'):
             SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(value))
+#     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_str))
     TR = unittest.TextTestRunner(verbosity=2)
     TR.run(SUITE)

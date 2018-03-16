@@ -14,6 +14,7 @@ from .augmented_assignment import LatticeWithComplementAugmentedTests
 
 
 ElementT = 'ElementT'
+KeyT = 'KeyT'
 ValueT = 'ValueT'
 
 
@@ -181,7 +182,6 @@ class MappingViewTests(SizedTests):
 
     :TODO: Maybe could try to test the dynamic nature of mapping views here.
     """
-    pass
 
 
 class KeysViewTests(MappingViewTests, SetTests):
@@ -232,10 +232,16 @@ class MutableSetTests(SetTests, LatticeWithComplementAugmentedTests):
 class MappingTests(SizedIterableContainerWithEmpty, EqualityTests):
     """The property tests of collections.abc.Mapping."""
 
+    @staticmethod
+    def relabel(annotation):
+        if annotation == ElementT:
+            return KeyT
+        return annotation
+
     def test_generic_2110_equality_definition(self, a: ClassUnderTest, b: ClassUnderTest):
         self.assertEqual(a == b, a.keys() == b.keys() and all(a[k] == b[k] for k in a))
 
-    def test_generic_2480_getitem_on_empty_either_succeeds_or_raises_KeyError(self, a: ElementT) -> None:
+    def test_generic_2480_getitem_on_empty_either_succeeds_or_raises_KeyError(self, a: KeyT) -> None:
         try:
             self.empty[a]
         except KeyError:
@@ -260,7 +266,7 @@ class MappingTests(SizedIterableContainerWithEmpty, EqualityTests):
         """Test values method."""
         self.assertIsInstance(a.values(), collections.abc.ValuesView)
 
-    def test_generic_2492_get_definition(self, a: ClassUnderTest, b: ElementT, c: ValueT) -> None:
+    def test_generic_2492_get_definition(self, a: ClassUnderTest, b: KeyT, c: ValueT) -> None:
         """Test get method."""
         if b in a:
             expected = a[b]
@@ -284,7 +290,7 @@ class MutableMappingTests(MappingTests):
         self.assertNotEqual(id(a), id(a_copy))
         self.assertEqual(a, a_copy)
 
-    def test_generic_2500_setitem_definition(self, a: ClassUnderTest, b: ElementT, c: ValueT) -> None:
+    def test_generic_2500_setitem_definition(self, a: ClassUnderTest, b: KeyT, c: ValueT) -> None:
         """a[b] = c; a[k] == c if k == b else a₀[k]"""
         a_copy = self.copy(a)
         a[b] = c
@@ -304,7 +310,7 @@ class MutableMappingTests(MappingTests):
         for key in universe:
             self.assertEqual(a[key], a_copy[key])
 
-    def test_generic_2502_pop_definition(self, a: ClassUnderTest, b: ElementT) -> None:
+    def test_generic_2502_pop_definition(self, a: ClassUnderTest, b: KeyT) -> None:
         """Test pop method."""
         a_copy = self.copy(a)
         try:
@@ -340,7 +346,7 @@ class MutableMappingTests(MappingTests):
         for k in a:
             self.assertEqual(a[k], b[k] if k in b else a_copy[k])
 
-    def test_generic_2506_setdefault_definition(self, a: ClassUnderTest, b: ElementT, c: ValueT) -> None:
+    def test_generic_2506_setdefault_definition(self, a: ClassUnderTest, b: KeyT, c: ValueT) -> None:
         """Test setdefault method."""
         a_copy = self.copy(a)
         v = a.setdefault(b, c)
@@ -355,7 +361,13 @@ class MutableMappingTests(MappingTests):
 class SequenceTests(SizedIterableContainerWithEmpty):
     """The property tests of collections.abc.Sequence."""
 
-    def test_generic_2530_getitem_on_empty_raises_IndexError(self, i: ElementT) -> None:
+    @staticmethod
+    def relabel(annotation):
+        if annotation == ElementT:
+            return ValueT
+        return annotation
+
+    def test_generic_2530_getitem_on_empty_raises_IndexError(self, i: KeyT) -> None:
         """Ø[i] raises IndexError"""
         with self.assertRaises(IndexError):
             self.empty[i]
@@ -448,7 +460,7 @@ class MutableSequenceTests(SequenceTests):
         self.assertNotEqual(id(a), id(a_copy))
         self.assertEqual(a, a_copy)
 
-    def test_generic_2550_setitem_definition(self, a: ClassUnderTest, b: ElementT, c: ValueT) -> None:
+    def test_generic_2550_setitem_definition(self, a: ClassUnderTest, b: KeyT, c: ValueT) -> None:
         """a[b] = c; a[i] == c if i == b else a₀[i]"""
         a_len = len(a)
         if -a_len <= b < a_len:
@@ -464,7 +476,7 @@ class MutableSequenceTests(SequenceTests):
             with self.assertRaises(IndexError):
                 a[b] = c
 
-    def test_generic_2552_delitem_definition(self, a: ClassUnderTest, b: ElementT) -> None:
+    def test_generic_2552_delitem_definition(self, a: ClassUnderTest, b: KeyT) -> None:
         """del a[b]; a[i] == a₀[i + int(b <= i)]"""
         a_len = len(a)
         if -a_len <= b < a_len:
@@ -480,7 +492,7 @@ class MutableSequenceTests(SequenceTests):
             with self.assertRaises(IndexError):
                 del a[b]
 
-    def test_generic_2554_insert_definition(self, a: ClassUnderTest, b: ElementT, c: ValueT) -> None:
+    def test_generic_2554_insert_definition(self, a: ClassUnderTest, b: KeyT, c: ValueT) -> None:
         """a.insert(b, c); a[i] == c if i == b else a₀[i - int(i > b)]"""
         a_len = len(a)
         a_copy = self.copy(a)
@@ -526,7 +538,7 @@ class MutableSequenceTests(SequenceTests):
             self.assertEqual(x, a_copy[i] if i < a_len else b[i-a_len])
             i += 1
 
-    def test_generic_2563_pop_definition(self, a: ClassUnderTest, b: ElementT) -> None:
+    def test_generic_2563_pop_definition(self, a: ClassUnderTest, b: KeyT) -> None:
         """v = a.pop(b); v == a₀[b] and (a[i] == a₀[i + int(b <= i)])"""
         a_len = len(a)
         if -a_len <= b < a_len:
@@ -571,7 +583,7 @@ class MutableSequenceTests(SequenceTests):
             i += 1
 
 
-__all__ = ('ElementT', 'ValueT',
+__all__ = ('ElementT', 'KeyT', 'ValueT',
            'IterableTests', 'SizedTests', 'ContainerTests',
            'SizedOverIterableTests', 'ContainerOverIterableTests', 'SizedIterableContainerWithEmpty',
            'SetTests', 'MappingViewTests', 'KeysViewTests', 'ItemsViewTests', 'ValuesViewTests', 'MutableSetTests',
