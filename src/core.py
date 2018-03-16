@@ -137,6 +137,8 @@ def Given(strategy_dict=None, *, testMethodPrefix='test_generic', data_arg='data
                             strat = strategy_dict[annotation]
                         elif arg == data_arg:
                             strat = st.data()
+                        elif isinstance(annotation, st.SearchStrategy):
+                            strat = annotation
                         else:
                             raise TypeError("Cannot bind {}.{}.{} with annotation {} to strategy".format(cls.__name__, name, arg, annotation))
                         given_args[arg] = strat
