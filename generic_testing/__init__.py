@@ -14,4 +14,6 @@ from generic_testing.numbers_abc import *
 from generic_testing.collections_abc import *
 from generic_testing.augmented_assignment import *
 from generic_testing.built_in_types import *
+from generic_testing.enums import *
+
 from generic_testing.loader import *
