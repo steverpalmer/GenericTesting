@@ -21,10 +21,10 @@ ValueT = 'ValueT'
 class HashableTests(GenericTests):
     """The property tests of collections.abc.Hashable."""
 
-    def test_generic_xxxx_hash_returns_an_int(self, a: ClassUnderTest):
+    def test_generic_2135_hash_returns_an_int(self, a: ClassUnderTest):
         self.assertIsInstance(hash(a), int)
 
-    def test_generic_xxxx_hash_equal_on_equal_inputs(self, a: ClassUnderTest, b: ClassUnderTest):
+    def test_generic_2136_hash_equal_on_equal_inputs(self, a: ClassUnderTest, b: ClassUnderTest):
         self.assertImplies(a == b, hash(a) == hash(b))
 
 
