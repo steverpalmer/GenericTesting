@@ -9,7 +9,7 @@ import datetime
 
 from hypothesis import given, strategies as st
 
-from .isclose import IsClose
+from generic_testing.isclose import IsClose
 
 
 class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):

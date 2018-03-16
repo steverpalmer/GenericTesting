@@ -8,7 +8,7 @@ import collections
 
 from hypothesis import strategies as st
 
-from src import *
+from generic_testing import *
 
 
 @Given(st.integers())

@@ -4,7 +4,7 @@
 
 from hypothesis import assume
 
-from .core import GenericTests, ClassUnderTest
+from generic_testing.core import GenericTests, ClassUnderTest
 
 
 class LatticeAugmentedAssignmentTests(GenericTests):

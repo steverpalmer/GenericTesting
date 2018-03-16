@@ -5,7 +5,7 @@
 
 import collections
 
-import src
+import generic_testing
 
 TestRecord = collections.namedtuple('TestRecord', ['class_', 'testname', 'test_number'])
 
@@ -14,8 +14,8 @@ class Main:
 
     def __init__(self):
         alltests = []
-        for name, cls in vars(src).items():
-            if name.endswith('Tests') and issubclass(cls, src.GenericTests):
+        for name, cls in vars(generic_testing).items():
+            if name.endswith('Tests') and issubclass(cls, generic_testing.GenericTests):
                 for name2 in vars(cls):
                     if name2.startswith('test_generic_'):
                         test_num = int(name2[13:17])

@@ -8,10 +8,10 @@ import math
 
 from hypothesis import assume
 
-from .core import ClassUnderTest
-from .relations import EqualityTests, TotalOrderingTests
-from .lattices import LatticeWithComplement
-from .arithmetic import FieldTests, AbsoluteValueTests, FloorDivModTests, ExponentiationTests
+from generic_testing.core import ClassUnderTest
+from generic_testing.relations import EqualityTests, TotalOrderingTests
+from generic_testing.lattices import LatticeWithComplement
+from generic_testing.arithmetic import FieldTests, AbsoluteValueTests, FloorDivModTests, ExponentiationTests
 
 
 class _ComplexTests(EqualityTests, FieldTests, AbsoluteValueTests):

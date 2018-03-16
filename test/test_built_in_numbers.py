@@ -8,7 +8,7 @@ import fractions
 
 from hypothesis import strategies as st
 
-from src import *
+from generic_testing import *
 
 
 @Given({ClassUnderTest: st.integers()})

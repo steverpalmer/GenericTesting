@@ -7,11 +7,11 @@ import collections
 import numbers
 import fractions
 
-from .core import GenericTests
-from .relations import EqualsOnlyTests, EqualityTests, LessOrEqualTests, PartialOrderingTests
-from .collections_abc import *
-from .numbers_abc import *
-from .built_in_types import *
+from generic_testing.core import GenericTests
+from generic_testing.relations import EqualsOnlyTests, EqualityTests, LessOrEqualTests, PartialOrderingTests
+from generic_testing.collections_abc import *
+from generic_testing.numbers_abc import *
+from generic_testing.built_in_types import *
 
 
 @enum.unique

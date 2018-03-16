@@ -9,7 +9,7 @@ import types
 
 from hypothesis import strategies as st
 
-from src import *
+from generic_testing import *
 
 
 element_st = st.integers()

@@ -7,7 +7,7 @@ import unittest
 
 from hypothesis import strategies as st
 
-from src import *
+from generic_testing import *
 
 from modulo_n import ModuloN, ModuloPow2
 

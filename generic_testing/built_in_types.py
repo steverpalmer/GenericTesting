@@ -9,15 +9,15 @@ from functools import wraps
 
 from hypothesis import assume
 
-from .isclose import IsClose
-from .core import ClassUnderTest
-from .relations import EqualityTests, TotalOrderingTests
-from .arithmetic import AdditionMonoidTests, ScalarT
-from .numbers_abc import IntegralTests, RationalTests, RealTests, ComplexTests
-from .collections_abc import (ElementT, SetTests, KeysViewTests, ItemsViewTests, ValuesViewTests,
-                              MutableSetTests, MappingTests, MutableMappingTests, SequenceTests, MutableSequenceTests)
-from .augmented_assignment import (ComplexAugmentedAssignmentTests, FloorDivAugmentedAssignmentTests,
-                                   IntegralAugmentedAssignmentTests, LatticeWithComplementAugmentedTests)
+from generic_testing.isclose import IsClose
+from generic_testing.core import ClassUnderTest
+from generic_testing.relations import EqualityTests, TotalOrderingTests
+from generic_testing.arithmetic import AdditionMonoidTests, ScalarT
+from generic_testing.numbers_abc import IntegralTests, RationalTests, RealTests, ComplexTests
+from generic_testing.collections_abc import (ElementT, SetTests, KeysViewTests, ItemsViewTests, ValuesViewTests,
+                                             MutableSetTests, MappingTests, MutableMappingTests, SequenceTests, MutableSequenceTests)
+from generic_testing.augmented_assignment import (ComplexAugmentedAssignmentTests, FloorDivAugmentedAssignmentTests,
+                                                  IntegralAugmentedAssignmentTests, LatticeWithComplementAugmentedTests)
 
 
 class intTests(IntegralTests, IntegralAugmentedAssignmentTests, FloorDivAugmentedAssignmentTests, LatticeWithComplementAugmentedTests):

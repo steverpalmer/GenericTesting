@@ -7,7 +7,7 @@ import unittest
 
 from hypothesis import strategies as st
 
-from src import *
+from generic_testing import *
 
 
 class timedeltaTests(EqualityTests, TotalOrderingTests, VectorSpaceTests):

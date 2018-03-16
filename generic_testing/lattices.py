@@ -4,7 +4,7 @@
 
 import abc
 
-from .core import GenericTests, ClassUnderTest
+from generic_testing.core import GenericTests, ClassUnderTest
 
 
 class LatticeTests(GenericTests):
