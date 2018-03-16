@@ -66,10 +66,9 @@ __all__ = ('Test_int', 'Test_Fraction', 'Test_float', 'Test_complex')
 
 if __name__ == '__main__':
     SUITE = unittest.TestSuite()
-    name = None  # :TRICK: need to introdcue 'name' before iterating through locals
-    value = None  # :TRICK: need to introdcue 'value' before iterating through locals
-    for name, value in locals().items():
-        if name.startswith('Test_'):
-            SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(value))
+    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_int))
+    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_Fraction))
+    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_float))
+    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_complex))
     TR = unittest.TextTestRunner(verbosity=1)
     TR.run(SUITE)
