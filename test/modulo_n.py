@@ -68,7 +68,7 @@ class ModuloN(numbers.Integral):
     Otherwise, the values are promoted to ints and normal arithmetic rules apply.
 
     Common modulus values are captured by a series of specialized constructors,
-    such as byte and digit.
+    such as bit and digit.
 
 --- !ClassDescription
     has:
@@ -127,24 +127,24 @@ class ModuloN(numbers.Integral):
         return cls(16, value, is_trusted=True)
 
     @classmethod
-    def byte(cls, value=None):
+    def u8(cls, value=None):
         return cls(256, value, is_trusted=True)
 
     @classmethod
-    def short(cls, value=None):
+    def u16(cls, value=None):
         return cls(65536, value, is_trusted=True)
 
     @classmethod
-    def word(cls, value=None):
+    def u32(cls, value=None):
         return cls(4294967296, value, is_trusted=True)
 
     def __repr__(self) -> str:
         specials = {2: "{self.__class__.__name__}.bit({self._value})",
                     10: "{self.__class__.__name__}.digit({self._value})",
                     16: "{self.__class__.__name__}.nibble({self._value})",
-                    256: "{self.__class__.__name__}.byte({self._value})",
-                    65536: "{self.__class__.__name__}.short({self._value})",
-                    4294967296: "{self.__class__.__name__}.word({self._value})"}
+                    256: "{self.__class__.__name__}.u8({self._value})",
+                    65536: "{self.__class__.__name__}.u16({self._value})",
+                    4294967296: "{self.__class__.__name__}.u32({self._value})"}
         return specials.get(self._modulus, "{self.__class__.__name__}({self._modulus}, {self._value})").format(self=self)
 
     def __str__(self) -> str:

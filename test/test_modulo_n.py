@@ -31,10 +31,10 @@ class Test_ModuloPow2_bit(ModuloPow2Tests):
     one = ModuloPow2.bit(1)
 
 
-@Given(st.builds(ModuloPow2.short, st.integers()))
-class Test_ModuloPow2_short(ModuloPow2Tests):
-    zero = ModuloPow2.short(0)
-    one = ModuloPow2.short(1)
+@Given(st.builds(ModuloPow2.u16, st.integers()))
+class Test_ModuloPow2_u16(ModuloPow2Tests):
+    zero = ModuloPow2.u16(0)
+    one = ModuloPow2.u16(1)
 
 
 if __name__ == '__main__':
@@ -42,6 +42,6 @@ if __name__ == '__main__':
     SUITE = unittest.TestSuite()
     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_ModuloN_decimal_digit))
     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_ModuloPow2_bit))
-    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_ModuloPow2_short))
+    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_ModuloPow2_u16))
     TR = unittest.TextTestRunner(verbosity=2)
     TR.run(SUITE)
