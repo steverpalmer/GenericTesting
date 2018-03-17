@@ -6,12 +6,28 @@ import enum
 import collections
 import numbers
 import fractions
+import types
+import inspect
 
-from generic_testing.core import GenericTests
-from generic_testing.relations import EqualsOnlyTests, EqualityTests, LessOrEqualTests, PartialOrderingTests
+import yaml
+
+from generic_testing.core import *
+from generic_testing.relations import *
+from generic_testing.lattices import *
+from generic_testing.arithmetic import *
 from generic_testing.collections_abc import *
 from generic_testing.numbers_abc import *
 from generic_testing.built_in_types import *
+
+
+class ClassDescription(types.SimpleNamespace, yaml.YAMLObject):
+
+    yaml_tag = u'!ClassDescription'
+
+    struct = collections.namedtuple('ClassDescriptionStruct', 'has skipping including excluding')
+
+    def in_full(self):
+        return self.struct(*(getattr(self, field, None) for field in self.struct._fields))
 
 
 @enum.unique
@@ -62,6 +78,36 @@ class GenericTestLoader:
     def discover(self, T: type) -> GenericTests:
         """Generate Base Case based on supplied class."""
         result = None
+        if isinstance(T.__doc__, str):
+            for class_description in yaml.load_all(T.__doc__):
+                if isinstance(class_description, ClassDescription):
+                    class_description = class_description.in_full()
+                    result = GenericTests
+                    if class_description.has:
+                        base_class_list = []
+                        for model in class_description.has:
+                            model += 'Tests'
+                            if model in globals():
+                                base_class_list.append(globals()[model])
+                        if base_class_list:
+                            class result(*base_class_list):
+                                pass
+                            if class_description.excluding:
+                                for name, _ in inspect.getmembers(result):
+                                    for excld in class_description.excluding:
+                                        if name.find(excld) >= 0:
+                                            setattr(result, name, GenericTests._pass)
+                                            break
+                            if class_description.skipping:
+                                for name, _ in inspect.getmembers(result):
+                                    for excld in class_description.skipping:
+                                        if name.find(excld) >= 0:
+                                            setattr(result, name, GenericTests._skip)
+                                            break
+#                             if class_description.where:
+#                                 for name, val in class_description.where.items():
+#                                     setattr(result, name, getattr(result, val, None))
+                    return result
         for known_T in reversed(self._superclass_mapping):
             if issubclass(T, known_T):
                 result = self._superclass_mapping[known_T]
@@ -127,4 +173,4 @@ defaultGenericTestLoader.register(fractions.Fraction, FractionTests)
 defaultGenericTestLoader.register(int, intTests)
 
 
-__all__ = ('GenericTestLoader', 'defaultGenericTestLoader')
+__all__ = ('ClassDescription', 'GenericTestLoader', 'defaultGenericTestLoader')

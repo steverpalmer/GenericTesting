@@ -53,6 +53,12 @@ class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):
         """
         return annotation
 
+    def _pass(self) -> None:
+        pass
+
+    def _skip(self) -> None:
+        raise unittest.SkipTest("")
+
     def assertIsInstance(self, obj, type_, msg: str=None):
         """Confirm type of object.
 
