@@ -119,7 +119,7 @@ class ModuloN(numbers.Integral):
         return cls(2, value, is_trusted=True)
 
     @classmethod
-    def digit(cls, value=None):
+    def decimal_digit(cls, value=None):
         return cls(10, value, is_trusted=True)
 
     @classmethod
@@ -242,11 +242,10 @@ class ModuloN(numbers.Integral):
     def __pos__(self) -> 'ModuloN':
         return type(self)(self._modulus, self._value, is_trusted=True)
 
+    __invert__ = None
+
     def __abs__(self) -> int:
         return self._value
-
-    def __invert__(self) -> 'ModuloN':
-        return type(self)(self._modulus, ~self._value, is_trusted=True)
 
     def __int__(self) -> int:
         return self._value
@@ -319,6 +318,10 @@ class ModuloPow2(ModuloN):
             value = 0
         self.__value = value & (self._modulus - 1)
 
+    @classmethod
+    def decimal_digit(cls, value=None):
+        raise ValueError("Modulus must be positive power of two")
+
     __lshift__, __rlshift__ = _operator_fallbacks(operator.lshift)
 
     __rshift__, __rrshift__ = _operator_fallbacks(operator.rshift)
@@ -328,6 +331,9 @@ class ModuloPow2(ModuloN):
     __xor__, __rxor__ = _operator_fallbacks(operator.xor)
 
     __or__, __ror__ = _operator_fallbacks(operator.or_)
+
+    def __invert__(self) -> 'ModuloN':
+        return type(self)(self._modulus, ~self._value, is_trusted=True)
 
 
 __all__ = ('ModuloN', 'ModuloPow2')

@@ -12,17 +12,17 @@ from generic_testing import *
 from modulo_n import ModuloN, ModuloPow2
 
 
-@Given(st.builds(ModuloN.digit, st.integers()))
-class Test_ModuloN_digit(defaultGenericTestLoader.discover(ModuloN)):
-    zero = ModuloN.digit(0)
-    one = ModuloN.digit(1)
+@Given(st.builds(ModuloN.decimal_digit, st.integers()))
+class Test_ModuloN_decimal_digit(defaultGenericTestLoader.discover(ModuloN)):
+    zero = ModuloN.decimal_digit(0)
+    one = ModuloN.decimal_digit(1)
 
 
 class ModuloPow2Tests(defaultGenericTestLoader.discover(ModuloPow2)):
     @property
     def bottom(self): return self.zero 
     @property
-    def top(self): return ~self.zero
+    def top(self): return -self.one
 
 
 @Given(st.builds(ModuloPow2.bit, st.integers()))
@@ -40,7 +40,7 @@ class Test_ModuloPow2_short(ModuloPow2Tests):
 if __name__ == '__main__':
     # Run the tests
     SUITE = unittest.TestSuite()
-    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_ModuloN_digit))
+    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_ModuloN_decimal_digit))
     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_ModuloPow2_bit))
     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_ModuloPow2_short))
     TR = unittest.TextTestRunner(verbosity=2)
