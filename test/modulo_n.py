@@ -275,11 +275,12 @@ class ModuloPow2(ModuloN):
 
 --- !ClassDescription
     has:
-      - ModuloN
-      - LatticeWithComplement
-      - BitShift
+      - Integral
     skipping:
       - rshift_definition
+    excluding:
+      - abs_is_multiplicitive
+      - less_or_equal_consistent_with_addition
     """
 
     def __init__(self, modulus: int, value: int=None, *, is_trusted: bool=False) -> None:
