@@ -58,6 +58,29 @@ def _pow(a: 'ModuloN', b: 'ModuloN') -> 'ModuloN':
     return type(a)(a._modulus, pow(a._value, int(b), a._modulus), is_trusted=True)
 
 class ModuloN(numbers.Integral):
+    """Modular Arithmetic.
+
+    ModuloN provides a class for modular arithmetic in Python.
+    See https://en.wikipedia.org/wiki/Modular_arithmetic.
+
+    Each instance includes the modulus as well as the value.
+    Calculations involving the same modulus values wrap around.
+    Otherwise, the values are promoted to ints and normal arithmetic rules apply.
+
+    Common modulus values are captured by a series of specialized constructors,
+    such as byte and digit.
+
+--- !ClassDescription
+    has:
+      - Equality
+      - TotalOrdering
+      - Field
+      - FloorDivMod
+      - Exponentiation
+      - AbsoluteValue
+    excluding:
+      - abs_is_multiplicitive
+    """
 
     __slots__ = ('_modulus', '__value')
 
@@ -125,12 +148,12 @@ class ModuloN(numbers.Integral):
         return specials.get(self._modulus, "{self.__class__.__name__}({self._modulus}, {self._value})").format(self=self)
 
     def __str__(self) -> str:
-        return "{self._value}(%{self._modulus})".format(self=self)
+        return "{self._value}(mod {self._modulus})".format(self=self)
 
     def __bytes__(self) -> bytes:
         return bytes(self._value)
 
-    def __format(self, format_spec) -> str:
+    def __format__(self, format_spec) -> str:
         return format(self._value, format_spec)
 
     def __eq__(self, other) -> bool:
@@ -245,6 +268,20 @@ class ModuloN(numbers.Integral):
 
 
 class ModuloPow2(ModuloN):
+    """Modular Arithmetic with modulus a power of 2.
+
+    ModuloPow2 is a ModuloN, optimised with a modulus that is a power of 2.
+    This means that instead of an expensive mod operation, we can simply use
+    bitwise and operation.
+
+--- !ClassDescription
+    has:
+      - ModuloN
+      - LatticeWithComplement
+      - BitShift
+    skipping:
+      - rshift_definition
+    """
 
     def __init__(self, modulus: int, value: int=None, *, is_trusted: bool=False) -> None:
         """
