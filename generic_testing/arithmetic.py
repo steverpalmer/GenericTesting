@@ -83,8 +83,7 @@ class MultiplicationMonoidTests(GenericTests):
 
 
 class AdditionExtensionsTests:
-    """Discrete tests of the __pos__ and __sub__ methods."
-    """
+    """Discrete tests of the __pos__ and __sub__ methods."""
 
     def test_generic_2232_pos_definition(self, a: ClassUnderTest) -> None:
         """+a == a"""
@@ -292,7 +291,7 @@ class VectorSpaceTests(RModuleTests, AdditionExtensionsTests):
 
     @property
     def scalar_zero(self) -> ScalarT:
-        """A zero in scalar type."""
+        """Zero in the scalar type."""
         return self.scalar_one - self.scalar_one
 
     def test_generic_2245_truediv_definition(self, r: ScalarT, a: ClassUnderTest) -> None:

@@ -22,9 +22,11 @@ class HashableTests(GenericTests):
     """The property tests of collections.abc.Hashable."""
 
     def test_generic_2135_hash_returns_an_int(self, a: ClassUnderTest):
+        """isinstance(hash(a), int)"""
         self.assertIsInstance(hash(a), int)
 
     def test_generic_2136_hash_equal_on_equal_inputs(self, a: ClassUnderTest, b: ClassUnderTest):
+        """a == b ⇒ hash(a) == hash(b)"""
         self.assertImplies(a == b, hash(a) == hash(b))
 
 
@@ -56,13 +58,13 @@ class SizedTests(GenericTests):
     """
 
     def test_generic_2410_len_returns_a_non_negative_int(self, a: ClassUnderTest) -> None:
-        "0 <= len(a)"
+        """0 <= len(a)"""
         a_len = len(a)
         self.assertIsInstance(a_len, int)
         self.assertGreaterEqual(a_len, 0)
 
     def test_generic_2800_bool_convention(self, a: ClassUnderTest) -> None:
-        "bool(a) ⇔ len(a) != 0"
+        """bool(a) ⇔ len(a) != 0"""
         self.assertEqual(len(a) != 0, bool(a))
 
 
@@ -76,6 +78,7 @@ class ContainerTests(GenericTests):
     """
 
     def test_generic_2420_contains_returns_a_boolean(self, a: ElementT, b: ClassUnderTest) -> None:
+        """isinstance(a in b, bool)"""
         self.assertIsInstance(a in b, bool)
 
 

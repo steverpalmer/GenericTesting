@@ -40,11 +40,12 @@ class EnumTests(_EnumTests):
     """Tests of Enum class properties."""
 
     def test_generic_2800_bool_convention(self, a: ClassUnderTest) -> None:
-        "bool(a)"
+        """bool(a)"""
         self.assertTrue(bool(a))
 
 
 class UniqueEnumTests(EnumTests):
+    """Tests of unique Enum class properties."""
 
     def test_generic_2645_class_getitem_is_injective(self, a: KeyT, b: KeyT):
         """a != b ⇒ Enum[a] != Enum[b]"""
@@ -52,7 +53,7 @@ class UniqueEnumTests(EnumTests):
 
 
 class IntEnumTests(intTests, _EnumTests):
-    pass
+    """Tests od IntEnum class properties"""
 
 
 __all__ = ('KeyT', 'EnumTests', 'UniqueEnumTests', 'IntEnumTests')
