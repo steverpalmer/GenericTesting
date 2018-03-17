@@ -227,7 +227,7 @@ class ExponentiationTests(GenericTests):
         self.assertEqual(self.zero ** self.zero, self.one)
 
     def test_generic_2251_exponentiation_by_zero(self, a: ClassUnderTest) -> None:
-        """not a == 0 ⇒ a ** 0 == 1"""
+        """a != 0 ⇒ a ** 0 == 1"""
         assume(not a == self.zero)
         self.assertEqual(a ** self.zero, self.one)
 
@@ -237,12 +237,12 @@ class ExponentiationTests(GenericTests):
         self.assertEqual(self.zero ** a, self.zero)
 
     def test_generic_2253_exponentiation_with_base_one(self, a: ClassUnderTest) -> None:
-        """not a == 0 ⇒ 1 ** a == 1"""
+        """a != 0 ⇒ 1 ** a == 1"""
         assume(not a == self.zero)
         self.assertEqual(self.one ** a, self.one)
 
     def test_generic_2254_exponentiation_by_one(self, a: ClassUnderTest) -> None:
-        """not a == 0 ⇒ a ** 1 == a"""
+        """a != 0 ⇒ a ** 1 == a"""
         assume(not a == self.zero)
         self.assertEqual(a ** self.one, a)
 
