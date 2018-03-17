@@ -49,8 +49,25 @@ can add any special tests you want in the normal `unittest.TestCase` style.
 The `Given` class decorator will bind the generic tests to the production strategy.
 The standard library `unittest.defaultTestLoader.loadTestsFromTestCase` can be
 used to generate a normal `unittest.TestSuite` collecting all the tests together
-ready to be run.  In this case, in excess of 57 properties of ints will be run against
-the hypothesis default 100 example ints.
+ready to be run.  As of 17th March, this will run 66 property tests, each exercises against
+the hypothesis default 100 example ints.  On my computer, this took 6.6 seconds to complete.
+
+A more interesting example is defined in the `test` directory in module `modulo_n.py`.
+It defines a new class `ModuloN` and a specialization `ModuloPow2`.
+Included in the docstring for the classes is a description of the class properties.
+The test module `test_modulo_n.py` has:
+
+    @Given(st.builds(ModuloN.decimal_digit, st.integers()))
+    class Test_ModuloN_decimal_digit(defaultGenericTestLoader.discover(ModuloN)):
+        zero = ModuloN.decimal_digit(0)
+        one = ModuloN.decimal_digit(1)
+
+Again `defaultGenericTestLoader.discover(ModuloN)` uses the class description to build
+a base clase with a corresponding set of properties.  In this case. the tests need a definition
+of the special values `zero` (the additive identity) and `one` (the multiplicative identity),
+given in the body of the test class.  Finally, the `Given` class decorator, binds the tests to values
+drawn from the set of ModuleN.decimal_digits based on the set of integers.  As of 17th March,
+this runs 36 tests against ModuloN in 4.5 seconds.
 
 Cheers,
 Steve Palmer
