@@ -24,7 +24,7 @@ class ClassDescription(types.SimpleNamespace, yaml.YAMLObject):
 
     yaml_tag = u'!ClassDescription'
 
-    struct = collections.namedtuple('ClassDescriptionStruct', 'has skipping including excluding')
+    struct = collections.namedtuple('ClassDescriptionStruct', 'has skipping excluding')
 
     def in_full(self):
         return self.struct(*(getattr(self, field, None) for field in self.struct._fields))
