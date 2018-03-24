@@ -388,7 +388,7 @@ class listTests(_tupleTests, MutableSequenceTests):
 
     empty = list()
 
-    def copy(self, a:ClassUnderTest) -> ClassUnderTest:
+    def copy(self, a: ClassUnderTest) -> ClassUnderTest:
         return a.copy()
 
     def test_generic_2630_clear_definition(self, a: ClassUnderTest) -> None:

@@ -128,11 +128,11 @@ class SizedIterableContainerWithEmpty(SizedOverIterableTests, ContainerOverItera
             next(iter(self.empty))
 
     def test_generic_2412_len_empty_is_zero(self) -> None:
-        "len(∅) == 0"
+        """len(∅) == 0"""
         self.assertEqual(len(self.empty), 0)
 
     def test_generic_2422_empty_contains_nothing(self, a: ElementT) -> None:
-        "a not in ∅"
+        """a not in ∅"""
         self.assertFalse(a in self.empty)
 
 
@@ -163,18 +163,18 @@ class SetTests(SizedIterableContainerWithEmpty, EqualityTests, PartialOrderingTe
         self.assertEqual(a <= b, expected)
 
     def test_generic_2151_ordering_consistent_with_lattice(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        "(a & b <= a <= a | b) and (a & b <= b <= a | b)"
+        """(a & b <= a <= a | b) and (a & b <= b <= a | b)"""
         union = a | b
         intersection = a & b
         self.assertTrue(intersection <= a <= union)
         self.assertTrue(intersection <= b <= union)
 
     def test_generic_2430_disjoint_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        "a.isdisjoint(b) ⇔ a & b == ∅"
+        """a.isdisjoint(b) ⇔ a & b == ∅"""
         self.assertEqual(a.isdisjoint(b), a & b == self.empty)
 
     def test_generic_2431_sub_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        "x in a - b ⇔ x in a and x not in b"
+        """x in a - b ⇔ x in a and x not in b"""
         c = a - b
         universe = a | b
         self.assertLessEqual(c, universe)
@@ -182,7 +182,7 @@ class SetTests(SizedIterableContainerWithEmpty, EqualityTests, PartialOrderingTe
             self.assertEqual(x in c, x in a and x not in b)
 
     def test_generic_2432_xor_defintion(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        "x in a ^ b ⇔ x in a and x not in b or x not in a and x in b"
+        """x in a ^ b ⇔ x in a and x not in b or x not in a and x in b"""
         c = a ^ b
         universe = a | b
         self.assertLessEqual(c, universe)
@@ -214,7 +214,7 @@ class MutableSetTests(SetTests, LatticeWithComplementAugmentedTests):
 
     @abc.abstractmethod
     def copy(self, a: ClassUnderTest) -> ClassUnderTest:
-        """ Copy Helper function.
+        """Copy Helper function.
 
         To test Mutable containers, it is useful to have a helper that takes
         a copy of the container before it is mutated.
@@ -293,7 +293,8 @@ class MutableMappingTests(MappingTests):
 
     @abc.abstractmethod
     def copy(self, a: ClassUnderTest) -> ClassUnderTest:
-        """
+        """Copy helper.
+
         To test Mutable containers, it is useful to have a helper that takes a copy
         of the container before it is mutated.
         """
@@ -398,19 +399,20 @@ class SequenceTests(SizedIterableContainerWithEmpty):
         a_len = len(a)
         i = 1
         while i <= a_len:
-            self.assertEqual(a[-i], a[a_len-i])
+            self.assertEqual(a[-i], a[a_len - i])
             i += 1
         with self.assertRaises(IndexError):
-            a[-a_len-1]
+            a[-a_len - 1]
 
     def test_generic_2533_getitem_slice_definition(self, a:ClassUnderTest, data) -> None:
         """a[start:stop:step][i] = a[start + i * step]"""
         a_len = len(a)
         if a_len > 0:
-            start = data.draw(st.integers(min_value=0, max_value=a_len-1))
-            stop = data.draw(st.integers(min_value=0, max_value=a_len-1))
+            start = data.draw(st.integers(min_value=0, max_value=a_len - 1))
+            stop = data.draw(st.integers(min_value=0, max_value=a_len - 1))
             step = data.draw(st.integers(min_value=1, max_value=a_len))
-            if start > stop: step = -step
+            if start > stop:
+                step = -step
             a_slice = a[start:stop:step]
             i = 0
             j = start

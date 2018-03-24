@@ -90,6 +90,10 @@ class LatticeWithComplementTests(BoundedLatticeTests):
 
 
 class BitShiftTests(GenericTests):
+    """Tests of the __lshift__ and __rshift__ operators.
+
+    Arguably, these operators are more to do with numbers than "lattices", but they need to be put somewhere.
+    """
 
     def test_generic_2390_lshift_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         """0 <= b ⇒ a << b == a * pow(2, b)"""

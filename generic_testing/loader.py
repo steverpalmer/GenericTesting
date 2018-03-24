@@ -21,6 +21,7 @@ from generic_testing.built_in_types import *
 
 
 class ClassDescription(types.SimpleNamespace, yaml.YAMLObject):
+    """Class to act as a marker in the class docstring for a yaml segment."""
 
     yaml_tag = u'!ClassDescription'
 
