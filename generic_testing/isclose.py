@@ -243,4 +243,5 @@ __all__ = ('IsClose')
 
 if __name__ == '__main__':
     import doctest
+    import datetime
     doctest.testmod()
