@@ -13,12 +13,12 @@ from modulo_n import ModuloN, ModuloPow2
 
 
 @Given(st.builds(ModuloN.decimal_digit, st.integers()))
-class Test_ModuloN_decimal_digit(defaultGenericTestLoader.discover(ModuloN)):
+class Test_ModuloN_decimal_digit(defaultGenericTestLoader.discover(ModuloN, use_docstring_yaml=True)):
     zero = ModuloN.decimal_digit(0)
     one = ModuloN.decimal_digit(1)
 
 
-class ModuloPow2Tests(defaultGenericTestLoader.discover(ModuloPow2)):
+class ModuloPow2Tests(defaultGenericTestLoader.discover(ModuloPow2, use_docstring_yaml=True)):
     @property
     def bottom(self): return self.zero 
     @property

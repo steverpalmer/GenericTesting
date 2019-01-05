@@ -76,10 +76,10 @@ class GenericTestLoader:
                             [SizedOverIterableTests],  # Sized and Iterable
                             [ContainerOverIterableTests, SizedOverIterableTests])  # Sized, Iterable and Container
 
-    def discover(self, T: type) -> GenericTests:
+    def discover(self, T: type, *, use_docstring_yaml: bool = False) -> GenericTests:
         """Generate Base Case based on supplied class."""
         result = None
-        if isinstance(T.__doc__, str):
+        if isinstance(T.__doc__, str) and use_docstring_yaml:
             for class_description in yaml.load_all(T.__doc__):
                 if isinstance(class_description, ClassDescription):
                     class_description = class_description.in_full()
