@@ -8,6 +8,7 @@ import numbers
 import fractions
 import types
 import inspect
+import io
 
 import yaml
 
@@ -18,6 +19,7 @@ from generic_testing.arithmetic import *
 from generic_testing.collections_abc import *
 from generic_testing.numbers_abc import *
 from generic_testing.built_in_types import *
+from generic_testing.file_likes import *
 
 
 class ClassDescription(types.SimpleNamespace, yaml.YAMLObject):
@@ -173,5 +175,8 @@ defaultGenericTestLoader.register(float, floatTests)
 defaultGenericTestLoader.register(fractions.Fraction, FractionTests)
 defaultGenericTestLoader.register(int, intTests)
 
+defaultGenericTestLoader.register(io.RawIOBase, RawIOBaseTests)
+defaultGenericTestLoader.register(io.BufferedIOBase, BufferedIOBaseTests)
+defaultGenericTestLoader.register(io.TextIOBase, TextIOBaseTests)
 
 __all__ = ('ClassDescription', 'GenericTestLoader', 'defaultGenericTestLoader')
