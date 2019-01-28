@@ -8,7 +8,7 @@ import unittest
 class LimitedTextTestResult(unittest.TextTestResult):
     """Stop after a certain number of failures or errors."""
 
-    def __init__(self, stream, descriptions, verbosity, max_failures: int=None, max_errors: int=None):
+    def __init__(self, stream, descriptions, verbosity, max_failures: int = None, max_errors: int = None):
         """Define maximum allowable failures and errors."""
         super().__init__(stream, descriptions, verbosity)
         self._max_failures = max_failures

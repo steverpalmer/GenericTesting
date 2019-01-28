@@ -404,7 +404,7 @@ class SequenceTests(SizedIterableContainerWithEmpty):
         with self.assertRaises(IndexError):
             a[-a_len - 1]
 
-    def test_generic_2533_getitem_slice_definition(self, a:ClassUnderTest, data) -> None:
+    def test_generic_2533_getitem_slice_definition(self, a: ClassUnderTest, data) -> None:
         """a[start:stop:step][i] = a[start + i * step]"""
         a_len = len(a)
         if a_len > 0:
@@ -482,7 +482,8 @@ class MutableSequenceTests(SequenceTests):
             a_copy = self.copy(a)
             a[b] = c
             self.assertEqual(len(a), a_len)
-            if b < 0: b += a_len
+            if b < 0:
+                b += a_len
             i = 0
             for x in a:
                 self.assertEqual(x, c if i == b else a_copy[i])
@@ -497,8 +498,9 @@ class MutableSequenceTests(SequenceTests):
         if -a_len <= b < a_len:
             a_copy = self.copy(a)
             del a[b]
-            self.assertEqual(len(a), a_len-1)
-            if b < 0: b += a_len
+            self.assertEqual(len(a), a_len - 1)
+            if b < 0:
+                b += a_len
             i = 0
             for x in a:
                 self.assertEqual(x, a_copy[i + int(b <= i)])
@@ -513,11 +515,12 @@ class MutableSequenceTests(SequenceTests):
         a_copy = self.copy(a)
         a.insert(b, c)
         self.assertEqual(len(a), a_len + 1)
-        if b < 0: b += a_len
+        if b < 0:
+            b += a_len
         b = max(0, min(a_len, b))  # clip b
         i = 0
         for x in a:
-            self.assertEqual(x, c if i == b else a_copy[i-int(i > b)])
+            self.assertEqual(x, c if i == b else a_copy[i - int(i > b)])
             i += 1
 
     def test_generic_2560_append_definition(self, a: ClassUnderTest, b: ValueT) -> None:
@@ -539,7 +542,7 @@ class MutableSequenceTests(SequenceTests):
         self.assertEqual(len(a), a_len)
         i = 0
         for x in a:
-            self.assertEqual(x, a_copy[-i-1])
+            self.assertEqual(x, a_copy[-i - 1])
             i += 1
 
     def test_generic_2562_extend_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
@@ -550,7 +553,7 @@ class MutableSequenceTests(SequenceTests):
         self.assertEqual(len(a), a_len + len(b))
         i = 0
         for x in a:
-            self.assertEqual(x, a_copy[i] if i < a_len else b[i-a_len])
+            self.assertEqual(x, a_copy[i] if i < a_len else b[i - a_len])
             i += 1
 
     def test_generic_2563_pop_definition(self, a: ClassUnderTest, b: KeyT) -> None:
@@ -561,7 +564,8 @@ class MutableSequenceTests(SequenceTests):
             v = a.pop(b)
             self.assertEqual(v, a_copy[b])
             self.assertEqual(len(a), a_len - 1)
-            if b < 0: b += a_len
+            if b < 0:
+                b += a_len
             i = 0
             for x in a:
                 self.assertEqual(x, a_copy[i + int(b <= i)])
@@ -594,7 +598,7 @@ class MutableSequenceTests(SequenceTests):
         self.assertEqual(len(a), a_len + len(b))
         i = 0
         for x in a:
-            self.assertEqual(x, a_copy[i] if i < a_len else b[i-a_len])
+            self.assertEqual(x, a_copy[i] if i < a_len else b[i - a_len])
             i += 1
 
 

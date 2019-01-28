@@ -146,7 +146,7 @@ class IsClose:
         return result
 
     @staticmethod
-    def polymorphic(a: numbers.Number, b: numbers.Number, *, rel_tol: float=None, abs_tol: float=None) -> bool:
+    def polymorphic(a: numbers.Number, b: numbers.Number, *, rel_tol: float = None, abs_tol: float = None) -> bool:
         """Polymorphic isclose.
 
         >>> IsClose.polymorphic(complex(1/3, 1/3), complex(0.3333333333333333333333, 0.33333333333333333333))
@@ -158,7 +158,7 @@ class IsClose:
         abs_tol = IsClose._abs_tol(abs_tol)
         return IsClose._polymorphic(a, b, rel_tol=rel_tol, abs_tol=abs_tol)
 
-    def __init__(self, rel_tol: numbers.Real=None, abs_tol: numbers.Real=None) -> None:
+    def __init__(self, rel_tol: numbers.Real = None, abs_tol: numbers.Real = None) -> None:
         """Define rel_tol and abs_tol default values."""
         self._rel_tol = IsClose._rel_tol(rel_tol)
         self._abs_tol = IsClose._abs_tol(abs_tol)
@@ -243,5 +243,4 @@ __all__ = ('IsClose')
 
 if __name__ == '__main__':
     import doctest
-    import datetime
     doctest.testmod()

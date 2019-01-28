@@ -59,7 +59,7 @@ class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):
     def _skip(self) -> None:
         raise unittest.SkipTest("")
 
-    def assertIsInstance(self, obj, type_, msg: str=None):
+    def assertIsInstance(self, obj, type_, msg: str = None):
         """Confirm type of object.
 
         I kept writing self.assertTrue(isinstance(obj, type_)),
@@ -70,7 +70,7 @@ class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):
                 msg = "{obj} has type {obj_type}, not a subclass of {type} as expected".format(obj=obj, obj_type=type(obj), type=type_)
             raise self.failureException(msg)
 
-    def assertImplies(self, antecedent, consequent, msg: str=None):
+    def assertImplies(self, antecedent, consequent, msg: str = None):
         """Confirm implication.
 
         I like implies as an operator ... so shoot me.
@@ -80,7 +80,7 @@ class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):
                 msg = "Consquent is False even though Antecedent is True"
             raise self.failureException(msg)
 
-    def assertIsClose(self, a, b, msg: str=None):
+    def assertIsClose(self, a, b, msg: str = None):
         """Confirm one number is close to another.
 
         Sort of like assertAlmostEqual, but defined in terms of IsClose.
@@ -90,7 +90,7 @@ class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):
                 msg = "{a} is not close enough to {b}".format(a=a, b=b)
             raise self.failureException(msg)
 
-    def assertNotIsClose(self, a, b, msg: str=None):
+    def assertNotIsClose(self, a, b, msg: str = None):
         """Confirm one number is not close to another.
 
         assertNotIsClose is to assertIsClose as assertNotAlmostEqual is to assertAlmostEqual - completeness
@@ -100,14 +100,14 @@ class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):
                 msg = "{a} is not close enough to {b}".format(a=a, b=b)
             raise self.failureException(msg)
 
-    def assertCloseOrLessThan(self, a, b, msg: str=None):
+    def assertCloseOrLessThan(self, a, b, msg: str = None):
         """Confirm one number is close or less than another."""
         if not (a < b or self.isclose(a, b)):
             if msg is None:
                 msg = "{a} is not sufficiently less than {b}".format(a=a, b=b)
             raise self.failureException(msg)
 
-    def assertCloseOrGreaterThan(self, a, b, msg: str=None):
+    def assertCloseOrGreaterThan(self, a, b, msg: str = None):
         """Confirm one number is close or greater than another."""
         if not (a > b or self.isclose(a, b)):
             if msg is None:
