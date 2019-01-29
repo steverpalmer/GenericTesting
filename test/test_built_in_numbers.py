@@ -34,23 +34,6 @@ class Test_float(floatTests):
     pass
 
 
-# :TODO: This is under consideration (https://github.com/HypothesisWorks/hypothesis-python/issues/1076), but here's my quick&dirty attempt
-# @st.cacheable
-# @st.base_defines_strategy(True)
-# def complex_numbers(min_real_value=None, max_real_value=None, min_imag_value=None, max_imag_value=None, allow_nan=None, allow_infinity=None):
-#     """Returns a strategy that generates complex numbers.
-# 
-#     Examples from this strategy shrink by shrinking their component real
-#     and imaginary parts.
-# 
-#     """
-#     from hypothesis.searchstrategy.numbers import ComplexStrategy
-#     return ComplexStrategy(
-#         st.tuples(
-#             st.floats(min_value=min_real_value, max_value=max_real_value, allow_nan=allow_nan, allow_infinity=allow_infinity),
-#             st.floats(min_value=min_imag_value, max_value=max_imag_value, allow_nan=allow_nan, allow_infinity=allow_infinity)))
-
-
 COMPLEX_RANGE = 1e10
 
 
