@@ -20,7 +20,7 @@ class Test_ModuloN_decimal_digit(defaultGenericTestLoader.discover(ModuloN, use_
 
 class ModuloPow2Tests(defaultGenericTestLoader.discover(ModuloPow2, use_docstring_yaml=True)):
     @property
-    def bottom(self): return self.zero 
+    def bottom(self): return self.zero
     @property
     def top(self): return -self.one
 
