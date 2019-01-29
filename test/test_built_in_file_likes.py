@@ -5,18 +5,37 @@
 
 import unittest
 import io
+import tempfile
 
 from hypothesis import strategies as st
 
 from generic_testing import *
 
 
-@Given({ClassUnderTest: st.builds(io.BytesIO, st.binary())})
-class Test_BinaryIO(IOBaseTests):
+def _make_temp_file(b: bytes):
+    result = tempfile.TemporaryFile()
+    if b:
+        result.write(b)
+        result.seek(0)
+    return result.detach()
+
+
+@Given({ClassUnderTest: st.builds(_make_temp_file), int: st.integers()})
+class Test_FileIO(FileIOTests):
     pass
 
 
-__all__ = ('Test_BinaryIO')
+@Given({ClassUnderTest: st.builds(io.BytesIO)})
+class Test_BytesIO(BytesIOTests):
+    pass
+
+
+@Given({ClassUnderTest: st.builds(io.StringIO)})
+class Test_StringIO(StringIOTests):
+    pass
+
+
+__all__ = ('Test_BytesIO', 'Test_StringIO')
 
 
 if __name__ == '__main__':
