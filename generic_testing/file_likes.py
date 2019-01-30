@@ -77,7 +77,12 @@ class IOBaseTests(IterableTests):
         """check verious read methods exist."""
         hypothesis.assume(not a.closed)
         self.assertTrue(callable(a.read))
-        self.assertTrue(callable(a.readinto))
+        # Althought 3.7.2 says that readinto is part of the interface of io.IOBase,
+        # It makes no sense appied to TestIOBase since (as it also states)
+        # "Python's character strings are immutable.
+        # Instead of requiring it here, I test it in the cases when it does make sense
+        # See Python Issue 35848
+        # self.assertTrue(callable(a.readinto))
         self.assertTrue(callable(a.readline))
         self.assertTrue(callable(a.readlines))
 
@@ -308,14 +313,7 @@ class BytesIOTests(BufferedIOBaseTests):
 
 
 class TextIOBaseTests(IOBaseTests):
-
-    def test_generic_2705_has_read_methods(self, a: ClassUnderTest) -> None:
-        """check verious read methods exist."""
-        hypothesis.assume(not a.closed)
-        self.assertTrue(callable(a.read))
-        # self.assertTrue(callable(a.readinto))  BUG #35848
-        self.assertTrue(callable(a.readline))
-        self.assertTrue(callable(a.readlines))
+    pass
 
 
 class StringIOTests(TextIOBaseTests):
