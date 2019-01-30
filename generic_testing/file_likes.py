@@ -5,12 +5,13 @@
 from collections import Counter
 import enum
 from time import sleep
+import os
 
 import hypothesis
 
+from generic_testing.timeout import Timeout
 from generic_testing.core import ClassUnderTest
 from generic_testing.collections_abc import IterableTests
-from timeout import Timeout
 
 
 class IOBaseTests(IterableTests):
@@ -35,7 +36,7 @@ class IOBaseTests(IterableTests):
     def test_generic_2700_closed(self, a: ClassUnderTest) -> None:
         """a.closed"""
         a.closed
-        #  If we don't through an exception, then we've passed ...
+        #  If we don't raise an exception, then we've passed ...
 
     def test_generic_2701_close_and_closed(self, a: ClassUnderTest) -> None:
         """a.close(); a.closed"""
@@ -48,16 +49,18 @@ class IOBaseTests(IterableTests):
     def test_generic_2702_close_and_read(self, a: ClassUnderTest) -> None:
         """a.close(); a.read()"""
         hypothesis.assume(not a.closed)
-        hypothesis.assume(a.readable)
-        a.close()
-        with self.assertRaises(ValueError):
-            a.read()
+        if a.readable():
+            a.close()
+            with self.assertRaises(ValueError):
+                a.read()
 
     def test_generic_2703_fileno_is_int(self, a: ClassUnderTest) -> None:
         """a.fileno()"""
         hypothesis.assume(not a.closed)
         try:
-            self.assertIsInstance(a.fileno(), int)
+            a_fileno = a.fileno()
+            self.assertIsInstance(a_fileno, int)
+            self.assertIsNotNone(os.fstat(a.fileno()))  # hopefully testing that the value is a real file descriptor
         except OSError:
             pass
 
@@ -126,7 +129,7 @@ class RawIOBaseTests(IOBaseTests):
         hypothesis.assume(not a.closed)
         if a.readable():
             State = enum.Enum('State', ('Looping', 'EOF_Found', 'Timeout'))
-            timeout = Timeout.after(10)
+            timeout = Timeout(10)
             state = State.Looping
             while state == State.Looping:
                 a_readall = a.readall()
@@ -151,7 +154,7 @@ class RawIOBaseTests(IOBaseTests):
             self.assertEqual(a_readinto, 0)
             buf = bytearray(n)
             State = enum.Enum('State', ('Looping', 'EOF_Found', 'Timeout'))
-            timeout = Timeout.after(10)
+            timeout = Timeout(10)
             state = State.Looping
             while state == State.Looping:
                 a_readinto = a.readinto(buf)
@@ -172,7 +175,7 @@ class RawIOBaseTests(IOBaseTests):
         hypothesis.assume(not a.closed)
         if a.readable():
             State = enum.Enum('State', ('Looping', 'EOF_Found', 'Timeout'))
-            timeout = Timeout.after(10)
+            timeout = Timeout(10)
             state = State.Looping
             while state == State.Looping:
                 a_read = a.read()
@@ -196,7 +199,7 @@ class RawIOBaseTests(IOBaseTests):
             a_read = a.read(0)
             self.assertEqual(a_read, b'')
             State = enum.Enum('State', ('Looping', 'EOF_Found', 'Timeout'))
-            timeout = Timeout.after(10)
+            timeout = Timeout(10)
             state = State.Looping
             while state == State.Looping:
                 a_read = a.read(n)
@@ -218,7 +221,7 @@ class RawIOBaseTests(IOBaseTests):
         hypothesis.assume(not a.closed)
         if a.readable():
             State = enum.Enum('State', ('Looping', 'EOF_Found', 'Timeout'))
-            timeout = Timeout.after(10)
+            timeout = Timeout(10)
             state = State.Looping
             while state == State.Looping:
                 a_readline = a.readline()
@@ -245,7 +248,7 @@ class RawIOBaseTests(IOBaseTests):
             a_readline = a.readline(0)
             self.assertEqual(a_readline, b'')
             State = enum.Enum('State', ('Looping', 'EOF_Found', 'Timeout'))
-            timeout = Timeout.after(10)
+            timeout = Timeout(10)
             state = State.Looping
             while state == State.Looping:
                 a_readline = a.readline(n)

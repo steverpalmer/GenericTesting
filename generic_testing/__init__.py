@@ -4,6 +4,8 @@
 
 __version__ = "0.1"
 
+from generic_testing.timeout import Timeout
+
 from generic_testing.isclose import IsClose
 
 from generic_testing.core import *
