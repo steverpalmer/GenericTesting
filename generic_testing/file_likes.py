@@ -4,8 +4,9 @@
 
 from collections import Counter
 import enum
-from time import sleep
+import time
 import os
+import abc
 
 import hypothesis
 
@@ -121,20 +122,25 @@ class IOBaseTests(IterableTests):
 class RawIOBaseTests(IOBaseTests):
     """Tests of RawIOBase inheritable properties."""
 
-    @staticmethod
-    def _check_line(line):
-        sp = line.split(b'\n')
-        len_sp = len(sp)
-        at_eof = len_sp < 2
-        wellformed = at_eof or (len_sp == 2 and len(sp[1]) == 0)
-        return (at_eof, wellformed)
+    @property
+    def max_test_time_seconds(self) -> float:
+        """Some of these tests use a timeout, not to enforce any performance
+        on the methods, but just to stop any tests hanging.  In such cases,
+        the testing will be incomplete.
+        """
+        return 1.0
+
+    def pause(self, delay_seconds=0.1) -> None:
+        """Delay test execution, particularly in the case of a Non-Blocking ClassUnderTest
+        """
+        time.sleep(delay_seconds)
 
     def test_generic_2710_raw_readall(self, a: ClassUnderTest) -> None:
         """io.RawIOBase.readall()"""
         hypothesis.assume(not a.closed)
         if a.readable():
             State = enum.Enum('State', ('Looping', 'EOF_Found', 'Timeout'))
-            timeout = Timeout(10)
+            timeout = Timeout(self.max_test_time_seconds)
             state = State.Looping
             while state == State.Looping:
                 a_readall = a.readall()
@@ -142,7 +148,7 @@ class RawIOBaseTests(IOBaseTests):
                     if timeout:
                         state = State.Timeout
                     else:
-                        sleep(0.1)
+                        self.delay()
                 else:
                     self.assertIsInstance(a_readall, bytes)
                     if a_readall == b'':
@@ -159,7 +165,7 @@ class RawIOBaseTests(IOBaseTests):
             self.assertEqual(a_readinto, 0)
             buf = bytearray(n)
             State = enum.Enum('State', ('Looping', 'EOF_Found', 'Timeout'))
-            timeout = Timeout(10)
+            timeout = Timeout(self.max_test_time_seconds)
             state = State.Looping
             while state == State.Looping:
                 a_readinto = a.readinto(buf)
@@ -167,7 +173,7 @@ class RawIOBaseTests(IOBaseTests):
                     if timeout:
                         state = State.Timeout
                     else:
-                        sleep(0.1)
+                        self.pause()
                 else:
                     self.assertTrue(0 <= a_readinto <= n)
                     if a_readinto == 0:
@@ -180,7 +186,7 @@ class RawIOBaseTests(IOBaseTests):
         hypothesis.assume(not a.closed)
         if a.readable():
             State = enum.Enum('State', ('Looping', 'EOF_Found', 'Timeout'))
-            timeout = Timeout(10)
+            timeout = Timeout(self.max_test_time_seconds)
             state = State.Looping
             while state == State.Looping:
                 a_read = a.read()
@@ -188,7 +194,7 @@ class RawIOBaseTests(IOBaseTests):
                     if timeout:
                         state = State.Timeout
                     else:
-                        sleep(0.1)
+                        self.pause()
                 else:
                     self.assertIsInstance(a_read, bytes)
                     if a_read == b'':
@@ -204,7 +210,7 @@ class RawIOBaseTests(IOBaseTests):
             a_read = a.read(0)
             self.assertEqual(a_read, b'')
             State = enum.Enum('State', ('Looping', 'EOF_Found', 'Timeout'))
-            timeout = Timeout(10)
+            timeout = Timeout(self.max_test_time_seconds)
             state = State.Looping
             while state == State.Looping:
                 a_read = a.read(n)
@@ -212,7 +218,7 @@ class RawIOBaseTests(IOBaseTests):
                     if timeout:
                         state = State.Timeout
                     else:
-                        sleep(0.1)
+                        self.pause()
                 else:
                     self.assertIsInstance(a_read, bytes)
                     self.assertTrue(0 <= len(a_read) <= n)
@@ -226,7 +232,7 @@ class RawIOBaseTests(IOBaseTests):
         hypothesis.assume(not a.closed)
         if a.readable():
             State = enum.Enum('State', ('Looping', 'EOF_Found', 'Timeout'))
-            timeout = Timeout(10)
+            timeout = Timeout(self.max_test_time_seconds)
             state = State.Looping
             while state == State.Looping:
                 a_readline = a.readline()
@@ -234,7 +240,7 @@ class RawIOBaseTests(IOBaseTests):
                     if timeout:
                         state = State.Timeout
                     else:
-                        sleep(0.1)
+                        self.pause()
                 else:
                     self.assertIsInstance(a_readline, bytes)
                     sp = a_readline.split(b'\n')
@@ -253,7 +259,7 @@ class RawIOBaseTests(IOBaseTests):
             a_readline = a.readline(0)
             self.assertEqual(a_readline, b'')
             State = enum.Enum('State', ('Looping', 'EOF_Found', 'Timeout'))
-            timeout = Timeout(10)
+            timeout = Timeout(self.max_test_time_seconds)
             state = State.Looping
             while state == State.Looping:
                 a_readline = a.readline(n)
@@ -261,7 +267,7 @@ class RawIOBaseTests(IOBaseTests):
                     if timeout:
                         state = State.Timeout
                     else:
-                        sleep(0.1)
+                        self.pause()
                 else:
                     self.assertIsInstance(a_readline, bytes)
                     self.assertLessEqual(len(a_readline), n)
@@ -273,6 +279,23 @@ class RawIOBaseTests(IOBaseTests):
                             self.assertTrue(len(sp) == 2 and len(sp[1]) == 0, "multiline response to readline")
             if state == State.EOF_Found:
                 self.assertEqual(a.readline(n), b'')
+
+    def test_generic_2720_raw_write(self, a: ClassUnderTest, b: bytes) -> None:
+        """io.RawIOBase.write(b)"""
+        hypothesis.assume(not a.closed)
+        if a.writable():
+            a_write = a.write(b)
+            if a_write is not None:
+                self.assertIsInstance(a_write, int)
+                self.assertTrue(0 <= a_write <= len(b))
+
+    def test_generic_2721_raw_writelines(self, a: ClassUnderTest, n: int, b: bytes) -> None:
+        """io.RawIOBase.writelines"""
+        hypothesis.assume(not a.closed)
+        n = (n & 255) + 1
+        if a.writable():
+            a.writelines([b] * n)
+            # test passes if this does not raise an exception
 
 
 class FileIOTests(RawIOBaseTests):

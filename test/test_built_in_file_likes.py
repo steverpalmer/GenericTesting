@@ -20,7 +20,7 @@ def _make_temp_file(b: bytes):
     return result.detach()
 
 
-@Given({ClassUnderTest: st.builds(_make_temp_file), int: st.integers()})
+@Given({ClassUnderTest: st.builds(_make_temp_file), int: st.integers(), bytes: st.binary()})
 class Test_FileIO(FileIOTests):
     pass
 
