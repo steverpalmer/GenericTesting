@@ -12,16 +12,27 @@ from hypothesis import strategies as st
 from generic_testing import *
 
 
-def _make_temp_file(b: bytes):
+def _make_raw_temp_file(b: bytes):
     result = tempfile.TemporaryFile(buffering=0)
-    if b:
-        result.write(b)
-        result.seek(0)
+    result.write(b)
+    result.seek(0)
     return result
 
 
-@Given({ClassUnderTest: st.builds(_make_temp_file), int: st.integers(), bytes: st.binary()})
+@Given({ClassUnderTest: st.builds(_make_raw_temp_file), int: st.integers(), bytes: st.binary()})
 class Test_FileIO(FileIOTests):
+    pass
+
+
+def _make_buffered_temp_file(b: bytes):
+    result = tempfile.TemporaryFile()
+    result.write(b)
+    result.seek(0)
+    return result
+
+
+@Given({ClassUnderTest: st.builds(_make_buffered_temp_file), int: st.integers(), bytes: st.binary()})
+class Test_BufferedIO(BufferedIOBaseTests):
     pass
 
 
@@ -30,12 +41,24 @@ class Test_BytesIO(BytesIOTests):
     pass
 
 
+def _make_text_temp_file(s: str):
+    result = tempfile.TemporaryFile('w+t')
+    result.write(s)
+    result.seek(0)
+    return result
+
+
+@Given({ClassUnderTest: st.builds(_make_text_temp_file), int: st.integers(), str: st.text()})
+class Test_TextIO(TextIOBaseTests):
+    pass
+
+
 @Given({ClassUnderTest: st.builds(io.StringIO)})
 class Test_StringIO(StringIOTests):
     pass
 
 
-__all__ = ('Test_BytesIO', 'Test_StringIO')
+__all__ = ('Test_FileIO', 'Test_BufferedIO', 'Test_BytesIO', 'Test_TextIO', 'Test_StringIO')
 
 
 if __name__ == '__main__':
