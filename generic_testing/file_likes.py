@@ -3,9 +3,11 @@
 """a library of generic tests for the file-like properties."""
 
 from collections import Counter
+import abc
 import enum
 import time
 import os
+import sys
 import unittest
 
 import hypothesis
@@ -17,6 +19,22 @@ from generic_testing.collections_abc import IterableTests
 
 class IOBaseTests(IterableTests):
     """Tests of IOBase inheritable properties."""
+
+    @property
+    @abc.abstractmethod
+    def dtype(self) -> type:
+        """as numpy.dtype, returns either bytes or str as appropriate"""
+        pass
+
+    def _to_dtype(self, msg):
+        if isinstance(msg, self.dtype):
+            result = msg
+        elif issubclass(self.dtype, str):
+            result = msg.decode()
+        else:
+            result = msg.encode()
+        assert isinstance(result, self.dtype)
+        return result
 
     def _ensure_readable(self, a: ClassUnderTest) -> None:
         if not a.readable():
@@ -139,25 +157,17 @@ class IOBaseTests(IterableTests):
         if a.writable():
             raise unittest.SkipTest("Test only applies to non writable streams")
         with self.assertRaises(OSError):
-            a.truncate()
-
-
-class _BytesIOBaseTests(IOBaseTests):
-    """Tests common to RawIOBase and BufferedIOBase classes"""
-
-    def test_generic_2708_write_when_not_writable(self, a: ClassUnderTest) -> None:
-        """check that OSError is raised when appropriate"""
-        hypothesis.assume(not a.closed)
-        if a.writable():
-            raise unittest.SkipTest("Test only applies to non writable streams")
+            a.write(self.dtype())
         with self.assertRaises(OSError):
             a.truncate()
-        with self.assertRaises(OSError):
-            a.write(b'')
 
 
-class RawIOBaseTests(_BytesIOBaseTests):
+class RawIOBaseTests(IOBaseTests):
     """Tests of RawIOBase inheritable properties."""
+
+    @property
+    def dtype(self) -> type:
+        return bytes
 
     @property
     def max_test_time_seconds(self) -> float:
@@ -391,8 +401,12 @@ class FileIOTests(RawIOBaseTests):
         self.assertSetEqual(set(c.values()), {1}, f"Duplicate mode character: {mode}")
 
 
-class BufferedIOBaseTests(_BytesIOBaseTests):
-    """Tests of RawIOBase inheritable properties."""
+class BufferedIOBaseTests(IOBaseTests):
+    """Tests of BufferedIOBase inheritable properties."""
+
+    @property
+    def dtype(self) -> type:
+        return bytes
 
     def test_generic_2720_raw(self, a: ClassUnderTest) -> None:
         pass
@@ -403,7 +417,11 @@ class BytesIOTests(BufferedIOBaseTests):
 
 
 class TextIOBaseTests(IOBaseTests):
-    pass
+    """Tests of TextIOBase inheritable properties."""
+
+    @property
+    def dtype(self) -> type:
+        return str
 
 
 class StringIOTests(TextIOBaseTests):
