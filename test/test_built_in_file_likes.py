@@ -13,11 +13,11 @@ from generic_testing import *
 
 
 def _make_temp_file(b: bytes):
-    result = tempfile.TemporaryFile()
+    result = tempfile.TemporaryFile(buffering=0)
     if b:
         result.write(b)
         result.seek(0)
-    return result.detach()
+    return result
 
 
 @Given({ClassUnderTest: st.builds(_make_temp_file), int: st.integers(), bytes: st.binary()})
