@@ -48,6 +48,17 @@ class IOBaseTests(IterableTests):
         if not a.writable():
             self.skipTest("Test only applies to writable streams")
 
+    def _ensure_blocking(self, a: ClassUnderTest) -> None:
+        try:
+            if not os.get_blocking(a.fileno()):
+                self.skipTest("Test only applies to blocking streams")
+        except OSError:
+            pass
+
+    def _ensure_non_interative(self, a: ClassUnderTest) -> None:
+        if a.isatty():
+            self.skipTest("Test only applies to non interactive streams")
+
     def test_generic_2400_iter_returns_an_iterator(self, a: ClassUnderTest) -> None:
         """Test __iter__ method."""
         hypothesis.assume(not a.closed)
@@ -425,49 +436,27 @@ class BufferedIOBaseTests(IOBaseTests):
         """io.BufferedIOBase.read()"""
         hypothesis.assume(not a.closed)
         self._ensure_readable(a)
-        State = enum.Enum('State', ('Looping', 'EOF_Found', 'Timeout'))
-        timeout = Timeout(self.max_test_time_seconds)
-        state = State.Looping
-        while state == State.Looping:
-            try:
-                a_read = a.read()
-            except BlockingIOError:
-                if timeout:
-                    state = State.Timeout
-                else:
-                    self.pause()
-            else:
-                self.assertIsInstance(a_read, bytes)
-                if a_read == b'':
-                    state = State.EOF_Found
-        if state == State.EOF_Found:
-            self.assertEqual(a.read(), b'')
+        self._ensure_blocking(a)
+        a_read = a.read()
+        self.assertIsInstance(a_read, bytes)
+        self.assertEqual(a.read(), b'')
 
     def test_generic_2713_read_limited(self, a: ClassUnderTest, n: int) -> None:
         """io.RawIOBase.read(n)"""
         hypothesis.assume(not a.closed)
         self._ensure_readable(a)
+        self._ensure_blocking(a)
+        self._ensure_non_interative(a)
         n = (n & 0xFFFF) + 1  # limit size of n to something reasonable
         a_read = a.read(0)
         self.assertEqual(a_read, b'')
-        State = enum.Enum('State', ('Looping', 'EOF_Found', 'Timeout'))
-        timeout = Timeout(self.max_test_time_seconds)
-        state = State.Looping
-        while state == State.Looping:
-            try:
-                a_read = a.read(n)
-            except BlockingIOError:
-                if timeout:
-                    state = State.Timeout
-                else:
-                    self.pause()
-            else:
-                self.assertIsInstance(a_read, bytes)
-                self.assertTrue(0 <= len(a_read) <= n)
-                if a_read == b'':
-                    state = State.EOF_Found
-        if state == State.EOF_Found:
-            self.assertEqual(a.read(n), b'')
+        while True:
+            a_read = a.read(n)
+            self.assertIsInstance(a_read, bytes)
+            self.assertTrue(0 <= len(a_read) <= n)
+            if len(a_read) < n:
+                break
+        self.assertEqual(a.read(n), b'')
 
     def test_generic_2750_raw(self, a: ClassUnderTest) -> None:
         """io.BufferedIOBase.raw"""
