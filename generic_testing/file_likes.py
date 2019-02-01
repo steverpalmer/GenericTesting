@@ -96,8 +96,8 @@ class IOBaseTests(IterableTests):
             with self.assertRaises(ValueError):
                 a.read()
 
-    def test_generic_2703_fileno_is_int(self, a: ClassUnderTest) -> None:
-        """a.fileno()"""
+    def test_generic_2703_fileno(self, a: ClassUnderTest) -> None:
+        """io.IOBase.fileno()"""
         hypothesis.assume(not a.closed)
         try:
             a_fileno = a.fileno()
@@ -338,6 +338,8 @@ class RawIOBaseTests(IOBaseTests):
         if state == State.EOF_Found:
             self.assertEqual(a.readline(n), b'')
 
+    # TODO: readlines
+
     def test_generic_2720_write(self, a: ClassUnderTest, b: bytes) -> None:
         """io.RawIOBase.write(b)"""
         hypothesis.assume(not a.closed)
@@ -432,6 +434,23 @@ class BufferedIOBaseTests(IOBaseTests):
         """
         time.sleep(delay_seconds)
 
+    def test_generic_2711_readinto(self, a: ClassUnderTest, n: int) -> None:
+        """io.BufferedIOBase.readinto(_)"""
+        hypothesis.assume(not a.closed)
+        self._ensure_readable(a)
+        self._ensure_blocking(a)
+        self._ensure_non_interative(a)
+        n = (n & 0xFFFF) + 1  # limit size of n to something reasonable
+        a_readinto = a.readinto(bytearray(0))
+        self.assertEqual(a_readinto, 0)
+        buf = bytearray(n)
+        while True:
+            a_readinto = a.readinto(buf)
+            self.assertTrue(0 <= a_readinto <= n)
+            if a_readinto < n:
+                break
+        self.assertEqual(a.readinto(buf), 0)
+
     def test_generic_2712_read_unlimited(self, a: ClassUnderTest) -> None:
         """io.BufferedIOBase.read()"""
         hypothesis.assume(not a.closed)
@@ -442,7 +461,7 @@ class BufferedIOBaseTests(IOBaseTests):
         self.assertEqual(a.read(), b'')
 
     def test_generic_2713_read_limited(self, a: ClassUnderTest, n: int) -> None:
-        """io.RawIOBase.read(n)"""
+        """io.BufferedIOBase.read(n)"""
         hypothesis.assume(not a.closed)
         self._ensure_readable(a)
         self._ensure_blocking(a)
@@ -453,10 +472,95 @@ class BufferedIOBaseTests(IOBaseTests):
         while True:
             a_read = a.read(n)
             self.assertIsInstance(a_read, bytes)
-            self.assertTrue(0 <= len(a_read) <= n)
+            self.assertLessEqual(len(a_read), n)
             if len(a_read) < n:
                 break
         self.assertEqual(a.read(n), b'')
+
+    def test_generic_2714_readline_unlimited(self, a: ClassUnderTest) -> None:
+        """io.BufferedIOBase.readline()"""
+        hypothesis.assume(not a.closed)
+        self._ensure_readable(a)
+        self._ensure_blocking(a)
+        while True:
+            a_readline = a.readline()
+            self.assertIsInstance(a_readline, bytes)
+            sp = a_readline.split(b'\n')
+            if len(sp) < 2:
+                break
+            else:
+                self.assertTrue(len(sp) == 2 and len(sp[1]) == 0, "multiline response to readline")
+        self.assertEqual(a.readline(), b'')
+
+    def test_generic_2715_readline_limited(self, a: ClassUnderTest, n: int) -> None:
+        """io.BufferedIOBase.readline(n)"""
+        hypothesis.assume(not a.closed)
+        self._ensure_readable(a)
+        self._ensure_blocking(a)
+        self._ensure_non_interative(a)
+        n = (n & 0xFFFF) + 1  # limit size of n to something reasonable
+        a_readline = a.readline(0)
+        self.assertEqual(a_readline, b'')
+        while True:
+            a_readline = a.readline(n)
+            self.assertIsInstance(a_readline, bytes)
+            self.assertLessEqual(len(a_readline), n)
+            if len(a_readline) < n:
+                sp = a_readline.split(b'\n')
+                if len(sp) < 2:
+                    break
+                else:
+                    self.assertTrue(len(sp) == 2 and len(sp[1]) == 0, "multiline response to readline")
+        self.assertEqual(a.readline(n), b'')
+
+    # TODO: readlines
+
+    def test_generic_2716_read1_unlimited(self, a: ClassUnderTest) -> None:
+        """io.BufferedIOBase.read1()"""
+        hypothesis.assume(not a.closed)
+        self._ensure_readable(a)
+        self._ensure_blocking(a)
+        self._ensure_non_interative(a)
+        while True:
+            a_read1 = a.read1()
+            self.assertIsInstance(a_read1, bytes)
+            if a_read1 == b'':
+                break
+        self.assertEqual(a.read1(), b'')
+
+    def test_generic_2717_read1_limited(self, a: ClassUnderTest, n: int) -> None:
+        """io.BufferedIOBase.read1(n)"""
+        hypothesis.assume(not a.closed)
+        self._ensure_readable(a)
+        self._ensure_blocking(a)
+        self._ensure_non_interative(a)
+        n = (n & 0xFFFF) + 1  # limit size of n to something reasonable
+        a_read = a.read(0)
+        self.assertEqual(a_read, b'')
+        while True:
+            a_read1 = a.read1(n)
+            self.assertIsInstance(a_read1, bytes)
+            self.assertLessEqual(len(a_read1), n)
+            if a_read1 == b'':
+                break
+        self.assertEqual(a.read1(n), b'')
+
+    def test_generic_2718_readinto1(self, a: ClassUnderTest, n: int) -> None:
+        """io.BufferedIOBase.readinto1(_)"""
+        hypothesis.assume(not a.closed)
+        self._ensure_readable(a)
+        self._ensure_blocking(a)
+        self._ensure_non_interative(a)
+        n = (n & 0xFFFF) + 1  # limit size of n to something reasonable
+        a_readinto1 = a.readinto1(bytearray(0))
+        self.assertEqual(a_readinto1, 0)
+        buf = bytearray(n)
+        while True:
+            a_readinto1 = a.readinto1(buf)
+            self.assertTrue(0 <= a_readinto1 <= n)
+            if a_readinto1 == 0:
+                break
+        self.assertEqual(a.readinto1(buf), 0)
 
     def test_generic_2750_raw(self, a: ClassUnderTest) -> None:
         """io.BufferedIOBase.raw"""
@@ -476,7 +580,109 @@ class BufferedIOBaseTests(IOBaseTests):
 
 
 class BytesIOTests(BufferedIOBaseTests):
-    pass
+
+    def test_generic_2703_fileno(self, a: ClassUnderTest) -> None:
+        """io.BytesIO.fileno()"""
+        hypothesis.assume(not a.closed)
+        with self.assertRaises(OSError):
+            a.fileno()
+
+    def test_generic_2704_has_query_methods(self, a: ClassUnderTest) -> None:
+        """io.BytesIO query methods as expected."""
+        hypothesis.assume(not a.closed)
+        self.assertFalse(a.isatty())
+        self.assertTrue(a.readable())
+        self.assertTrue(a.writable())
+        self.assertTrue(a.seekable())
+
+    def test_generic_2760_getbuffer(self, a: ClassUnderTest) -> None:
+        """io.BytesIO.getbuffer"""
+        hypothesis.assume(not a.closed)
+        # TODO: figure out a better set of tests...!
+        a.getbuffer()
+
+    def test_generic_2761_getvalue(self, a: ClassUnderTest) -> None:
+        """io.BytesIO.getvalue"""
+        hypothesis.assume(not a.closed)
+        a_getvalue = a.getvalue()
+        self.assertIsInstance(a_getvalue, bytes)
+
+    def test_generic_2716_read1_unlimited(self, a: ClassUnderTest) -> None:
+        """io.BytesIOBase.read1()"""
+        hypothesis.assume(not a.closed)
+        a_read1 = a.read1()
+        self.assertIsInstance(a_read1, bytes)
+        self.assertEqual(a.read1(), b'')
+
+    def test_generic_2717_read1_limited(self, a: ClassUnderTest, n: int) -> None:
+        """io.BytesIOBase.read1(n)"""
+        hypothesis.assume(not a.closed)
+        n = (n & 0xFFFF) + 1  # limit size of n to something reasonable
+        a_read1 = a.read1(0)
+        self.assertEqual(a_read1, b'')
+        while True:
+            a_read1 = a.read1(n)
+            self.assertIsInstance(a_read1, bytes)
+            self.assertLessEqual(len(a_read1), n)
+            if len(a_read1) < n:
+                break
+        self.assertEqual(a.read1(n), b'')
+
+    def test_generic_2718_readinto1(self, a: ClassUnderTest, n: int) -> None:
+        """io.BytesIO.readinto1(_)"""
+        hypothesis.assume(not a.closed)
+        n = (n & 0xFFFF) + 1  # limit size of n to something reasonable
+        a_readinto1 = a.readinto1(bytearray(0))
+        self.assertEqual(a_readinto1, 0)
+        buf = bytearray(n)
+        while True:
+            a_readinto1 = a.readinto1(buf)
+            self.assertTrue(0 <= a_readinto1 <= n)
+            if a_readinto1 < n:
+                break
+        self.assertEqual(a.readinto1(buf), 0)
+
+    def test_generic_2730_tell(self, a: ClassUnderTest, n: int) -> None:
+        """io.BytesIO.tell()"""
+        hypothesis.assume(not a.closed)
+        n = (n & 0xFFFF) + 1  # limit size of n to something reasonable
+        a_tell = a.tell()
+        self.assertEqual(a_tell, 0)
+        a_read = a.read(n)
+        a_tell = a.tell()
+        self.assertEqual(a_tell, len(a_read))
+
+    def test_generic_2731_seek(self, a: ClassUnderTest, n: int) -> None:
+        """io.BytesIO.seek()"""
+        hypothesis.assume(not a.closed)
+        n = (n & 0xFFFF) + 1  # limit size of n to something reasonable
+        a.seek(0, 2)
+        a_size = a.tell()
+        self.assertLessEqual(0, a_size)
+        a.seek(1, 1)
+        self.assertEqual(a.tell(), a_size + 1)
+        a.seek(n)
+        self.assertEqual(a.tell(), n)
+
+    def test_generic_2735_truncate(self, a: ClassUnderTest, n: int) -> None:
+        """io.BytesIO.truncate()"""
+        # TODO:
+        hypothesis.assume(not a.closed)
+        self._ensure_seekable(a)
+        self._ensure_writable(a)
+        n = n & 0xFFFF  # limit size of n to something reasonable
+        start = a.tell()
+        a_truncate = a.truncate(n)
+        finish = a.tell()
+        self.assertIsInstance(a_truncate, int)
+        self.assertEqual(a_truncate, n)
+        self.assertEqual(start, finish)
+
+    def test_generic_2751_detach(self, a: ClassUnderTest) -> None:
+        """io.BytesIO.detach"""
+        hypothesis.assume(not a.closed)
+        with self.assertRaises(io.UnsupportedOperation):
+            a.detach()
 
 
 class TextIOBaseTests(IOBaseTests):
