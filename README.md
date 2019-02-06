@@ -70,22 +70,5 @@ given in the body of the test class.  Finally, the `Given` class decorator, bind
 drawn from the set of ModuleN.decimal_digits based on the set of integers.  As of 17th March,
 this runs 36 tests against ModuloN in 4.5 seconds.
 
-**Security Warning**
-
-The test file `modulo_n.py` demonstrates how a class can define
-testable properties in its own docstring.  However, I use a
-cheap-and-cheerful method of embedding a Yaml encoded object in the
-docstring and then using the yaml.load method to retrieve it.
-Unfortuneately, this has a security vulnerability and it is possible
-to use this yaml method to execute *any* python code.  Nevertheless:
- * this is a docstring in code under test - probably your own code, so
-   maybe this isn't so bad;
- * the PyYaml team are working on producing a [safer
-   option](https://github.com/yaml/pyyaml/pull/189) and I'd rather see
-   what they come up with before deciding what I should do;
- * the `defaultGenericTestLoader.discover` method needs to be passed
-   the parameter `use_docstring_yaml=True` explicitly to activate this
-   insecure feature.
-
 Cheers,
 Steve Palmer

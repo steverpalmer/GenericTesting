@@ -22,17 +22,6 @@ from generic_testing.built_in_types import *
 from generic_testing.file_likes import *
 
 
-class ClassDescription(types.SimpleNamespace, yaml.YAMLObject):
-    """Class to act as a marker in the class docstring for a yaml segment."""
-
-    yaml_tag = u'!ClassDescription'
-
-    struct = collections.namedtuple('ClassDescriptionStruct', 'has skipping excluding')
-
-    def in_full(self):
-        return self.struct(*(getattr(self, field, None) for field in self.struct._fields))
-
-
 @enum.unique
 class _ContainerLikeFlags(enum.IntEnum):
     Init = 0
@@ -82,39 +71,37 @@ class GenericTestLoader:
         """Generate Base Case based on supplied class."""
         result = None
         if isinstance(T.__doc__, str) and use_docstring_yaml:
-            for class_description in yaml.load_all(T.__doc__):
-                if isinstance(class_description, ClassDescription):
-                    class_description = class_description.in_full()
-                    result = GenericTests
-                    if class_description.has:
-                        base_class_list = []
-                        for model in class_description.has:
-                            model += 'Tests'
-                            if model in globals():
-                                base_class_list.append(globals()[model])
-                        if base_class_list:
-                            class result(*base_class_list):
-                                pass
-                            if class_description.excluding:
-                                for name, _ in inspect.getmembers(result):
-                                    for excld in class_description.excluding:
-                                        if name.find(excld) >= 0:
-                                            setattr(result, name, GenericTests._pass)
-                                            break
-                            if class_description.skipping:
-                                for name, _ in inspect.getmembers(result):
-                                    for excld in class_description.skipping:
-                                        if name.find(excld) >= 0:
-                                            setattr(result, name, GenericTests._skip)
-                                            break
-#                             if class_description.where:
-#                                 for name, val in class_description.where.items():
-#                                     setattr(result, name, getattr(result, val, None))
-                    return result
-        for known_T in reversed(self._superclass_mapping):
-            if issubclass(T, known_T):
-                result = self._superclass_mapping[known_T]
-                break
+
+            for class_description in yaml.safe_load_all(T.__doc__):
+                if isinstance(class_description, dict):
+                    base_class_list = []
+                    for model in class_description.get('has', []):
+                        model = str(model) + 'Tests'
+                        if model in globals():
+                            base_class_list.append(globals()[model])
+                    if base_class_list:
+                        class result(*base_class_list):
+                            pass
+                        if 'excluding' in class_description:
+                            for name, _ in inspect.getmembers(result):
+                                for excld in class_description['excluding']:
+                                    if name.find(excld) >= 0:
+                                        setattr(result, name, GenericTests._pass)
+                                        break
+                        if 'skipping' in class_description:
+                            for name, _ in inspect.getmembers(result):
+                                for excld in class_description['skipping']:
+                                    if name.find(excld) >= 0:
+                                        setattr(result, name, GenericTests._skip)
+                                        break
+#                        if class_description.where:
+#                            for name, val in class_description.where.items():
+#                                setattr(result, name, getattr(result, val, None))
+        if result is None:
+            for known_T in reversed(self._superclass_mapping):
+                if issubclass(T, known_T):
+                    result = self._superclass_mapping[known_T]
+                    break
         if result is None:
             # Need to work a bit harder
             base_class_list = list(self.collection_like_list[_ContainerLikeFlags.discover(T)])
@@ -179,4 +166,4 @@ defaultGenericTestLoader.register(io.RawIOBase, RawIOBaseTests)
 defaultGenericTestLoader.register(io.BufferedIOBase, BufferedIOBaseTests)
 defaultGenericTestLoader.register(io.TextIOBase, TextIOBaseTests)
 
-__all__ = ('ClassDescription', 'GenericTestLoader', 'defaultGenericTestLoader')
+__all__ = ('GenericTestLoader', 'defaultGenericTestLoader')

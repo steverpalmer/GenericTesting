@@ -54,8 +54,10 @@ def _operator_fallbacks(fallback_operator, doc=""):
 
     return forward, reverse
 
+
 def _pow(a: 'ModuloN', b: 'ModuloN') -> 'ModuloN':
     return type(a)(a._modulus, pow(a._value, int(b), a._modulus), is_trusted=True)
+
 
 class ModuloN(numbers.Integral):
     """Modular Arithmetic.
@@ -70,7 +72,7 @@ class ModuloN(numbers.Integral):
     Common modulus values are captured by a series of specialized constructors,
     such as bit and digit.
 
---- !ClassDescription
+---
     has:
       - Equality
       - TotalOrdering
@@ -84,7 +86,7 @@ class ModuloN(numbers.Integral):
 
     __slots__ = ('_modulus', '__value')
 
-    def __init__(self, modulus: int, value: int=None, *, is_trusted=False) -> None:
+    def __init__(self, modulus: int, value: int = None, *, is_trusted: bool = False) -> None:
         """
         >>> _ = ModuloN(8, 3)
         >>> ModuloN(-2)
@@ -273,7 +275,7 @@ class ModuloPow2(ModuloN):
     This means that instead of an expensive mod operation, we can simply use
     bitwise and operation.
 
---- !ClassDescription
+---
     has:
       - Integral
     skipping:
@@ -283,7 +285,7 @@ class ModuloPow2(ModuloN):
       - less_or_equal_consistent_with_addition
     """
 
-    def __init__(self, modulus: int, value: int=None, *, is_trusted: bool=False) -> None:
+    def __init__(self, modulus: int, value: int = None, *, is_trusted: bool = False) -> None:
         """
         >>> _ = ModuloPow2(8, 3)
         >>> ModuloPow2(-2)
