@@ -7,6 +7,7 @@ import unittest
 
 from test_built_in_numbers import *
 from test_built_in_containers import *
+from test_built_in_file_likes import *
 
 if __name__ == '__main__':
     SUITE = unittest.TestSuite()
