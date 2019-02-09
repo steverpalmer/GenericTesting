@@ -36,7 +36,7 @@ class Test_BufferedIO(BufferedIOBaseTests):
     pass
 
 
-@Given({ClassUnderTest: st.builds(io.BytesIO), int: st.integers()})
+@Given({ClassUnderTest: st.builds(io.BytesIO), int: st.integers(), bytes: st.binary()})
 class Test_BytesIO(BytesIOTests):
     pass
 
@@ -53,7 +53,7 @@ class Test_TextIO(TextIOBaseTests):
     pass
 
 
-@Given({ClassUnderTest: st.builds(io.StringIO)})
+@Given({ClassUnderTest: st.builds(io.StringIO), int: st.integers(), str: st.text()})
 class Test_StringIO(StringIOTests):
     pass
 
@@ -68,7 +68,8 @@ if __name__ == '__main__':
 #    for name, value in locals().items():
 #        if name.startswith('Test_'):
 #            SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(value))
-    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_BufferedIO))
+    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_FileIO))
     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_BytesIO))
+    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_StringIO))
     TR = unittest.TextTestRunner(verbosity=2)
     TR.run(SUITE)

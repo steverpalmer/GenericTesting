@@ -388,7 +388,28 @@ class RawIOBaseTests(IOBaseTests):
         self.assertEqual(start, finish)
 
 
-class FileIOTests(RawIOBaseTests):
+class ReadWriteStorageBinarySteamTests:
+    """Discrete test of steams with Read/Write Semantics """
+
+    def test_generic_2790_read_seek_write(self, a: ClassUnderTest, b: bytes, n: int) -> None:
+        hypothesis.assume(not a.closed)
+        self._ensure_readable(a)
+        self._ensure_seekable(a)
+        self._ensure_writable(a)
+        a.seek(0)
+        original = a.read()
+        length = len(original)
+        position = n % length if length > 0 else 0
+        a.seek(position)
+        written = a.write(b)
+        self.assertEqual(written, len(b))
+        expected = bytearray(original)
+        expected[position:position + written] = b
+        a.seek(0)
+        self.assertEqual(a.read(), expected)
+
+
+class FileIOTests(RawIOBaseTests, ReadWriteStorageBinarySteamTests):
     """Tests of FileIO properties."""
 
     def test_generic_2740_name(self, a: ClassUnderTest) -> None:
@@ -579,7 +600,7 @@ class BufferedIOBaseTests(IOBaseTests):
             pass
 
 
-class BytesIOTests(BufferedIOBaseTests):
+class BytesIOTests(BufferedIOBaseTests, ReadWriteStorageBinarySteamTests):
 
     def test_generic_2703_fileno(self, a: ClassUnderTest) -> None:
         """io.BytesIO.fileno()"""
@@ -693,7 +714,27 @@ class TextIOBaseTests(IOBaseTests):
         return str
 
 
-class StringIOTests(TextIOBaseTests):
+class ReadWriteStorageTextSteamTests:
+    """Discrete test of steams with Read/Write Semantics """
+
+    def test_generic_2790_read_seek_write(self, a: ClassUnderTest, s: str, n: int) -> None:
+        hypothesis.assume(not a.closed)
+        self._ensure_readable(a)
+        self._ensure_seekable(a)
+        self._ensure_writable(a)
+        a.seek(0)
+        original = a.read()
+        length = len(original)
+        position = n % length if length > 0 else 0
+        a.seek(position)
+        written = a.write(s)
+        self.assertEqual(written, len(s))
+        expected = original[:position] + s + original[min(position + written, length):]
+        a.seek(0)
+        self.assertEqual(a.read(), expected)
+
+
+class StringIOTests(TextIOBaseTests, ReadWriteStorageTextSteamTests):
     pass
 
 
