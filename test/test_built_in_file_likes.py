@@ -54,6 +54,29 @@ class Test_BufferedWriter(BufferedIOBaseTests):
     pass
 
 
+def _make_buffered_random_file(b: bytes):
+    return io.BufferedRandom(_make_raw_temp_file(b))
+
+
+@Given({ClassUnderTest: st.builds(_make_buffered_random_file), int: st.integers(), bytes: st.binary()})
+class Test_BufferedRandom(BufferedIOBaseTests):
+    pass
+
+
+def _make_buffered_pair_file(b: bytes):
+    return io.BufferedRWPair(_make_raw_temp_file(b), _make_raw_temp_file(b))
+
+
+@Given({ClassUnderTest: st.builds(_make_buffered_pair_file), int: st.integers(), bytes: st.binary()})
+class Test_BufferedRWPair(BufferedIOBaseTests):
+
+    def test_generic_2591_detach(self, a: ClassUnderTest) -> None:
+        """io.BufferedRWPair.detach"""
+        # hypothesis.assume(not a.closed)
+        with self.assertRaises(io.UnsupportedOperation):
+            a.detach()
+
+
 @Given({ClassUnderTest: st.builds(io.BytesIO), int: st.integers(), bytes: st.binary()})
 class Test_BytesIO(BytesIOTests):
     pass
@@ -81,12 +104,12 @@ __all__ = ('Test_FileIO', 'Test_BufferedIO', 'Test_BytesIO', 'Test_TextIO', 'Tes
 
 if __name__ == '__main__':
     SUITE = unittest.TestSuite()
-    if True:
+    if False:
         name = None
         value = None
         for name, value in locals().items():
             if name.startswith('Test_'):
                 SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(value))
     else:
-        SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_StringIO))
+        SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_BufferedRWPair))
     unittest.TextTestRunner(verbosity=2).run(SUITE)
