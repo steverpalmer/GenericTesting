@@ -63,13 +63,14 @@ __all__ = ('Test_FileIO', 'Test_BufferedIO', 'Test_BytesIO', 'Test_TextIO', 'Tes
 
 if __name__ == '__main__':
     SUITE = unittest.TestSuite()
-#    name = None
-#    value = None
-#    for name, value in locals().items():
-#        if name.startswith('Test_'):
-#            SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(value))
-    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_FileIO))
-    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_BytesIO))
-    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_StringIO))
-    TR = unittest.TextTestRunner(verbosity=2)
-    TR.run(SUITE)
+    if True:
+        name = None
+        value = None
+        for name, value in locals().items():
+            if name.startswith('Test_'):
+                SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(value))
+    else:
+        SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_FileIO))
+        SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_BytesIO))
+        SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_StringIO))
+    unittest.TextTestRunner(verbosity=2).run(SUITE)
