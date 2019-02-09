@@ -135,14 +135,6 @@ class IOBaseTests(IterableTests):
         with self.assertRaises(OSError):
             a.write(self.dtype())
 
-    def test_generic_2583_writelines_when_not_writable(self, a: ClassUnderTest) -> None:
-        """check that OSError is raised when appropriate"""
-        hypothesis.assume(not a.closed)
-        if a.writable():
-            raise unittest.SkipTest("Test only applies to non writable streams")
-        with self.assertRaises(OSError):
-            a.writelines([])
-
     def test_generic_2584_tell_when_not_seekable(self, a: ClassUnderTest) -> None:
         """check that OSError is raised when appropriate"""
         hypothesis.assume(not a.closed)
