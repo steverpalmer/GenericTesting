@@ -9,6 +9,7 @@ import time
 import os
 import unittest
 import io
+import codecs
 
 import hypothesis
 
@@ -735,6 +736,24 @@ class TextIOBaseTests(IOBaseTests, _SharedBufferedTextIOBaseTests):
     def newline(self):
         return '\n'
 
+    def test_generic_2591_detach(self, a: ClassUnderTest) -> None:
+        """io.TextIOBase.detach"""
+        hypothesis.assume(not a.closed)
+        try:
+            self.assertIsInstance(a.detach(), io.BufferedIOBase)
+        except io.UnsupportedOperation:
+            pass
+
+    def generic_test_2595_encoding(self, a: ClassUnderTest) -> None:
+        """io.TextIOBase.encoding"""
+        hypothesis(not a.closed)
+        self.assertIsNotNone(codecs.lookup(a.encoding))
+
+    def generic_test_2596_errors(self, a: ClassUnderTest) -> None:
+        """io.TextIOBase.errors"""
+        hypothesis(not a.closed)
+        self.assertIsNotNone(codecs.lookup_error(a.errors))
+
 
 class StringIOTests(TextIOBaseTests):
 
@@ -812,6 +831,12 @@ class StringIOTests(TextIOBaseTests):
         expected = original[:position] + s + original[min(position + written, length):]
         a.seek(0)
         self.assertEqual(a.read(), expected)
+
+    def test_generic_2591_detach(self, a: ClassUnderTest) -> None:
+        """io.StringIO.detach"""
+        hypothesis.assume(not a.closed)
+        with self.assertRaises(io.UnsupportedOperation):
+            a.detach()
 
 
 __all__ = ('IOBaseTests', 'RawIOBaseTests', 'FileIOTests', 'BufferedIOBaseTests', 'BytesIOTests', 'TextIOBaseTests', 'StringIOTests')
