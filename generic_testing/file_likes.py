@@ -28,6 +28,7 @@ class IOBaseTests(IterableTests):
 
     @property
     def dtype(self):
+        """as in numpy.dtype"""
         return type(self.newline)
 
     def _ensure_readable(self, a: ClassUnderTest) -> None:
@@ -69,12 +70,12 @@ class IOBaseTests(IterableTests):
         self._ensure_readable(a)
         super().test_generic_2401_iterator_protocol_observed(a)
 
-    def test_generic_2700_closed(self, a: ClassUnderTest) -> None:
+    def test_generic_2570_closed(self, a: ClassUnderTest) -> None:
         """a.closed"""
-        a.closed
+        bool(a.closed)
         #  If we don't raise an exception, then we've passed ...
 
-    def test_generic_2701_close_and_closed(self, a: ClassUnderTest) -> None:
+    def test_generic_2571_close_and_closed(self, a: ClassUnderTest) -> None:
         """a.close(); a.closed"""
         hypothesis.assume(not a.closed)
         a.close()
@@ -82,61 +83,26 @@ class IOBaseTests(IterableTests):
         a.close()
         self.assertTrue(a.closed)
 
-    def test_generic_2702_close_and_read(self, a: ClassUnderTest) -> None:
-        """a.close(); a.read()"""
-        hypothesis.assume(not a.closed)
-        if a.readable():
-            a.close()
-            with self.assertRaises(ValueError):
-                a.read()
-
-    def test_generic_2703_fileno(self, a: ClassUnderTest) -> None:
+    def test_generic_2572_fileno(self, a: ClassUnderTest) -> None:
         """io.IOBase.fileno()"""
         hypothesis.assume(not a.closed)
         try:
             a_fileno = a.fileno()
             self.assertIsInstance(a_fileno, int)
-            self.assertIsNotNone(os.fstat(a.fileno()))  # hopefully testing that the value is a real file descriptor
+            self.assertIsNotNone(os.fstat(a_fileno))  # hopefully testing that the value is a real file descriptor
         except OSError:
             pass
 
-    def test_generic_2704_has_query_methods(self, a: ClassUnderTest) -> None:
+    def test_generic_2573_has_query_methods(self, a: ClassUnderTest) -> None:
         """check verious query methods don't raise exceptions."""
         hypothesis.assume(not a.closed)
-        a.isatty()
-        a.readable()
-        a.writable()
-        a.seekable()
+        bool(a.isatty())
+        bool(a.readable())
+        bool(a.writable())
+        bool(a.seekable())
         #  If we don't through an exception, then we've passed ...
 
-    def test_generic_2705_has_read_methods(self, a: ClassUnderTest) -> None:
-        """check verious read methods exist."""
-        hypothesis.assume(not a.closed)
-        self.assertTrue(callable(a.read))
-        # Althought 3.7.2 says that readinto is part of the interface of io.IOBase,
-        # It makes no sense appied to TestIOBase since (as it also states)
-        # "Python's character strings are immutable.
-        # Instead of requiring it here, I test it in the cases when it does make sense
-        # See Python Issue 35848
-        # self.assertTrue(callable(a.readinto))
-        self.assertTrue(callable(a.readline))
-        self.assertTrue(callable(a.readlines))
-
-    def test_generic_2706_has_seek_methods(self, a: ClassUnderTest) -> None:
-        """check verious seek methods exist."""
-        hypothesis.assume(not a.closed)
-        self.assertTrue(callable(a.seek))
-        self.assertTrue(callable(a.tell))
-        self.assertTrue(callable(a.truncate))
-
-    def test_generic_2707_has_write_methods(self, a: ClassUnderTest) -> None:
-        """check verious write methods exist."""
-        hypothesis.assume(not a.closed)
-        self.assertTrue(callable(a.write))
-        self.assertTrue(callable(a.writelines))
-        self.assertTrue(callable(a.flush))
-
-    def test_generic_2708_read_when_not_readable(self, a: ClassUnderTest) -> None:
+    def test_generic_2577_read_when_not_readable(self, a: ClassUnderTest) -> None:
         """check that OSError is raised when appropriate"""
         hypothesis.assume(not a.closed)
         if a.readable():
@@ -144,27 +110,61 @@ class IOBaseTests(IterableTests):
         with self.assertRaises(OSError):
             a.read()
 
-    def test_generic_2708_seek_when_not_seekable(self, a: ClassUnderTest) -> None:
+    def test_generic_2578_readline_when_not_readable(self, a: ClassUnderTest) -> None:
         """check that OSError is raised when appropriate"""
         hypothesis.assume(not a.closed)
-        if a.seekable():
-            raise unittest.SkipTest("Test only applies to non seekable streams")
+        if a.readable():
+            raise unittest.SkipTest("Test only applies to non readable streams")
         with self.assertRaises(OSError):
-            a.seek(0)
-        with self.assertRaises(OSError):
-            a.tell()
-        with self.assertRaises(OSError):
-            a.truncate()
+            a.readline()
 
-    def test_generic_2708_write_when_not_writable(self, a: ClassUnderTest) -> None:
+    def test_generic_2579_readlines_when_not_readable(self, a: ClassUnderTest) -> None:
+        """check that OSError is raised when appropriate"""
+        hypothesis.assume(not a.closed)
+        if a.readable():
+            raise unittest.SkipTest("Test only applies to non readable streams")
+        with self.assertRaises(OSError):
+            a.readlines()
+
+    def test_generic_2582_write_when_not_writable(self, a: ClassUnderTest) -> None:
         """check that OSError is raised when appropriate"""
         hypothesis.assume(not a.closed)
         if a.writable():
             raise unittest.SkipTest("Test only applies to non writable streams")
         with self.assertRaises(OSError):
             a.write(self.dtype())
+
+    def test_generic_2583_writelines_when_not_writable(self, a: ClassUnderTest) -> None:
+        """check that OSError is raised when appropriate"""
+        hypothesis.assume(not a.closed)
+        if a.writable():
+            raise unittest.SkipTest("Test only applies to non writable streams")
         with self.assertRaises(OSError):
-            a.truncate()
+            a.writelines([])
+
+    def test_generic_2584_tell_when_not_seekable(self, a: ClassUnderTest) -> None:
+        """check that OSError is raised when appropriate"""
+        hypothesis.assume(not a.closed)
+        if a.seekable():
+            raise unittest.SkipTest("Test only applies to non seekable streams")
+        with self.assertRaises(OSError):
+            a.tell()
+
+    def test_generic_2585_seek_when_not_seekable(self, a: ClassUnderTest) -> None:
+        """check that OSError is raised when appropriate"""
+        hypothesis.assume(not a.closed)
+        if a.seekable():
+            raise unittest.SkipTest("Test only applies to non seekable streams")
+        with self.assertRaises(OSError):
+            a.seek(0)
+
+    def test_generic_2586_truncate_when_not_seekable_or_writable(self, a: ClassUnderTest) -> None:
+        """check that OSError is raised when appropriate"""
+        hypothesis.assume(not a.closed)
+        if a.seekable() and a.writable():
+            raise unittest.SkipTest("Test only applies to non seekable, non writable streams")
+        with self.assertRaises(OSError):
+            a.truncate(0)
 
 
 class RawIOBaseTests(IOBaseTests):
@@ -187,7 +187,7 @@ class RawIOBaseTests(IOBaseTests):
         """
         time.sleep(delay_seconds)
 
-    def test_generic_2710_readall(self, a: ClassUnderTest) -> None:
+    def test_generic_2575_readall(self, a: ClassUnderTest) -> None:
         """io.RawIOBase.readall()"""
         hypothesis.assume(not a.closed)
         self._ensure_readable(a)
@@ -207,8 +207,11 @@ class RawIOBaseTests(IOBaseTests):
                     state = State.EOF_Found
         if state == State.EOF_Found:
             self.assertEqual(a.readall(), self.dtype())
+        a.close()
+        with self.assertRaises(ValueError):
+            a.readall()
 
-    def test_generic_2711_readinto(self, a: ClassUnderTest, n: int) -> None:
+    def test_generic_2576_readinto(self, a: ClassUnderTest, n: int) -> None:
         """io.RawIOBase.readinto(_)"""
         hypothesis.assume(not a.closed)
         self._ensure_readable(a)
@@ -232,8 +235,11 @@ class RawIOBaseTests(IOBaseTests):
                     state = State.EOF_Found
         if state == State.EOF_Found:
             self.assertEqual(a.readinto(buf), 0)
+        a.close()
+        with self.assertRaises(ValueError):
+            a.readinto(buf)
 
-    def test_generic_2712_read_unlimited(self, a: ClassUnderTest) -> None:
+    def test_generic_2577_read_unlimited(self, a: ClassUnderTest) -> None:
         """io.RawIOBase.read()"""
         hypothesis.assume(not a.closed)
         self._ensure_readable(a)
@@ -253,8 +259,11 @@ class RawIOBaseTests(IOBaseTests):
                     state = State.EOF_Found
         if state == State.EOF_Found:
             self.assertEqual(a.read(), self.dtype())
+        a.close()
+        with self.assertRaises(ValueError):
+            a.read()
 
-    def test_generic_2713_read_limited(self, a: ClassUnderTest, n: int) -> None:
+    def test_generic_2577_read_limited(self, a: ClassUnderTest, n: int) -> None:
         """io.RawIOBase.read(n)"""
         hypothesis.assume(not a.closed)
         self._ensure_readable(a)
@@ -278,8 +287,11 @@ class RawIOBaseTests(IOBaseTests):
                     state = State.EOF_Found
         if state == State.EOF_Found:
             self.assertEqual(a.read(n), self.dtype())
+        a.close()
+        with self.assertRaises(ValueError):
+            a.read(n)
 
-    def test_generic_2714_readline_unlimited(self, a: ClassUnderTest) -> None:
+    def test_generic_2578_readline_unlimited(self, a: ClassUnderTest) -> None:
         """io.RawIOBase.readline()"""
         hypothesis.assume(not a.closed)
         self._ensure_readable(a)
@@ -302,8 +314,11 @@ class RawIOBaseTests(IOBaseTests):
                     self.assertTrue(len(sp) == 2 and len(sp[1]) == 0, "multiline response to readline")
         if state == State.EOF_Found:
             self.assertEqual(a.readline(), self.dtype())
+        a.close()
+        with self.assertRaises(ValueError):
+            a.readline()
 
-    def test_generic_2715_readline_limited(self, a: ClassUnderTest, n: int) -> None:
+    def test_generic_2578_readline_limited(self, a: ClassUnderTest, n: int) -> None:
         """io.RawIOBase.readline(n)"""
         hypothesis.assume(not a.closed)
         self._ensure_readable(a)
@@ -331,10 +346,13 @@ class RawIOBaseTests(IOBaseTests):
                         self.assertTrue(len(sp) == 2 and len(sp[1]) == 0, "multiline response to readline")
         if state == State.EOF_Found:
             self.assertEqual(a.readline(n), self.dtype())
+        a.close()
+        with self.assertRaises(ValueError):
+            a.readline(n)
 
-    # TODO: readlines
+    # TODO: 2579_readlines
 
-    def test_generic_2720_write(self, a: ClassUnderTest, b: bytes) -> None:
+    def test_generic_2582_write(self, a: ClassUnderTest, b: bytes) -> None:
         """io.RawIOBase.write(b)"""
         hypothesis.assume(not a.closed)
         self._ensure_writable(a)
@@ -342,23 +360,32 @@ class RawIOBaseTests(IOBaseTests):
         if a_write is not None:
             self.assertIsInstance(a_write, int)
             self.assertTrue(0 <= a_write <= len(b))
+        a.close()
+        with self.assertRaises(ValueError):
+            a.write(b)
 
-    def test_generic_2721_writelines(self, a: ClassUnderTest, n: int, b: bytes) -> None:
+    def test_generic_2583_writelines(self, a: ClassUnderTest, n: int, b: bytes) -> None:
         """io.RawIOBase.writelines"""
         hypothesis.assume(not a.closed)
         self._ensure_writable(a)
         n = (n & 0xFF) + 1
         a.writelines([b] * n)
         # test passes if this does not raise an exception
+        a.close()
+        with self.assertRaises(ValueError):
+            a.writelines([])
 
-    def test_generic_2730_tell(self, a: ClassUnderTest) -> None:
+    def test_generic_2584_tell(self, a: ClassUnderTest) -> None:
         """io.RawIOBase.tell()"""
         hypothesis.assume(not a.closed)
         self._ensure_seekable(a)
         a.tell()
         # test passes if this does not raise an exception
+        a.close()
+        with self.assertRaises(ValueError):
+            a.tell()
 
-    def test_generic_2731_seek(self, a: ClassUnderTest) -> None:
+    def test_generic_2585_seek(self, a: ClassUnderTest) -> None:
         """io.RawIOBase.seek()"""
         hypothesis.assume(not a.closed)
         self._ensure_seekable(a)
@@ -367,8 +394,11 @@ class RawIOBaseTests(IOBaseTests):
         a.seek(0, 0)
         a.seek(0, 1)
         # test passes if this does not raise an exception
+        a.close()
+        with self.assertRaises(ValueError):
+            a.seek(0)
 
-    def test_generic_2735_truncate(self, a: ClassUnderTest, n: int) -> None:
+    def test_generic_2586_truncate(self, a: ClassUnderTest, n: int) -> None:
         """io.RawIOBase.truncate()"""
         hypothesis.assume(not a.closed)
         self._ensure_seekable(a)
@@ -380,12 +410,15 @@ class RawIOBaseTests(IOBaseTests):
         self.assertIsInstance(a_truncate, int)
         self.assertEqual(a_truncate, n)
         self.assertEqual(start, finish)
+        a.close()
+        with self.assertRaises(ValueError):
+            a.truncate(0)
 
 
-class ReadWriteStorageBinarySteamTests:
+class _ReadWriteStorageBinarySteamTests:
     """Discrete test of steams with Read/Write Semantics """
 
-    def test_generic_2790_read_seek_write(self, a: ClassUnderTest, b: bytes, n: int) -> None:
+    def test_generic_2587_read_seek_write_on_storage(self, a: ClassUnderTest, b: bytes, n: int) -> None:
         hypothesis.assume(not a.closed)
         self._ensure_readable(a)
         self._ensure_seekable(a)
@@ -403,10 +436,10 @@ class ReadWriteStorageBinarySteamTests:
         self.assertEqual(a.read(), expected)
 
 
-class FileIOTests(RawIOBaseTests, ReadWriteStorageBinarySteamTests):
+class FileIOTests(RawIOBaseTests, _ReadWriteStorageBinarySteamTests):
     """Tests of FileIO properties."""
 
-    def test_generic_2740_name(self, a: ClassUnderTest) -> None:
+    def test_generic_2650_name(self, a: ClassUnderTest) -> None:
         """io.FileIO.name"""
         hypothesis.assume(not a.closed)
         self.assertIsInstance(a.mode, str)
@@ -417,7 +450,7 @@ class FileIOTests(RawIOBaseTests, ReadWriteStorageBinarySteamTests):
             self.assertTrue(isinstance(name, bytes) or isinstance(name, str))
             self.assertTrue(len(name) > 0)
 
-    def test_generic_2741_mode(self, a: ClassUnderTest) -> None:
+    def test_generic_2651_mode(self, a: ClassUnderTest) -> None:
         """io.FileIO.mode"""
         hypothesis.assume(not a.closed)
         self.assertIsInstance(a.mode, str)
@@ -432,7 +465,7 @@ class FileIOTests(RawIOBaseTests, ReadWriteStorageBinarySteamTests):
 class _SharedBufferedTextIOBaseTests:
     """Some tests are very similar between buffered and test stuff."""
 
-    def test_generic_2712_read_unlimited(self, a: ClassUnderTest) -> None:
+    def test_generic_2577_read_unlimited(self, a: ClassUnderTest) -> None:
         """io.BufferedorTextTextIOBase.read()"""
         hypothesis.assume(not a.closed)
         self._ensure_readable(a)
@@ -441,7 +474,7 @@ class _SharedBufferedTextIOBaseTests:
         self.assertIsInstance(a_read, self.dtype)
         self.assertEqual(a.read(), self.dtype())
 
-    def test_generic_2713_read_limited(self, a: ClassUnderTest, n: int) -> None:
+    def test_generic_2577_read_limited(self, a: ClassUnderTest, n: int) -> None:
         """io.BufferedOrTextIOBase.read(n)"""
         hypothesis.assume(not a.closed)
         self._ensure_readable(a)
@@ -458,7 +491,7 @@ class _SharedBufferedTextIOBaseTests:
                 break
         self.assertEqual(a.read(n), self.dtype())
 
-    def test_generic_2714_readline_unlimited(self, a: ClassUnderTest) -> None:
+    def test_generic_2578_readline_unlimited(self, a: ClassUnderTest) -> None:
         """io.BufferedOrTextIOBase.readline()"""
         hypothesis.assume(not a.closed)
         self._ensure_readable(a)
@@ -473,7 +506,7 @@ class _SharedBufferedTextIOBaseTests:
                 self.assertTrue(len(sp) == 2 and len(sp[1]) == 0, "multiline response to readline")
         self.assertEqual(a.readline(), self.dtype())
 
-    def test_generic_2715_readline_limited(self, a: ClassUnderTest, n: int) -> None:
+    def test_generic_2578_readline_limited(self, a: ClassUnderTest, n: int) -> None:
         """io.BufferedIOBase.readline(n)"""
         hypothesis.assume(not a.closed)
         self._ensure_readable(a)
@@ -504,7 +537,7 @@ class BufferedIOBaseTests(IOBaseTests, _SharedBufferedTextIOBaseTests):
     def newline(self):
         return b'\n'
 
-    def test_generic_2711_readinto(self, a: ClassUnderTest, n: int) -> None:
+    def test_generic_2576_readinto(self, a: ClassUnderTest, n: int) -> None:
         """io.BufferedIOBase.readinto(_)"""
         hypothesis.assume(not a.closed)
         self._ensure_readable(a)
@@ -521,7 +554,7 @@ class BufferedIOBaseTests(IOBaseTests, _SharedBufferedTextIOBaseTests):
                 break
         self.assertEqual(a.readinto(buf), 0)
 
-    def test_generic_2716_read1_unlimited(self, a: ClassUnderTest) -> None:
+    def test_generic_2580_read1_unlimited(self, a: ClassUnderTest) -> None:
         """io.BufferedIOBase.read1()"""
         hypothesis.assume(not a.closed)
         self._ensure_readable(a)
@@ -534,7 +567,7 @@ class BufferedIOBaseTests(IOBaseTests, _SharedBufferedTextIOBaseTests):
                 break
         self.assertEqual(a.read1(), self.dtype())
 
-    def test_generic_2717_read1_limited(self, a: ClassUnderTest, n: int) -> None:
+    def test_generic_2580_read1_limited(self, a: ClassUnderTest, n: int) -> None:
         """io.BufferedIOBase.read1(n)"""
         hypothesis.assume(not a.closed)
         self._ensure_readable(a)
@@ -551,7 +584,7 @@ class BufferedIOBaseTests(IOBaseTests, _SharedBufferedTextIOBaseTests):
                 break
         self.assertEqual(a.read1(n), self.dtype())
 
-    def test_generic_2718_readinto1(self, a: ClassUnderTest, n: int) -> None:
+    def test_generic_2581_readinto1(self, a: ClassUnderTest, n: int) -> None:
         """io.BufferedIOBase.readinto1(_)"""
         hypothesis.assume(not a.closed)
         self._ensure_readable(a)
@@ -568,7 +601,7 @@ class BufferedIOBaseTests(IOBaseTests, _SharedBufferedTextIOBaseTests):
                 break
         self.assertEqual(a.readinto1(buf), 0)
 
-    def test_generic_2750_raw(self, a: ClassUnderTest) -> None:
+    def test_generic_2590_raw(self, a: ClassUnderTest) -> None:
         """io.BufferedIOBase.raw"""
         hypothesis.assume(not a.closed)
         try:
@@ -576,7 +609,7 @@ class BufferedIOBaseTests(IOBaseTests, _SharedBufferedTextIOBaseTests):
         except AttributeError:
             pass
 
-    def test_generic_2751_detach(self, a: ClassUnderTest) -> None:
+    def test_generic_2591_detach(self, a: ClassUnderTest) -> None:
         """io.BufferedIOBase.detach"""
         hypothesis.assume(not a.closed)
         try:
@@ -585,15 +618,19 @@ class BufferedIOBaseTests(IOBaseTests, _SharedBufferedTextIOBaseTests):
             pass
 
 
-class BytesIOTests(BufferedIOBaseTests, ReadWriteStorageBinarySteamTests):
+class BytesIOTests(BufferedIOBaseTests, _ReadWriteStorageBinarySteamTests):
 
-    def test_generic_2703_fileno(self, a: ClassUnderTest) -> None:
+    def test_generic_2402_zero_iterations_over_empty(self) -> None:
+        with self.assertRaises(StopIteration):
+            next(iter(io.BytesIO()))
+
+    def test_generic_2572_fileno(self, a: ClassUnderTest) -> None:
         """io.BytesIO.fileno()"""
         hypothesis.assume(not a.closed)
         with self.assertRaises(OSError):
             a.fileno()
 
-    def test_generic_2704_has_query_methods(self, a: ClassUnderTest) -> None:
+    def test_generic_2573_has_query_methods(self, a: ClassUnderTest) -> None:
         """io.BytesIO query methods as expected."""
         hypothesis.assume(not a.closed)
         self.assertFalse(a.isatty())
@@ -601,26 +638,26 @@ class BytesIOTests(BufferedIOBaseTests, ReadWriteStorageBinarySteamTests):
         self.assertTrue(a.writable())
         self.assertTrue(a.seekable())
 
-    def test_generic_2760_getbuffer(self, a: ClassUnderTest) -> None:
+    def test_generic_2660_getbuffer(self, a: ClassUnderTest) -> None:
         """io.BytesIO.getbuffer"""
         hypothesis.assume(not a.closed)
         # TODO: figure out a better set of tests...!
         a.getbuffer()
 
-    def test_generic_2761_getvalue(self, a: ClassUnderTest) -> None:
+    def test_generic_2661_getvalue(self, a: ClassUnderTest) -> None:
         """io.BytesIO.getvalue"""
         hypothesis.assume(not a.closed)
         a_getvalue = a.getvalue()
         self.assertIsInstance(a_getvalue, self.dtype)
 
-    def test_generic_2716_read1_unlimited(self, a: ClassUnderTest) -> None:
+    def test_generic_2580_read1_unlimited(self, a: ClassUnderTest) -> None:
         """io.BytesIOBase.read1()"""
         hypothesis.assume(not a.closed)
         a_read1 = a.read1()
         self.assertIsInstance(a_read1, self.dtype)
         self.assertEqual(a.read1(), self.dtype())
 
-    def test_generic_2717_read1_limited(self, a: ClassUnderTest, n: int) -> None:
+    def test_generic_2580_read1_limited(self, a: ClassUnderTest, n: int) -> None:
         """io.BytesIOBase.read1(n)"""
         hypothesis.assume(not a.closed)
         n = (n & 0xFFFF) + 1  # limit size of n to something reasonable
@@ -634,7 +671,7 @@ class BytesIOTests(BufferedIOBaseTests, ReadWriteStorageBinarySteamTests):
                 break
         self.assertEqual(a.read1(n), self.dtype())
 
-    def test_generic_2718_readinto1(self, a: ClassUnderTest, n: int) -> None:
+    def test_generic_2581_readinto1(self, a: ClassUnderTest, n: int) -> None:
         """io.BytesIO.readinto1(_)"""
         hypothesis.assume(not a.closed)
         n = (n & 0xFFFF) + 1  # limit size of n to something reasonable
@@ -648,7 +685,7 @@ class BytesIOTests(BufferedIOBaseTests, ReadWriteStorageBinarySteamTests):
                 break
         self.assertEqual(a.readinto1(buf), 0)
 
-    def test_generic_2730_tell(self, a: ClassUnderTest, n: int) -> None:
+    def test_generic_2584_tell(self, a: ClassUnderTest, n: int) -> None:
         """io.BytesIO.tell()"""
         hypothesis.assume(not a.closed)
         n = (n & 0xFFFF) + 1  # limit size of n to something reasonable
@@ -658,7 +695,7 @@ class BytesIOTests(BufferedIOBaseTests, ReadWriteStorageBinarySteamTests):
         a_tell = a.tell()
         self.assertEqual(a_tell, len(a_read))
 
-    def test_generic_2731_seek(self, a: ClassUnderTest, n: int) -> None:
+    def test_generic_2585_seek(self, a: ClassUnderTest, n: int) -> None:
         """io.BytesIO.seek()"""
         hypothesis.assume(not a.closed)
         n = (n & 0xFFFF) + 1  # limit size of n to something reasonable
@@ -670,7 +707,7 @@ class BytesIOTests(BufferedIOBaseTests, ReadWriteStorageBinarySteamTests):
         a.seek(n)
         self.assertEqual(a.tell(), n)
 
-    def test_generic_2735_truncate(self, a: ClassUnderTest, n: int) -> None:
+    def test_generic_2586_truncate(self, a: ClassUnderTest, n: int) -> None:
         """io.BytesIO.truncate()"""
         # TODO:
         hypothesis.assume(not a.closed)
@@ -684,7 +721,7 @@ class BytesIOTests(BufferedIOBaseTests, ReadWriteStorageBinarySteamTests):
         self.assertEqual(a_truncate, n)
         self.assertEqual(start, finish)
 
-    def test_generic_2751_detach(self, a: ClassUnderTest) -> None:
+    def test_generic_2591_detach(self, a: ClassUnderTest) -> None:
         """io.BytesIO.detach"""
         hypothesis.assume(not a.closed)
         with self.assertRaises(io.UnsupportedOperation):
@@ -699,10 +736,68 @@ class TextIOBaseTests(IOBaseTests, _SharedBufferedTextIOBaseTests):
         return '\n'
 
 
-class ReadWriteStorageTextSteamTests:
-    """Discrete test of steams with Read/Write Semantics """
+class StringIOTests(TextIOBaseTests):
 
-    def test_generic_2790_read_seek_write(self, a: ClassUnderTest, s: str, n: int) -> None:
+    def test_generic_2402_zero_iterations_over_empty(self) -> None:
+        with self.assertRaises(StopIteration):
+            next(iter(io.StringIO()))
+
+    def test_generic_2572_fileno(self, a: ClassUnderTest) -> None:
+        """io.BytesIO.fileno()"""
+        hypothesis.assume(not a.closed)
+        with self.assertRaises(OSError):
+            a.fileno()
+
+    def test_generic_2573_has_query_methods(self, a: ClassUnderTest) -> None:
+        """io.BytesIO query methods as expected."""
+        hypothesis.assume(not a.closed)
+        self.assertFalse(a.isatty())
+        self.assertTrue(a.readable())
+        self.assertTrue(a.writable())
+        self.assertTrue(a.seekable())
+
+    def test_generic_2584_tell(self, a: ClassUnderTest, n: int) -> None:
+        """io.StrinIO.tell()"""
+        hypothesis.assume(not a.closed)
+        n = (n & 0xFFFF) + 1  # limit size of n to something reasonable
+        a_tell = a.tell()
+        self.assertEqual(a_tell, 0)
+        a_read = a.read(n)
+        a_tell = a.tell()
+        self.assertEqual(a_tell, len(a_read))
+
+    def test_generic_2585_seek(self, a: ClassUnderTest, n: int) -> None:
+        """io.StringIO.seek()"""
+        hypothesis.assume(not a.closed)
+        n = (n & 0xFFFF) + 1  # limit size of n to something reasonable
+        a.seek(0, 2)
+        a_size = a.tell()
+        self.assertLessEqual(0, a_size)
+        a.seek(0, 1)
+        self.assertEqual(a.tell(), a_size)
+        a.seek(0)
+        self.assertEqual(a.tell(), 0)
+        a.read(n)
+        a_tell = a.tell()
+        a_read = a.read()
+        a.seek(a_tell)
+        self.assertEqual(a.read(), a_read)
+
+    def test_generic_2586_truncate(self, a: ClassUnderTest, n: int) -> None:
+        """io.StringIO.truncate()"""
+        # TODO:
+        hypothesis.assume(not a.closed)
+        self._ensure_seekable(a)
+        self._ensure_writable(a)
+        n = n & 0xFFFF  # limit size of n to something reasonable
+        start = a.tell()
+        a_truncate = a.truncate(n)
+        finish = a.tell()
+        self.assertIsInstance(a_truncate, int)
+        self.assertEqual(a_truncate, n)
+        self.assertEqual(start, finish)
+
+    def test_generic_2587_read_seek_write_on_storage(self, a: ClassUnderTest, s: str, n: int) -> None:
         hypothesis.assume(not a.closed)
         self._ensure_readable(a)
         self._ensure_seekable(a)
@@ -717,10 +812,6 @@ class ReadWriteStorageTextSteamTests:
         expected = original[:position] + s + original[min(position + written, length):]
         a.seek(0)
         self.assertEqual(a.read(), expected)
-
-
-class StringIOTests(TextIOBaseTests, ReadWriteStorageTextSteamTests):
-    pass
 
 
 __all__ = ('IOBaseTests', 'RawIOBaseTests', 'FileIOTests', 'BufferedIOBaseTests', 'BytesIOTests', 'TextIOBaseTests', 'StringIOTests')
