@@ -70,7 +70,5 @@ if __name__ == '__main__':
             if name.startswith('Test_'):
                 SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(value))
     else:
-        SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_FileIO))
-        SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_BytesIO))
         SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_StringIO))
     unittest.TextTestRunner(verbosity=2).run(SUITE)
