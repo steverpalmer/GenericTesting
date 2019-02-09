@@ -36,6 +36,24 @@ class Test_BufferedIO(BufferedIOBaseTests):
     pass
 
 
+def _make_buffered_reader_file(b: bytes):
+    return io.BufferedReader(_make_raw_temp_file(b))
+
+
+@Given({ClassUnderTest: st.builds(_make_buffered_reader_file), int: st.integers(), bytes: st.binary()})
+class Test_BufferedReader(BufferedIOBaseTests):
+    pass
+
+
+def _make_buffered_writer_file(b: bytes):
+    return io.BufferedWriter(_make_raw_temp_file(b))
+
+
+@Given({ClassUnderTest: st.builds(_make_buffered_writer_file), int: st.integers(), bytes: st.binary()})
+class Test_BufferedWriter(BufferedIOBaseTests):
+    pass
+
+
 @Given({ClassUnderTest: st.builds(io.BytesIO), int: st.integers(), bytes: st.binary()})
 class Test_BytesIO(BytesIOTests):
     pass
