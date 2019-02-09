@@ -22,19 +22,13 @@ class IOBaseTests(IterableTests):
 
     @property
     @abc.abstractmethod
-    def dtype(self) -> type:
-        """as numpy.dtype, returns either bytes or str as appropriate"""
+    def newline(self):
+        """is the newline character in the appropriate base type"""
         pass
 
-    def _to_dtype(self, msg):
-        if isinstance(msg, self.dtype):
-            result = msg
-        elif issubclass(self.dtype, str):
-            result = msg.decode()
-        else:
-            result = msg.encode()
-        assert isinstance(result, self.dtype)
-        return result
+    @property
+    def dtype(self):
+        return type(self.newline)
 
     def _ensure_readable(self, a: ClassUnderTest) -> None:
         if not a.readable():
@@ -177,8 +171,8 @@ class RawIOBaseTests(IOBaseTests):
     """Tests of RawIOBase inheritable properties."""
 
     @property
-    def dtype(self) -> type:
-        return bytes
+    def newline(self) -> type:
+        return b'\n'
 
     @property
     def max_test_time_seconds(self) -> float:
@@ -208,11 +202,11 @@ class RawIOBaseTests(IOBaseTests):
                 else:
                     self.delay()
             else:
-                self.assertIsInstance(a_readall, bytes)
-                if a_readall == b'':
+                self.assertIsInstance(a_readall, self.dtype)
+                if a_readall == self.dtype():
                     state = State.EOF_Found
         if state == State.EOF_Found:
-            self.assertEqual(a.readall(), b'')
+            self.assertEqual(a.readall(), self.dtype())
 
     def test_generic_2711_readinto(self, a: ClassUnderTest, n: int) -> None:
         """io.RawIOBase.readinto(_)"""
@@ -254,11 +248,11 @@ class RawIOBaseTests(IOBaseTests):
                 else:
                     self.pause()
             else:
-                self.assertIsInstance(a_read, bytes)
-                if a_read == b'':
+                self.assertIsInstance(a_read, self.dtype)
+                if a_read == self.dtype():
                     state = State.EOF_Found
         if state == State.EOF_Found:
-            self.assertEqual(a.read(), b'')
+            self.assertEqual(a.read(), self.dtype())
 
     def test_generic_2713_read_limited(self, a: ClassUnderTest, n: int) -> None:
         """io.RawIOBase.read(n)"""
@@ -278,12 +272,12 @@ class RawIOBaseTests(IOBaseTests):
                 else:
                     self.pause()
             else:
-                self.assertIsInstance(a_read, bytes)
+                self.assertIsInstance(a_read, self.dtype)
                 self.assertTrue(0 <= len(a_read) <= n)
-                if a_read == b'':
+                if a_read == self.dtype():
                     state = State.EOF_Found
         if state == State.EOF_Found:
-            self.assertEqual(a.read(n), b'')
+            self.assertEqual(a.read(n), self.dtype())
 
     def test_generic_2714_readline_unlimited(self, a: ClassUnderTest) -> None:
         """io.RawIOBase.readline()"""
@@ -300,14 +294,14 @@ class RawIOBaseTests(IOBaseTests):
                 else:
                     self.pause()
             else:
-                self.assertIsInstance(a_readline, bytes)
-                sp = a_readline.split(b'\n')
+                self.assertIsInstance(a_readline, self.dtype)
+                sp = a_readline.split(self.newline)
                 if len(sp) < 2:
                     state = State.EOF_Found
                 else:
                     self.assertTrue(len(sp) == 2 and len(sp[1]) == 0, "multiline response to readline")
         if state == State.EOF_Found:
-            self.assertEqual(a.readline(), b'')
+            self.assertEqual(a.readline(), self.dtype())
 
     def test_generic_2715_readline_limited(self, a: ClassUnderTest, n: int) -> None:
         """io.RawIOBase.readline(n)"""
@@ -315,7 +309,7 @@ class RawIOBaseTests(IOBaseTests):
         self._ensure_readable(a)
         n = (n & 0xFFFF) + 1  # limit size of n to something reasonable
         a_readline = a.readline(0)
-        self.assertEqual(a_readline, b'')
+        self.assertEqual(a_readline, self.dtype())
         State = enum.Enum('State', ('Looping', 'EOF_Found', 'Timeout'))
         timeout = Timeout(self.max_test_time_seconds)
         state = State.Looping
@@ -327,16 +321,16 @@ class RawIOBaseTests(IOBaseTests):
                 else:
                     self.pause()
             else:
-                self.assertIsInstance(a_readline, bytes)
+                self.assertIsInstance(a_readline, self.dtype)
                 self.assertLessEqual(len(a_readline), n)
                 if len(a_readline) < n:
-                    sp = a_readline.split(b'\n')
+                    sp = a_readline.split(self.newline)
                     if len(sp) < 2:
                         state = State.EOF_Found
                     else:
                         self.assertTrue(len(sp) == 2 and len(sp[1]) == 0, "multiline response to readline")
         if state == State.EOF_Found:
-            self.assertEqual(a.readline(n), b'')
+            self.assertEqual(a.readline(n), self.dtype())
 
     # TODO: readlines
 
@@ -435,25 +429,80 @@ class FileIOTests(RawIOBaseTests, ReadWriteStorageBinarySteamTests):
         self.assertSetEqual(set(c.values()), {1}, f"Duplicate mode character: {mode}")
 
 
-class BufferedIOBaseTests(IOBaseTests):
+class _SharedBufferedTextIOBaseTests:
+    """Some tests are very similar between buffered and test stuff."""
+
+    def test_generic_2712_read_unlimited(self, a: ClassUnderTest) -> None:
+        """io.BufferedorTextTextIOBase.read()"""
+        hypothesis.assume(not a.closed)
+        self._ensure_readable(a)
+        self._ensure_blocking(a)
+        a_read = a.read()
+        self.assertIsInstance(a_read, self.dtype)
+        self.assertEqual(a.read(), self.dtype())
+
+    def test_generic_2713_read_limited(self, a: ClassUnderTest, n: int) -> None:
+        """io.BufferedOrTextIOBase.read(n)"""
+        hypothesis.assume(not a.closed)
+        self._ensure_readable(a)
+        self._ensure_blocking(a)
+        self._ensure_non_interative(a)
+        n = (n & 0xFFFF) + 1  # limit size of n to something reasonable
+        a_read = a.read(0)
+        self.assertEqual(a_read, self.dtype())
+        while True:
+            a_read = a.read(n)
+            self.assertIsInstance(a_read, self.dtype)
+            self.assertLessEqual(len(a_read), n)
+            if len(a_read) < n:
+                break
+        self.assertEqual(a.read(n), self.dtype())
+
+    def test_generic_2714_readline_unlimited(self, a: ClassUnderTest) -> None:
+        """io.BufferedOrTextIOBase.readline()"""
+        hypothesis.assume(not a.closed)
+        self._ensure_readable(a)
+        self._ensure_blocking(a)
+        while True:
+            a_readline = a.readline()
+            self.assertIsInstance(a_readline, self.dtype)
+            sp = a_readline.split(self.newline)
+            if len(sp) < 2:
+                break
+            else:
+                self.assertTrue(len(sp) == 2 and len(sp[1]) == 0, "multiline response to readline")
+        self.assertEqual(a.readline(), self.dtype())
+
+    def test_generic_2715_readline_limited(self, a: ClassUnderTest, n: int) -> None:
+        """io.BufferedIOBase.readline(n)"""
+        hypothesis.assume(not a.closed)
+        self._ensure_readable(a)
+        self._ensure_blocking(a)
+        self._ensure_non_interative(a)
+        n = (n & 0xFFFF) + 1  # limit size of n to something reasonable
+        a_readline = a.readline(0)
+        self.assertEqual(a_readline, self.dtype())
+        while True:
+            a_readline = a.readline(n)
+            self.assertIsInstance(a_readline, self.dtype)
+            self.assertLessEqual(len(a_readline), n)
+            if len(a_readline) < n:
+                sp = a_readline.split(self.newline)
+                if len(sp) < 2:
+                    break
+                else:
+                    self.assertTrue(len(sp) == 2 and len(sp[1]) == 0, "multiline response to readline")
+        self.assertEqual(a.readline(n), self.dtype())
+
+    # TODO: readlines
+
+
+class BufferedIOBaseTests(IOBaseTests, _SharedBufferedTextIOBaseTests):
     """Tests of BufferedIOBase inheritable properties."""
 
     @property
-    def dtype(self) -> type:
-        return bytes
-
-    @property
-    def max_test_time_seconds(self) -> float:
-        """Some of these tests use a timeout, not to enforce any performance
-        on the methods, but just to stop any tests hanging.  In such cases,
-        the testing will be incomplete.
-        """
-        return 1.0
-
-    def pause(self, delay_seconds=0.1) -> None:
-        """Delay test execution, particularly in the case of a Non-Blocking ClassUnderTest
-        """
-        time.sleep(delay_seconds)
+    def newline(self):
+        return b'\n'
 
     def test_generic_2711_readinto(self, a: ClassUnderTest, n: int) -> None:
         """io.BufferedIOBase.readinto(_)"""
@@ -472,70 +521,6 @@ class BufferedIOBaseTests(IOBaseTests):
                 break
         self.assertEqual(a.readinto(buf), 0)
 
-    def test_generic_2712_read_unlimited(self, a: ClassUnderTest) -> None:
-        """io.BufferedIOBase.read()"""
-        hypothesis.assume(not a.closed)
-        self._ensure_readable(a)
-        self._ensure_blocking(a)
-        a_read = a.read()
-        self.assertIsInstance(a_read, bytes)
-        self.assertEqual(a.read(), b'')
-
-    def test_generic_2713_read_limited(self, a: ClassUnderTest, n: int) -> None:
-        """io.BufferedIOBase.read(n)"""
-        hypothesis.assume(not a.closed)
-        self._ensure_readable(a)
-        self._ensure_blocking(a)
-        self._ensure_non_interative(a)
-        n = (n & 0xFFFF) + 1  # limit size of n to something reasonable
-        a_read = a.read(0)
-        self.assertEqual(a_read, b'')
-        while True:
-            a_read = a.read(n)
-            self.assertIsInstance(a_read, bytes)
-            self.assertLessEqual(len(a_read), n)
-            if len(a_read) < n:
-                break
-        self.assertEqual(a.read(n), b'')
-
-    def test_generic_2714_readline_unlimited(self, a: ClassUnderTest) -> None:
-        """io.BufferedIOBase.readline()"""
-        hypothesis.assume(not a.closed)
-        self._ensure_readable(a)
-        self._ensure_blocking(a)
-        while True:
-            a_readline = a.readline()
-            self.assertIsInstance(a_readline, bytes)
-            sp = a_readline.split(b'\n')
-            if len(sp) < 2:
-                break
-            else:
-                self.assertTrue(len(sp) == 2 and len(sp[1]) == 0, "multiline response to readline")
-        self.assertEqual(a.readline(), b'')
-
-    def test_generic_2715_readline_limited(self, a: ClassUnderTest, n: int) -> None:
-        """io.BufferedIOBase.readline(n)"""
-        hypothesis.assume(not a.closed)
-        self._ensure_readable(a)
-        self._ensure_blocking(a)
-        self._ensure_non_interative(a)
-        n = (n & 0xFFFF) + 1  # limit size of n to something reasonable
-        a_readline = a.readline(0)
-        self.assertEqual(a_readline, b'')
-        while True:
-            a_readline = a.readline(n)
-            self.assertIsInstance(a_readline, bytes)
-            self.assertLessEqual(len(a_readline), n)
-            if len(a_readline) < n:
-                sp = a_readline.split(b'\n')
-                if len(sp) < 2:
-                    break
-                else:
-                    self.assertTrue(len(sp) == 2 and len(sp[1]) == 0, "multiline response to readline")
-        self.assertEqual(a.readline(n), b'')
-
-    # TODO: readlines
-
     def test_generic_2716_read1_unlimited(self, a: ClassUnderTest) -> None:
         """io.BufferedIOBase.read1()"""
         hypothesis.assume(not a.closed)
@@ -544,10 +529,10 @@ class BufferedIOBaseTests(IOBaseTests):
         self._ensure_non_interative(a)
         while True:
             a_read1 = a.read1()
-            self.assertIsInstance(a_read1, bytes)
-            if a_read1 == b'':
+            self.assertIsInstance(a_read1, self.dtype)
+            if a_read1 == self.dtype():
                 break
-        self.assertEqual(a.read1(), b'')
+        self.assertEqual(a.read1(), self.dtype())
 
     def test_generic_2717_read1_limited(self, a: ClassUnderTest, n: int) -> None:
         """io.BufferedIOBase.read1(n)"""
@@ -557,14 +542,14 @@ class BufferedIOBaseTests(IOBaseTests):
         self._ensure_non_interative(a)
         n = (n & 0xFFFF) + 1  # limit size of n to something reasonable
         a_read = a.read(0)
-        self.assertEqual(a_read, b'')
+        self.assertEqual(a_read, self.dtype())
         while True:
             a_read1 = a.read1(n)
-            self.assertIsInstance(a_read1, bytes)
+            self.assertIsInstance(a_read1, self.dtype)
             self.assertLessEqual(len(a_read1), n)
-            if a_read1 == b'':
+            if a_read1 == self.dtype():
                 break
-        self.assertEqual(a.read1(n), b'')
+        self.assertEqual(a.read1(n), self.dtype())
 
     def test_generic_2718_readinto1(self, a: ClassUnderTest, n: int) -> None:
         """io.BufferedIOBase.readinto1(_)"""
@@ -626,14 +611,14 @@ class BytesIOTests(BufferedIOBaseTests, ReadWriteStorageBinarySteamTests):
         """io.BytesIO.getvalue"""
         hypothesis.assume(not a.closed)
         a_getvalue = a.getvalue()
-        self.assertIsInstance(a_getvalue, bytes)
+        self.assertIsInstance(a_getvalue, self.dtype)
 
     def test_generic_2716_read1_unlimited(self, a: ClassUnderTest) -> None:
         """io.BytesIOBase.read1()"""
         hypothesis.assume(not a.closed)
         a_read1 = a.read1()
-        self.assertIsInstance(a_read1, bytes)
-        self.assertEqual(a.read1(), b'')
+        self.assertIsInstance(a_read1, self.dtype)
+        self.assertEqual(a.read1(), self.dtype())
 
     def test_generic_2717_read1_limited(self, a: ClassUnderTest, n: int) -> None:
         """io.BytesIOBase.read1(n)"""
@@ -643,11 +628,11 @@ class BytesIOTests(BufferedIOBaseTests, ReadWriteStorageBinarySteamTests):
         self.assertEqual(a_read1, b'')
         while True:
             a_read1 = a.read1(n)
-            self.assertIsInstance(a_read1, bytes)
+            self.assertIsInstance(a_read1, self.dtype)
             self.assertLessEqual(len(a_read1), n)
             if len(a_read1) < n:
                 break
-        self.assertEqual(a.read1(n), b'')
+        self.assertEqual(a.read1(n), self.dtype())
 
     def test_generic_2718_readinto1(self, a: ClassUnderTest, n: int) -> None:
         """io.BytesIO.readinto1(_)"""
@@ -706,12 +691,12 @@ class BytesIOTests(BufferedIOBaseTests, ReadWriteStorageBinarySteamTests):
             a.detach()
 
 
-class TextIOBaseTests(IOBaseTests):
+class TextIOBaseTests(IOBaseTests, _SharedBufferedTextIOBaseTests):
     """Tests of TextIOBase inheritable properties."""
 
     @property
-    def dtype(self) -> type:
-        return str
+    def newline(self):
+        return '\n'
 
 
 class ReadWriteStorageTextSteamTests:
