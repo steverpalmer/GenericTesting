@@ -6,7 +6,6 @@ import enum
 import collections
 import numbers
 import fractions
-import types
 import inspect
 import io
 
@@ -20,6 +19,26 @@ from generic_testing.collections_abc import *
 from generic_testing.numbers_abc import *
 from generic_testing.built_in_types import *
 from generic_testing.file_likes import *
+
+
+class _ClassDescription(yaml.YAMLObject):
+
+    yaml_tag = '!ClassDescription'
+    yaml_loader = yaml.SafeLoader
+
+    @staticmethod
+    def _is_none_or_list_of_str(l) -> bool:
+        return l is None or (isinstance(l, list) and all(isinstance(s, str) for s in l))
+
+    def __new__(cls, *, has=None, excluding=None, skipping=None):
+        assert cls._is_none_or_list_of_str(has)
+        assert cls._is_none_or_list_of_str(excluding)
+        assert cls._is_none_or_list_of_str(skipping)
+        result = super().__new__(cls)
+        result.has = has
+        result.excluding = excluding
+        result.skipping = skipping
+        return result
 
 
 @enum.unique
@@ -73,30 +92,33 @@ class GenericTestLoader:
         if isinstance(T.__doc__, str) and use_docstring_yaml:
 
             for class_description in yaml.safe_load_all(T.__doc__):
-                if isinstance(class_description, dict):
-                    base_class_list = []
-                    for model in class_description.get('has', []):
-                        model = str(model) + 'Tests'
-                        if model in globals():
-                            base_class_list.append(globals()[model])
-                    if base_class_list:
-                        class result(*base_class_list):
-                            pass
-                        if 'excluding' in class_description:
-                            for name, _ in inspect.getmembers(result):
-                                for excld in class_description['excluding']:
-                                    if name.find(excld) >= 0:
-                                        setattr(result, name, GenericTests._pass)
-                                        break
-                        if 'skipping' in class_description:
-                            for name, _ in inspect.getmembers(result):
-                                for excld in class_description['skipping']:
-                                    if name.find(excld) >= 0:
-                                        setattr(result, name, GenericTests._skip)
-                                        break
-#                        if class_description.where:
-#                            for name, val in class_description.where.items():
-#                                setattr(result, name, getattr(result, val, None))
+                if isinstance(class_description, _ClassDescription):
+                    print(repr(class_description))
+                    if class_description.has:
+                        base_class_list = []
+                        for model in class_description.has:
+                            model = str(model) + 'Tests'
+                            if model in globals():
+                                base_class_list.append(globals()[model])
+                        if base_class_list:
+                            class result(*base_class_list):
+                                pass
+                            if class_description.excluding:
+                                for name, _ in inspect.getmembers(result):
+                                    for excld in class_description.excluding:
+                                        if name.find(excld) >= 0:
+                                            setattr(result, name, GenericTests._pass)
+                                            break
+                            if class_description.skipping:
+                                for name, _ in inspect.getmembers(result):
+                                    for excld in class_description.skipping:
+                                        if name.find(excld) >= 0:
+                                            setattr(result, name, GenericTests._skip)
+                                            break
+#                            if class_description.where:
+#                                for name, val in class_description.where.items():
+#                                    setattr(result, name, getattr(result, val, None))
+                    break  # accept only one ClassDescription per docstring
         if result is None:
             for known_T in reversed(self._superclass_mapping):
                 if issubclass(T, known_T):

@@ -72,7 +72,7 @@ class ModuloN(numbers.Integral):
     Common modulus values are captured by a series of specialized constructors,
     such as bit and digit.
 
----
+--- !ClassDescription
     has:
       - Equality
       - TotalOrdering
@@ -275,7 +275,7 @@ class ModuloPow2(ModuloN):
     This means that instead of an expensive mod operation, we can simply use
     bitwise and operation.
 
----
+--- !ClassDescription
     has:
       - Integral
     skipping:
