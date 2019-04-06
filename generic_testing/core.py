@@ -67,7 +67,7 @@ class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):
         """
         if not isinstance(obj, type_):
             if msg is None:
-                msg = "{obj} has type {obj_type}, not a subclass of {type} as expected".format(obj=obj, obj_type=type(obj), type=type_)
+                msg = f"{obj!r} has type {type(obj).__name__}, not a subclass of {type_.__name__} as expected"
             raise self.failureException(msg)
 
     def assertImplies(self, antecedent, consequent, msg: str = None):
@@ -87,7 +87,7 @@ class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):
         """
         if not self.isclose(a, b):
             if msg is None:
-                msg = "{a} is not close enough to {b}".format(a=a, b=b)
+                msg = f"{a} is not close enough to {b}"
             raise self.failureException(msg)
 
     def assertNotIsClose(self, a, b, msg: str = None):
@@ -97,21 +97,21 @@ class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):
         """
         if self.isclose(a, b):
             if msg is None:
-                msg = "{a} is not close enough to {b}".format(a=a, b=b)
+                msg = f"{a} is not close enough to {b}"
             raise self.failureException(msg)
 
     def assertCloseOrLessThan(self, a, b, msg: str = None):
         """Confirm one number is close or less than another."""
         if not (a < b or self.isclose(a, b)):
             if msg is None:
-                msg = "{a} is not sufficiently less than {b}".format(a=a, b=b)
+                msg = f"{a} is not sufficiently less than {b}"
             raise self.failureException(msg)
 
     def assertCloseOrGreaterThan(self, a, b, msg: str = None):
         """Confirm one number is close or greater than another."""
         if not (a > b or self.isclose(a, b)):
             if msg is None:
-                msg = "{a} is not sufficiently less than {b}".format(a=a, b=b)
+                msg = f"{a} is not sufficiently less than {b}"
             raise self.failureException(msg)
 
 
@@ -146,7 +146,7 @@ def Given(strategy_dict=None, *, testMethodPrefix='test_generic', data_arg='data
                         elif isinstance(annotation, st.SearchStrategy):
                             strat = annotation
                         else:
-                            raise TypeError("Cannot bind {}.{}.{} with annotation {} to strategy".format(cls.__name__, name, arg, annotation))
+                            raise TypeError(f"Cannot bind {cls.__name__}.{name}.{arg} with annotation {annotation} to strategy")
                         given_args[arg] = strat
                     setattr(cls, name, given(**given_args)(method))
         return cls
