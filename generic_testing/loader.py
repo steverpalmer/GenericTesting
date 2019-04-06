@@ -42,7 +42,7 @@ class _ClassDescription(yaml.YAMLObject):
 
 
 @enum.unique
-class _ContainerLikeFlags(enum.IntEnum):
+class _ContainerLikeFlags(enum.IntFlag):
     Init = 0
     Container = 1
     Iterable = 2
