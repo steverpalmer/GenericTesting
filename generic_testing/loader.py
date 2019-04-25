@@ -93,7 +93,6 @@ class GenericTestLoader:
 
             for class_description in yaml.safe_load_all(T.__doc__):
                 if isinstance(class_description, _ClassDescription):
-                    print(repr(class_description))
                     if class_description.has:
                         base_class_list = []
                         for model in class_description.has:
