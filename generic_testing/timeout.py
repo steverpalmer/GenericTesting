@@ -1,10 +1,13 @@
+#!/usr/bin/env python3
 # Copyright 2019 Steve Palmer
 
-"""a library for simplictic timeout flags."""
+"""A library for simple timeout flags."""
 
-from typing import Union
+import typing
 import time
 import datetime
+
+__version__ = '0.1'
 
 
 class Timeout:
@@ -15,9 +18,9 @@ class Timeout:
     You can query a timeout value to determine how much longer till the timeout expires.
     """
 
-    # __slots__ = ('_delay', '_start', '_finish', '_out')
+    __slots__ = ('_delay', '_start', '_finish', '_out')
 
-    def __init__(self, delay: Union[int, float, datetime.timedelta], start: float = None) -> None:
+    def __init__(self, delay: typing.Union[int, float, datetime.timedelta], start: float = None) -> None:
         if isinstance(delay, datetime.timedelta):
             delay = delay.total_seconds()
         self._delay = max(0, delay)
@@ -34,7 +37,7 @@ class Timeout:
         return f"Timeout(in {self.remaining} seconds)"
 
     @property
-    def delay(self) -> Union[float, int]:
+    def delay(self) -> typing.Union[float, int]:
         """
         >>> Timeout(6).delay
         6
@@ -42,13 +45,15 @@ class Timeout:
         return self._delay
 
     @delay.setter
-    def delay(self, delay: Union[int, float]):
+    def delay(self, delay: typing.Union[int, float]):
         """
         >>> t = Timeout(6)
         >>> t.delay = 5
         >>> t.delay
         5
         """
+        if isinstance(delay, datetime.timedelta):
+            delay = delay.total_seconds()
         self._delay = max(0, delay)
         self.restart(self._start)
 
@@ -109,12 +114,12 @@ class Timeout:
         self._out = False
 
     @property
-    def remaining(self) -> Union[float, int]:
+    def remaining(self) -> typing.Union[float, int]:
         return max(0, self._finish - time.monotonic())
 
     @property
-    def elapse(self) -> Union[float, int]:
-        return min(time.monotonic() - time.monotonic(), self._elapse)
+    def elapse(self) -> typing.Union[float, int]:
+        return time.monotonic() - self._start
 
     def wait(self) -> None:
         while self:
@@ -126,11 +131,10 @@ class Timeout:
 
     @classmethod
     def clone(cls, timeout: 'Timeout') -> 'Timeout':
-        return cls(timeout._delay, timeout._repeat, timeout._start)
+        return cls(timeout._delay, timeout._start)
 
 
 __all__ = ('Timeout')
-
 
 if __name__ == "__main__":
     import doctest
