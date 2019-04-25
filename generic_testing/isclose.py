@@ -1,59 +1,34 @@
-# Copyright 2018 Steve Palmer
+#!/usr/bin/env python3
+# Copyright 2019 Steve Palmer
 
 """Extension to math.isclose and cmath.isclose."""
 
 import numbers
 import math
 import cmath
+from collections import namedtuple
 
-# import networkx as nx
-#
-# def _most_specific_single_supertype(*args) -> type:
-#     """Determine the most specific (least abstract) supertype of the args.
-#
-#     This is akin to the Lowest common ancestor problem,
-#     but since it is a relatively small scale,
-#     I don't try for an optimized algorithm.
-#
-#     Can be awkward if the args have more than one common superclass.
-#     """
-#     types = tuple(o if isinstance(o, type) else type(o) for o in args)
-#     superclasses = nx.DiGraph()
-#     common_superclasses = [set(T.__mro__) for T in types]
-#     common_superclasses = common_superclasses[0].intersection(*common_superclasses[1:])
-#     for T in common_superclasses:
-#         for parent in T.__mro__:
-#             if parent != T:
-#                 superclasses.add_edge(T, parent)
-#     superclasses = nx.transitive_closure(superclasses)
-#     while True:
-#         sorted_superclasses = list(nx.topological_sort(superclasses))
-#         result = sorted_superclasses[0]
-#         if all(superclasses.has_edge(result, T) for T in sorted_superclasses[1:]):
-#             break
-#         common_superclasses &= set(superclasses.successors(result))
-#         superclasses = superclasses.subgraph(common_superclasses)
-#     return result
+__version__ = '0.1'
 
 
-class IsClose:
+class IsClose(namedtuple('IsClose', ('rel_tol', 'abs_tol'))):
     """Make the IsClose of math and cmath a little more convenient."""
 
     @staticmethod
-    def _rel_tol(rel_tol) -> float:
+    def _rel_tol_helper(rel_tol) -> float:
         """Exposes the default value of rel_tol to the library IsClose function.
 
-        >>> IsClose._rel_tol("fred")
+        >>> IsClose._rel_tol_helper("fred")
         Traceback (most recent call last):
             ...
         TypeError: rel_tol must be a real number
-        >>> IsClose._rel_tol(-1.0)
+        >>> IsClose._rel_tol_helper(-1.0)
         Traceback (most recent call last):
             ...
         ValueError: rel_tol must be non-negative
-        >>> IsClose._rel_tol(0.001)
+        >>> IsClose._rel_tol_helper(0.001)
         0.001
-        >>> IsClose._rel_tol(None)
+        >>> IsClose._rel_tol_helper(None)
         1e-09
         """
         if rel_tol is None:
@@ -67,20 +42,20 @@ class IsClose:
         return result
 
     @staticmethod
-    def _abs_tol(abs_tol) -> float:
+    def _abs_tol_helper(abs_tol) -> float:
         """Exposes the default value of abs_tol to the library IsClose function.
 
-        >>> IsClose._abs_tol("fred")
+        >>> IsClose._abs_tol_helper("fred")
         Traceback (most recent call last):
             ...
         TypeError: abs_tol must be a real number
-        >>> IsClose._abs_tol(-1.0)
+        >>> IsClose._abs_tol_helper(-1.0)
         Traceback (most recent call last):
             ...
         ValueError: abs_tol must be non-negative
-        >>> IsClose._abs_tol(1e-30)
+        >>> IsClose._abs_tol_helper(1e-30)
         1e-30
-        >>> IsClose._abs_tol(None)
+        >>> IsClose._abs_tol_helper(None)
         0.0
         """
         if abs_tol is None:
@@ -154,34 +129,12 @@ class IsClose:
         >>> IsClose.polymorphic(float(2), float(1))
         False
         """
-        rel_tol = IsClose._rel_tol(rel_tol)
-        abs_tol = IsClose._abs_tol(abs_tol)
+        rel_tol = IsClose._rel_tol_helper(rel_tol)
+        abs_tol = IsClose._abs_tol_helper(abs_tol)
         return IsClose._polymorphic(a, b, rel_tol=rel_tol, abs_tol=abs_tol)
 
-    def __init__(self, rel_tol: numbers.Real = None, abs_tol: numbers.Real = None) -> None:
-        """Define rel_tol and abs_tol default values."""
-        self._rel_tol = IsClose._rel_tol(rel_tol)
-        self._abs_tol = IsClose._abs_tol(abs_tol)
-
-    @property
-    def rel_tol(self) -> float:
-        """rel_tol value.
-
-        >>> ic = IsClose(0.01, 0.001)
-        >>> ic.rel_tol
-        0.01
-        """
-        return self._rel_tol
-
-    @property
-    def abs_tol(self) -> float:
-        """abs_tol value.
-
-        >>> ic = IsClose(0.01, 0.001)
-        >>> ic.abs_tol
-        0.001
-        """
-        return self._abs_tol
+    def __new__(cls, rel_tol: numbers.Real = None, abs_tol: numbers.Real = None) -> 'IsClose':
+        return super().__new__(cls, IsClose._rel_tol_helper(rel_tol), IsClose._abs_tol_helper(abs_tol))
 
     def __call__(self, a: numbers.Number, b: numbers.Number) -> bool:
         """Apply IsClose().
@@ -190,7 +143,7 @@ class IsClose:
         >>> myisclose(1.0, 1.0)
         True
         """
-        return IsClose._polymorphic(a, b, rel_tol=self._rel_tol, abs_tol=self._abs_tol)
+        return IsClose._polymorphic(a, b, rel_tol=self.rel_tol, abs_tol=self.abs_tol)
 
     def close(self):
         """close function.
@@ -208,9 +161,7 @@ class IsClose:
         >>> callable(myisclose.notclose)
         True
         """
-        def result(a: numbers.Number, b: numbers.Number):
-            return not self(a, b)
-        return result
+        return lambda a, b: not self(a, b)
 
     # the following only make sense to floats
 
@@ -240,7 +191,7 @@ class IsClose:
 
 __all__ = ('IsClose')
 
-
 if __name__ == '__main__':
+    import datetime  # noqa F401
     import doctest
     doctest.testmod()
