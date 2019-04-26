@@ -65,7 +65,7 @@ class floatTests(RealTests, ComplexAugmentedAssignmentTests, FloorDivAugmentedAs
 
     @wraps(RealTests.test_generic_2220_addition_associativity)
     def test_generic_2220_addition_associativity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
-        isclose = IsClose(rel_tol=self.isclose.rel_tol * 100.0)
+        isclose = IsClose(rel_tol=IsClose.default_rel_tol * 100.0)
         assume(not isclose(abs(a), abs(b)) and not isclose(abs(b), abs(c)))
         super().test_generic_2220_addition_associativity(a, b, c)
 
@@ -73,7 +73,7 @@ class floatTests(RealTests, ComplexAugmentedAssignmentTests, FloorDivAugmentedAs
     def test_generic_2237_multiplication_addition_left_distributivity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
         # :FUDGE: this consistently fails when b is close to -c due to the limitations of floating point numbers.
         # Therefore, continue the test only when the b is not close of -c
-        assume(not IsClose.polymorphic(b, -c, rel_tol=self.isclose.rel_tol ** 0.5, abs_tol=self.isclose.abs_tol * 100.0))
+        assume(not IsClose.polymorphic(b, -c, rel_tol=IsClose.default_rel_tol ** 0.5, abs_tol=IsClose.default_abs_tol * 100.0))
         super().test_generic_2237_multiplication_addition_left_distributivity(a, b, c)
 
     @wraps(RealTests.test_generic_2274_abs_is_subadditive)
@@ -94,14 +94,14 @@ class complexTests(ComplexTests, ComplexAugmentedAssignmentTests):
     def test_generic_2237_multiplication_addition_left_distributivity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
         # :FUDGE: this consistently fails when b is close to -c due to the limitations of floating point numbers.
         # Therefore, continue the test only when the b is not close of -c
-        assume(not IsClose.polymorphic(b, -c, rel_tol=self.isclose.rel_tol ** 0.5, abs_tol=self.isclose.abs_tol * 100.0))
+        assume(not IsClose.polymorphic(b, -c, rel_tol=IsClose.default_rel_tol ** 0.5, abs_tol=IsClose.default_abs_tol * 100.0))
         super().test_generic_2237_multiplication_addition_left_distributivity(a, b, c)
 
     @wraps(ComplexTests.test_generic_2238_multiplication_addition_right_distributivity)
     def test_generic_2238_multiplication_addition_right_distributivity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
         # :FUDGE: this consistently fails when b is close to -c due to the limitations of floating point numbers.
         # Therefore, continue the test only when the b is not close of -c
-        assume(not IsClose.polymorphic(b, -c, rel_tol=self.isclose.rel_tol ** 0.5, abs_tol=self.isclose.abs_tol * 100.0))
+        assume(not IsClose.polymorphic(b, -c, rel_tol=IsClose.default_rel_tol ** 0.5, abs_tol=IsClose.default_abs_tol * 100.0))
         super().test_generic_2238_multiplication_addition_right_distributivity(a, b, c)
 
     @wraps(ComplexTests.test_generic_2274_abs_is_subadditive)

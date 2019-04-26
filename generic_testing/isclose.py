@@ -3,149 +3,92 @@
 
 """Extension to math.isclose and cmath.isclose."""
 
+import typing
 import numbers
 import math
 import cmath
-from collections import namedtuple
+import dataclasses
+# from collections import namedtuple
 
 __version__ = '0.1'
 
 
-class IsClose(namedtuple('IsClose', ('rel_tol', 'abs_tol'))):
+T = typing.TypeVar('T')  # should support basic operator (+, -) and relations (<, >)
+
+T_abs_tol = typing.TypeVar('T_abs_tol')
+T_rel_tol = typing.TypeVar('T_rel_tol')
+Relation = typing.Callable[[T, T], bool]
+
+
+@dataclasses.dataclass(frozen=True)
+class IsClose(typing.Generic[T, T_abs_tol, T_rel_tol]):
     """Make the IsClose of math and cmath a little more convenient."""
 
-    @staticmethod
-    def _rel_tol_helper(rel_tol) -> float:
-        """Exposes the default value of rel_tol to the library IsClose function.
+    rel_tol: T_rel_tol = None
+    abs_tol: T_abs_tol = None
 
-        >>> IsClose._rel_tol_helper("fred")
-        Traceback (most recent call last):
-            ...
-        TypeError: rel_tol must be a real number
-        >>> IsClose._rel_tol_helper(-1.0)
-        Traceback (most recent call last):
-            ...
-        ValueError: rel_tol must be non-negative
-        >>> IsClose._rel_tol_helper(0.001)
-        0.001
-        >>> IsClose._rel_tol_helper(None)
-        1e-09
-        """
-        if rel_tol is None:
-            result = 1e-09  # §9.2.1  math.IsClose rel_tol default value (and cmath.IsClose)
-        elif not isinstance(rel_tol, numbers.Real):
-            raise TypeError("rel_tol must be a real number")
-        else:
-            result = float(rel_tol)
-            if result < 0.0:
-                raise ValueError("rel_tol must be non-negative")
-        return result
+    default_rel_tol: T_rel_tol = dataclasses.field(default=1e-9, init=False, repr=False, compare=False)
+    default_abs_tol: T_abs_tol = dataclasses.field(default=0.0, init=False, repr=False, compare=False)
 
     @staticmethod
-    def _abs_tol_helper(abs_tol) -> float:
-        """Exposes the default value of abs_tol to the library IsClose function.
-
-        >>> IsClose._abs_tol_helper("fred")
-        Traceback (most recent call last):
-            ...
-        TypeError: abs_tol must be a real number
-        >>> IsClose._abs_tol_helper(-1.0)
-        Traceback (most recent call last):
-            ...
-        ValueError: abs_tol must be non-negative
-        >>> IsClose._abs_tol_helper(1e-30)
-        1e-30
-        >>> IsClose._abs_tol_helper(None)
-        0.0
-        """
-        if abs_tol is None:
-            result = 0.0  # §9.2.1  math.IsClose abs_tol default value (and cmath.IsClose)
-        elif not isinstance(abs_tol, numbers.Real):
-            raise TypeError("abs_tol must be a real number")
-        else:
-            result = float(abs_tol)
-            if result < 0.0:
-                raise ValueError("abs_tol must be non-negative")
-        return result
-
-    @staticmethod
-    def _polymorphic(a: numbers.Number, b: numbers.Number, rel_tol: float, abs_tol: float) -> bool:
+    def polymorphic(a: T, b: T, *, rel_tol: T_rel_tol = None, abs_tol: T_abs_tol = None) -> bool:
         """Polymorphic isclose.
 
-        >>> IsClose._polymorphic(complex(1), float(1), 0.0, 0.0)
+        >>> IsClose.polymorphic(complex(1), float(1))
         True
-        >>> IsClose._polymorphic(float(1), complex(2), 0.0, 0.0)
+        >>> IsClose.polymorphic(float(1), complex(2))
         False
-        >>> IsClose._polymorphic(float(2), float(1), 0.0, 0.0)
+        >>> IsClose.polymorphic(float(2), float(1))
         False
-        >>> IsClose._polymorphic(1, float(1), 0.0, 0.0)
+        >>> IsClose.polymorphic(1, float(1))
         True
-        >>> IsClose._polymorphic(datetime.timedelta(1), datetime.timedelta(1), 0.0, 0.0)
+        >>> IsClose.polymorphic(datetime.timedelta(1), datetime.timedelta(1), \
+                                rel_tol=0.0, abs_tol=datetime.timedelta(0))
         True
-        >>> IsClose._polymorphic(datetime.timedelta(1, microseconds=1), datetime.timedelta(1), 0.0, 0.0)
+        >>> IsClose.polymorphic(datetime.timedelta(1, microseconds=1), datetime.timedelta(1), \
+                                rel_tol=0.0, abs_tol=datetime.timedelta(0))
         False
-        >>> IsClose._polymorphic(datetime.timedelta(1, microseconds=1), datetime.timedelta(1), 1e-9, 0.0)
+        >>> IsClose.polymorphic(datetime.timedelta(1, microseconds=1), datetime.timedelta(1), \
+                                rel_tol=1e-9, abs_tol=datetime.timedelta(0))
+        True
+        >>> IsClose.polymorphic(datetime.datetime.now(), datetime.datetime.now(), \
+                                abs_tol=datetime.timedelta(seconds=1))
         True
         """
         if not isinstance(a, numbers.Number) or not isinstance(b, numbers.Number):
             # try and do something reasonable
             result = False
-            if a == b:
-                result = True
-            else:
-                try:
-                    difference = abs(a - b)
-                except BaseException:
-                    pass
+            try:
+                if a is b or a == b:
+                    result = True
                 else:
-                    try:
-                        if difference < rel_tol * max(abs(a), abs(b)):
-                            result = True
-                    except BaseException:
-                        pass
-                    if not result:
-                        if type(a) == type(b):
-                            try:
-                                abs_tol = type(a)(abs_tol)
-                            except BaseException:
-                                pass
-                        try:
-                            if difference <= abs_tol:
-                                result = True
-                        except BaseException:
-                            pass
-        elif isinstance(a, numbers.Complex) or isinstance(b, numbers.Complex):
-            result = cmath.isclose(complex(a), complex(b), rel_tol=rel_tol, abs_tol=abs_tol)
+                    difference: T_abs_tol = abs(a - b)
+                    abs_result = abs_tol is not None and difference <= abs_tol
+                    rel_result = rel_tol is not None and difference <= rel_tol * max(abs(a), abs(b))
+                    result = abs_result or rel_result
+            except Exception:
+                raise TypeError
         else:
-            result = math.isclose(float(a), float(b), rel_tol=rel_tol, abs_tol=abs_tol)
+            if rel_tol is None:
+                rel_tol = IsClose.default_rel_tol
+            if abs_tol is None:
+                abs_tol = IsClose.default_abs_tol
+            if isinstance(a, numbers.Complex) or isinstance(b, numbers.Complex):
+                result = cmath.isclose(complex(a), complex(b), rel_tol=rel_tol, abs_tol=abs_tol)
+            else:
+                result = math.isclose(float(a), float(b), rel_tol=rel_tol, abs_tol=abs_tol)
         return result
 
-    @staticmethod
-    def polymorphic(a: numbers.Number, b: numbers.Number, *, rel_tol: float = None, abs_tol: float = None) -> bool:
-        """Polymorphic isclose.
-
-        >>> IsClose.polymorphic(complex(1/3, 1/3), complex(0.3333333333333333333333, 0.33333333333333333333))
-        True
-        >>> IsClose.polymorphic(float(2), float(1))
-        False
-        """
-        rel_tol = IsClose._rel_tol_helper(rel_tol)
-        abs_tol = IsClose._abs_tol_helper(abs_tol)
-        return IsClose._polymorphic(a, b, rel_tol=rel_tol, abs_tol=abs_tol)
-
-    def __new__(cls, rel_tol: numbers.Real = None, abs_tol: numbers.Real = None) -> 'IsClose':
-        return super().__new__(cls, IsClose._rel_tol_helper(rel_tol), IsClose._abs_tol_helper(abs_tol))
-
-    def __call__(self, a: numbers.Number, b: numbers.Number) -> bool:
+    def __call__(self, a: T, b: T) -> bool:
         """Apply IsClose().
 
         >>> myisclose = IsClose()
         >>> myisclose(1.0, 1.0)
         True
         """
-        return IsClose._polymorphic(a, b, rel_tol=self.rel_tol, abs_tol=self.abs_tol)
+        return IsClose.polymorphic(a, b, rel_tol=self.rel_tol, abs_tol=self.abs_tol)
 
-    def close(self):
+    def close(self) -> Relation:
         """close function.
 
         >>> myisclose = IsClose()
@@ -154,7 +97,7 @@ class IsClose(namedtuple('IsClose', ('rel_tol', 'abs_tol'))):
         """
         return self
 
-    def notclose(self):
+    def notclose(self) -> Relation:
         """not close function.
 
         >>> myisclose = IsClose()
@@ -163,30 +106,21 @@ class IsClose(namedtuple('IsClose', ('rel_tol', 'abs_tol'))):
         """
         return lambda a, b: not self(a, b)
 
-    # the following only make sense to floats
-
-    def much_less_than(self):
+    def much_less_than(self) -> Relation:
         """definitely less function."""
-        def result(a: float, b: float) -> bool:
-            return a < b and not self(a, b)
-        return result
+        return lambda a, b: a < b and not self(a, b)
 
-    def less_than_or_close(self):
+    def less_than_or_close(self) -> Relation:
         """less or close function."""
-        def result(a: float, b: float) -> bool:
-            return a < b or self(a, b)
+        return lambda a, b: a < b or self(a, b)
 
-    def much_greater_than(self):
+    def much_greater_than(self) -> Relation:
         """definitely greater function."""
-        def result(a: float, b: float) -> bool:
-            return a > b and not self(a, b)
-        return result
+        return lambda a, b: a > b and not self(a, b)
 
-    def greater_than_or_close(self):
+    def greater_than_or_close(self) -> Relation:
         """greater or close function."""
-        def result(a: float, b: float) -> bool:
-            return a > b or self(a, b)
-        return result
+        return lambda a, b: a > b or self(a, b)
 
 
 __all__ = ('IsClose')
