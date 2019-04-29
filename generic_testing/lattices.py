@@ -9,8 +9,8 @@ from hypothesis import assume
 from generic_testing.core import GenericTests, ClassUnderTest
 
 
-class LatticeTests(GenericTests):
-    """Tests of the __or__ and __and__ operators."""
+class LatticeOrTests(GenericTests):
+    """Tests of the __or__ operator."""
 
     def test_generic_2200_or_commutativity(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         """a | b == b | a"""
@@ -20,9 +20,9 @@ class LatticeTests(GenericTests):
         """a | (b | c) == (a | b) | c"""
         self.assertEqual(a | (b | c), (a | b) | c)
 
-    def test_generic_2203_or_and_absorption(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        """a | (a & b) == a"""
-        self.assertEqual(a | (a & b), a)
+
+class LatticeAndTests(GenericTests):
+    """Tests of the __or__ operator."""
 
     def test_generic_2205_and_commutativity(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         """a & b == b & a"""
@@ -31,6 +31,14 @@ class LatticeTests(GenericTests):
     def test_generic_2206_and_associativity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
         """a & (b & c) == (a & b) & c"""
         self.assertEqual(a & (b & c), (a & b) & c)
+
+
+class LatticeTests(LatticeOrTests, LatticeAndTests):
+    """Tests of the __or__ and __and__ operators."""
+
+    def test_generic_2203_or_and_absorption(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        """a | (a & b) == a"""
+        self.assertEqual(a | (a & b), a)
 
     def test_generic_2208_and_or_absorption(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         """a & (a | b) == a"""
@@ -106,5 +114,5 @@ class BitShiftTests(GenericTests):
         self.assertEqual(a >> b, a // pow(self.one + self.one, b))
 
 
-__all__ = ('LatticeTests', 'BoundedBelowLatticeTests', 'BoundedLatticeTests', 'LatticeWithComplementTests',
+__all__ = ('LatticeOrTests', 'LatticeAndTests', 'LatticeTests', 'BoundedBelowLatticeTests', 'BoundedLatticeTests', 'LatticeWithComplementTests',
            'BitShiftTests')
