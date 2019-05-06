@@ -3,11 +3,15 @@
 
 """A library for simple timeout flags."""
 
+import numbers
 import typing
 import time
 import datetime
 
 __version__ = '0.1'
+
+
+ClockDeltaT = numbers.Real
 
 
 class Timeout:
@@ -18,12 +22,31 @@ class Timeout:
     You can query a timeout value to determine how much longer till the timeout expires.
     """
 
-    __slots__ = ('_delay', '_start', '_finish', '_out')
+    __slots__ = ('_delay', '_start', '_clock')
+    # _delay: ClockDeltaT = non-negative time in _clock delta units from _start before the timeout is reached.
+    # _start: float = time the timeout starts, using the _clock.
+    # _clock: Callable[[], float] the clock to use returning a Real number.
 
-    def __init__(self, delay: typing.Union[int, float, datetime.timedelta], start: float = None) -> None:
+    @staticmethod
+    def _delay_param(delay: typing.Union[ClockDeltaT, datetime.timedelta]) -> ClockDeltaT:
+        """
+        Convert a delay argument into the internal type.
+
+        Specifically, will convert datetime.timedelta objects to seconds on the fly.
+        WARNING: you shoulb using a seconds clock in you are going to use datetime.timedelta objects.
+        """
         if isinstance(delay, datetime.timedelta):
             delay = delay.total_seconds()
-        self._delay = max(0, delay)
+        result = max(0, delay)
+        return result
+
+    def __init__(self,
+                 delay: typing.Union[ClockDeltaT, datetime.timedelta],
+                 start: float = None,
+                 *,
+                 clock: typing.Callable[[], float] = None) -> None:
+        self._clock = clock or time.monotonic
+        self._delay = Timeout._delay_param(delay)
         self.restart(start)
 
     def __repr__(self) -> str:
@@ -37,25 +60,26 @@ class Timeout:
         return f"Timeout(in {self.remaining} seconds)"
 
     @property
-    def delay(self) -> typing.Union[float, int]:
+    def _finish(self) -> float:
+        return self._start + self._delay
+
+    @property
+    def delay(self) -> ClockDeltaT:
         """
         >>> Timeout(6).delay
-        6
+        6.0
         """
         return self._delay
 
     @delay.setter
-    def delay(self, delay: typing.Union[int, float]):
+    def delay(self, delay: typing.Union[ClockDeltaT, datetime.timedelta]):
         """
         >>> t = Timeout(6)
         >>> t.delay = 5
         >>> t.delay
         5
         """
-        if isinstance(delay, datetime.timedelta):
-            delay = delay.total_seconds()
-        self._delay = max(0, delay)
-        self.restart(self._start)
+        self._delay = Timeout._delay_param(delay)
 
     def __bool__(self) -> bool:
         """
@@ -66,8 +90,7 @@ class Timeout:
         >>> bool(t)
         True
         """
-        self._out = self._out or (time.monotonic() >= self._finish)
-        return self._out
+        return self._clock() >= self._finish
 
     def recycle(self) -> None:
         """Restart timeout from the last time it timed out
@@ -87,9 +110,9 @@ class Timeout:
         >>> bool(t)
         True
         """
-        self.restart(self._finish)
+        self._start = self._finish
 
-    def restart(self, start=None) -> None:
+    def restart(self, start: float = None) -> None:
         """Restart timeout from, by default, now
         >>> t = Timeout(6)
         >>> bool(t)
@@ -108,30 +131,27 @@ class Timeout:
         False
         """
         if start is None:
-            start = time.monotonic()
+            start = self._clock()
         self._start = start
-        self._finish = self._start + self._delay
-        self._out = False
 
     @property
-    def remaining(self) -> typing.Union[float, int]:
-        return max(0, self._finish - time.monotonic())
+    def remaining(self) -> ClockDeltaT:
+        return max(0, self._finish - self._clock())
 
     @property
-    def elapse(self) -> typing.Union[float, int]:
-        return time.monotonic() - self._start
+    def elapse(self) -> ClockDeltaT:
+        return self._clock() - self._start
 
     def wait(self) -> None:
-        while self:
-            time.sleep(self.remaining)
+        time.sleep(self.remaining)
 
     @classmethod
-    def at(cls, when: datetime.datetime) -> 'Timeout':
-        return cls(when - datetime.now(datetime.timezone.utc))
+    def at(cls, when: datetime.datetime, *, clock=None) -> 'Timeout':
+        return cls(when - datetime.now(datetime.timezone.utc), clock=clock)
 
-    @classmethod
-    def clone(cls, timeout: 'Timeout') -> 'Timeout':
-        return cls(timeout._delay, timeout._start)
+    def copy(self) -> 'Timeout':
+        result = Timeout(self._delay, self._start, clock=self._clock)
+        return result
 
 
 __all__ = ('Timeout')
