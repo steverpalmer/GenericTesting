@@ -115,7 +115,7 @@ class ContainerOverIterableTests(IterableTests, ContainerTests):
         self.assertEqual(a in b, contains)
 
 
-class SizedIterableContainerWithEmpty(SizedOverIterableTests, ContainerOverIterableTests):
+class SizedIterableContainerWithEmptyTests(SizedOverIterableTests, ContainerOverIterableTests):
     """These test common properties of almost all containers."""
 
     @property
@@ -136,7 +136,7 @@ class SizedIterableContainerWithEmpty(SizedOverIterableTests, ContainerOverItera
         self.assertFalse(a in self.empty)
 
 
-class SetTests(SizedIterableContainerWithEmpty, EqualityTests, PartialOrderingTests, BoundedBelowLatticeTests):
+class SetTests(SizedIterableContainerWithEmptyTests, EqualityTests, PartialOrderingTests, BoundedBelowLatticeTests):
     """The property tests of collections.abc.Set."""
 
     @property
@@ -179,7 +179,7 @@ class SetTests(SizedIterableContainerWithEmpty, EqualityTests, PartialOrderingTe
         universe = a | b
         self.assertLessEqual(c, universe)
         for x in universe:
-            self.assertEqual(x in c, x in a and x not in b)
+            self.assertEqual(x in c, x in a and x not in b, f"fails for a={a!r}, b={b!r}, x={x!r}")
 
     def test_generic_2432_xor_defintion(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         """x in a ^ b ⇔ x in a and x not in b or x not in a and x in b"""
@@ -187,7 +187,7 @@ class SetTests(SizedIterableContainerWithEmpty, EqualityTests, PartialOrderingTe
         universe = a | b
         self.assertLessEqual(c, universe)
         for x in universe:
-            self.assertEqual(x in c, x in a and x not in b or x not in a and x in b)
+            self.assertEqual(x in c, x in a and x not in b or x not in a and x in b, f"fails for a={a!r}, b={b!r}, x={x!r}")
 
 
 class MappingViewTests(SizedTests):
@@ -242,7 +242,7 @@ class MutableSetTests(SetTests, LatticeWithComplementAugmentedTests):
             self.assertEqual(x in a, x in a_copy and not x == b)
 
 
-class MappingTests(SizedIterableContainerWithEmpty, EqualityTests):
+class MappingTests(SizedIterableContainerWithEmptyTests, EqualityTests):
     """The property tests of collections.abc.Mapping."""
 
     @staticmethod
@@ -372,7 +372,7 @@ class MutableMappingTests(MappingTests):
         self.assertEqual(a, a_copy)
 
 
-class SequenceTests(SizedIterableContainerWithEmpty):
+class SequenceTests(SizedIterableContainerWithEmptyTests):
     """The property tests of collections.abc.Sequence."""
 
     @staticmethod
@@ -604,6 +604,6 @@ class MutableSequenceTests(SequenceTests):
 
 __all__ = ('ElementT', 'KeyT', 'ValueT',
            'HashableTests', 'IterableTests', 'SizedTests', 'ContainerTests',
-           'SizedOverIterableTests', 'ContainerOverIterableTests', 'SizedIterableContainerWithEmpty',
+           'SizedOverIterableTests', 'ContainerOverIterableTests', 'SizedIterableContainerWithEmptyTests',
            'SetTests', 'MappingViewTests', 'KeysViewTests', 'ItemsViewTests', 'ValuesViewTests', 'MutableSetTests',
            'MappingTests', 'MutableMappingTests', 'SequenceTests', 'MutableSequenceTests')
