@@ -25,7 +25,6 @@ class IOBaseTests(IterableTests):
     @abc.abstractmethod
     def newline(self):
         """is the newline character in the appropriate base type"""
-        pass
 
     @property
     def dtype(self):

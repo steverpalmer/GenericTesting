@@ -22,7 +22,6 @@ class AdditionMonoidTests(GenericTests):
     @abc.abstractmethod
     def zero(self) -> ClassUnderTest:
         """Addition Identity Value."""
-        pass
 
     def test_generic_2220_addition_associativity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
         """a + (b + c) == (a + b) + c"""
@@ -70,7 +69,6 @@ class MultiplicationMonoidTests(GenericTests):
     @abc.abstractmethod
     def one(self) -> ClassUnderTest:
         """Multiplication Identity Value."""
-        pass
 
     def test_generic_2234_multiplication_associativity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
         """a * (b * c) == (a * b) * c"""
@@ -313,7 +311,6 @@ class AffineSpaceTests:
     @abc.abstractmethod
     def vector_space_zero(self) -> VectorSpaceT:
         """Addition Identity Value."""
-        pass
 
     def test_generic_2220_addition_associativity(self, a: ClassUnderTest, b: VectorSpaceT, c: VectorSpaceT) -> None:
         """a + (b + c) == (a + b) + c"""

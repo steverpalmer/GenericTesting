@@ -56,7 +56,6 @@ class BoundedBelowLatticeTests(LatticeTests):
     @abc.abstractmethod
     def bottom(self) -> ClassUnderTest:
         """Lowest bound value."""
-        pass
 
     def test_generic_2202_or_identity(self, a: ClassUnderTest) -> None:
         """a | ⊥ == a"""
@@ -70,7 +69,6 @@ class BoundedLatticeTests(BoundedBelowLatticeTests):
     @abc.abstractmethod
     def top(self) -> ClassUnderTest:
         """Highest bound value."""
-        pass
 
     def test_generic_2207_and_identity(self, a: ClassUnderTest) -> None:
         """a & ⊤ = a"""

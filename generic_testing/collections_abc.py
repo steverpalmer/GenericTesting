@@ -121,7 +121,7 @@ class SizedIterableContainerWithEmptyTests(SizedOverIterableTests, ContainerOver
     @property
     @abc.abstractmethod
     def empty(self) -> ClassUnderTest:
-        pass
+        """The Empty container"""
 
     def test_generic_2402_zero_iterations_over_empty(self) -> None:
         with self.assertRaises(StopIteration):

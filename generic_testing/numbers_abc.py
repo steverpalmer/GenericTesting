@@ -176,7 +176,7 @@ class RationalTests(_RationalTests):
     @property
     @abc.abstractmethod
     def half(self) -> ClassUnderTest:
-        pass
+        """½"""
 
     def test_generic_2360_half_plus_half_is_one(self) -> None:
         """½ + ½ == 1"""
