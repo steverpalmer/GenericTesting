@@ -8,8 +8,6 @@ from hypothesis import assume
 
 from generic_testing.core import GenericTests, ClassUnderTest
 
-ScalarT = 'ScalarT'
-
 
 class AdditionMonoidTests(GenericTests):
     """Tests of the simplest (Monoid) semantics of the __add__ operator.
@@ -120,40 +118,6 @@ class CommutativeRingTests(RingTests):
     def test_generic_2239_multiplication_commutativity(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
         """a * b == b * a"""
         self.assertEqual(a * b, b * a)
-
-
-class RModuleTests(AdditionAbelianGroupTests):
-    """Test of the R-Module Semantics of the __add__ and __mul__ operators.
-
-    A distinction in this case is the the __mul__ operator takes a scalar and a value
-    This a generalization of a Vector Space used for types like timedelta.
-    See https://en.wikipedia.org/wiki/Module_(mathematics)
-    """
-
-    @property
-    @abc.abstractmethod
-    def scalar_one(self) -> ScalarT:
-        """Multiplication Identity Value."""
-
-    def test_generic_2234_multiplication_associativity(self, r: ScalarT, s: ScalarT, a: ClassUnderTest) -> None:
-        """(r * s) * a == (r * (s * a)"""
-        self.assertEqual((r * s) * a, r * (s * a))
-
-    def test_generic_2235_multiplication_identity(self, a: ClassUnderTest) -> None:
-        """1 * a == a"""
-        self.assertEqual(self.scalar_one * a, a)
-
-    def test_generic_2237_multiplication_addition_left_distributivity(self, r: ScalarT, a: ClassUnderTest, b: ClassUnderTest) -> None:
-        """r * (a + b) == (r * a) + (r * b)"""
-        self.assertEqual(r * (a + b), r * a + r * b)
-
-    def test_generic_2239_multiplication_commutativity(self, r: ScalarT, a: ClassUnderTest) -> None:
-        """r * a == a * r"""
-        self.assertEqual(r * a, a * r)
-
-    def test_generic_2240_r_module_multiplication_addition_left_distributivity(self, r: ScalarT, s: ScalarT, a: ClassUnderTest) -> None:
-        """(r + s) * a == (r * a) + (s * a)"""
-        self.assertEqual((r + s) * a, r * a + s * a)
 
 
 class FieldTests(CommutativeRingTests):
@@ -278,6 +242,43 @@ class AbsoluteValueTests(GenericTests):
         self.assertLessEqual(abs(a + b), abs(a) + abs(b))
 
 
+ScalarT = 'ScalarT'
+
+
+class RModuleTests(AdditionAbelianGroupTests):
+    """Test of the R-Module Semantics of the __add__ and __mul__ operators.
+
+    A distinction in this case is the the __mul__ operator takes a scalar and a value
+    This a generalization of a Vector Space used for types like timedelta.
+    See https://en.wikipedia.org/wiki/Module_(mathematics)
+    """
+
+    @property
+    @abc.abstractmethod
+    def scalar_one(self) -> ScalarT:
+        """Multiplication Identity Value."""
+
+    def test_generic_2234_multiplication_associativity(self, r: ScalarT, s: ScalarT, a: ClassUnderTest) -> None:
+        """(r * s) * a == (r * (s * a)"""
+        self.assertEqual((r * s) * a, r * (s * a))
+
+    def test_generic_2235_multiplication_identity(self, a: ClassUnderTest) -> None:
+        """1 * a == a"""
+        self.assertEqual(self.scalar_one * a, a)
+
+    def test_generic_2237_multiplication_addition_left_distributivity(self, r: ScalarT, a: ClassUnderTest, b: ClassUnderTest) -> None:
+        """r * (a + b) == (r * a) + (r * b)"""
+        self.assertEqual(r * (a + b), r * a + r * b)
+
+    def test_generic_2239_multiplication_commutativity(self, r: ScalarT, a: ClassUnderTest) -> None:
+        """r * a == a * r"""
+        self.assertEqual(r * a, a * r)
+
+    def test_generic_2240_r_module_multiplication_addition_left_distributivity(self, r: ScalarT, s: ScalarT, a: ClassUnderTest) -> None:
+        """(r + s) * a == (r * a) + (s * a)"""
+        self.assertEqual((r + s) * a, r * a + s * a)
+
+
 class VectorSpaceTests(RModuleTests, AdditionExtensionsTests):
     """Tests of the Vector Space semantics of the basic arithmetic operators.
 
@@ -337,6 +338,5 @@ class AffineSpaceTests:
 
 __all__ = ('AdditionMonoidTests', 'AdditionGroupTests', 'AdditionAbelianGroupTests', 'AdditionCommutativeGroupTests',
            'MultiplicationMonoidTests', 'RingTests', 'CommutativeRingTests', 'FieldTests',
-           'FloorDivModTests', 'ExponentiationTests', 'AbsoluteValueTests',
-           'AdditionExtensionsTests', 'ScalarT', 'RModuleTests', 'VectorSpaceTests',
-           'VectorSpaceT', 'AffineSpaceTests')
+           'FloorDivModTests', 'ExponentiationTests', 'AbsoluteValueTests', 'AdditionExtensionsTests',
+           'ScalarT', 'RModuleTests', 'VectorSpaceTests', 'VectorSpaceT', 'AffineSpaceTests')
