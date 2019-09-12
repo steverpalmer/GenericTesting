@@ -73,7 +73,7 @@ class MultiplicationMonoidTests(GenericTests):
         self.assertEqual(a * (b * c), (a * b) * c)
 
     def test_generic_2235_multiplication_identity(self, a: ClassUnderTest) -> None:
-        """a * 1 == 1 == 1 * a"""
+        """a * 1 == a == 1 * a"""
         self.assertEqual(a * self.one, a)
         self.assertEqual(self.one * a, a)
 
