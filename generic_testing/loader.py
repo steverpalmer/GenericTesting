@@ -19,6 +19,7 @@ from generic_testing.collections_abc import *
 from generic_testing.numbers_abc import *
 from generic_testing.built_in_types import *
 from generic_testing.file_likes import *
+from generic_testing.enums import *
 
 
 class _ClassDescription(yaml.YAMLObject):
@@ -39,6 +40,9 @@ class _ClassDescription(yaml.YAMLObject):
         result.excluding = excluding
         result.skipping = skipping
         return result
+
+    def __repr__(self) -> str:
+        return f"{type(self).__name__}(has={self.has!r}, excluding={self.excluding!r}, skipping={self.skipping!r})"
 
 
 @enum.unique
@@ -99,6 +103,8 @@ class GenericTestLoader:
                             model = str(model) + 'Tests'
                             if model in globals():
                                 base_class_list.append(globals()[model])
+                            else:
+                                print(f"ERROR: Model {model} not in globals")
                         if base_class_list:
                             class result(*base_class_list):
                                 pass
@@ -144,6 +150,7 @@ class GenericTestLoader:
                     pass
         if result is None:
             raise TypeError()
+        assert issubclass(result, GenericTests)
         return result
 
 
