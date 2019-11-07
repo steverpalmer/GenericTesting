@@ -6,10 +6,8 @@
 import unittest
 import enum
 
-from hypothesis import strategies as st
-
-from generic_testing.core import ClassUnderTest, Given
-from generic_testing.enums import KeyT, EnumTests, UniqueEnumTests, IntEnumTests
+from generic_testing.core import Given
+from generic_testing.enums import EnumTests, UniqueEnumTests, IntEnumTests, enum_strategy_dict
 
 
 class E1(enum.Enum):
@@ -18,26 +16,21 @@ class E1(enum.Enum):
     green = 1
 
 
-@Given({ClassUnderTest: st.sampled_from(E1),
-        KeyT: st.sampled_from(list(E1.__members__))})
+@Given(enum_strategy_dict(E1))
 class Test_E1(EnumTests):
-
-    def __init__(self, methodName=None):
-        super().__init__(E1, methodName=methodName)
+    pass
 
 
+@enum.unique
 class E2(enum.Enum):
     red = 0
     blue = 1
     green = 2
 
 
-@Given({ClassUnderTest: st.sampled_from(E2),
-        KeyT: st.sampled_from(list(E2.__members__))})
+@Given(enum_strategy_dict(E2))
 class Test_E2(UniqueEnumTests):
-
-    def __init__(self, methodName=None):
-        super().__init__(E2, methodName=methodName)
+    pass
 
 
 class E3(enum.IntEnum):
@@ -46,12 +39,9 @@ class E3(enum.IntEnum):
     green = 1
 
 
-@Given({ClassUnderTest: st.sampled_from(E3),
-        KeyT: st.sampled_from(list(E3.__members__))})
+@Given(enum_strategy_dict(E3))
 class Test_E3(IntEnumTests):
-
-    def __init__(self, methodName=None):
-        super().__init__(E3, methodName=methodName)
+    pass
 
 
 if __name__ == '__main__':
