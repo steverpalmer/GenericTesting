@@ -8,7 +8,14 @@ import typing
 import time
 import datetime
 
-__version__ = '0.1'
+try:
+    from generic_testing.version import Version, version
+    if not version.is_backwards_compatible_with('1.0.0'):
+        raise ImportError
+except ImportError:
+    def Version(s): return s  # noqa
+finally:
+    version = Version('1.0.0')
 
 
 ClockDeltaT = numbers.Real
@@ -33,7 +40,7 @@ class Timeout:
         Convert a delay argument into the internal type.
 
         Specifically, will convert datetime.timedelta objects to seconds on the fly.
-        WARNING: you shoulb using a seconds clock in you are going to use datetime.timedelta objects.
+        WARNING: you should using a seconds clock in you are going to use datetime.timedelta objects.
         """
         if isinstance(delay, datetime.timedelta):
             delay = delay.total_seconds()
@@ -67,7 +74,7 @@ class Timeout:
     def delay(self) -> ClockDeltaT:
         """
         >>> Timeout(6).delay
-        6.0
+        6
         """
         return self._delay
 
@@ -154,7 +161,7 @@ class Timeout:
         return result
 
 
-__all__ = ('Timeout')
+__all__ = ('version', 'Timeout')
 
 if __name__ == "__main__":
     import doctest

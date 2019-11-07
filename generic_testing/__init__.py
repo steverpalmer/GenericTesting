@@ -2,11 +2,15 @@
 
 """Merge generic_testing into a single namespace."""
 
-__version__ = "0.1"
+from generic_testing.version import Version, version
+assert version.is_backwards_compatible_with('1.0.0')
+version = Version('0.1.1')
 
-from generic_testing.timeout import Timeout
+from generic_testing.timeout import Timeout, version as _timeout_version
+assert _timeout_version.is_backwards_compatible_with('1.0.0')
 
-from generic_testing.isclose import IsClose
+from generic_testing.isclose import IsClose, version as _isclose_version
+assert _isclose_version.is_backwards_compatible_with('1.0.0')
 
 from generic_testing.core import *
 from generic_testing.relations import *

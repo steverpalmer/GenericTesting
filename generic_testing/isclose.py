@@ -8,9 +8,15 @@ import numbers
 import math
 import cmath
 import dataclasses
-# from collections import namedtuple
 
-__version__ = '0.1'
+try:
+    from generic_testing.version import Version, version
+    if not version.is_backwards_compatible_with('1.0.0'):
+        raise ImportError
+except ImportError:
+    def Version(s): return s  # noqa
+finally:
+    version = Version('1.0.0')
 
 
 T = typing.TypeVar('T')  # should support basic operator (+, -) and relations (<, >)
@@ -123,7 +129,7 @@ class IsClose(typing.Generic[T, T_abs_tol, T_rel_tol]):
         return lambda a, b: a > b or self(a, b)
 
 
-__all__ = ('IsClose')
+__all__ = ('version', 'IsClose')
 
 if __name__ == '__main__':
     import datetime  # noqa F401

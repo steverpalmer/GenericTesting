@@ -7,6 +7,15 @@ import numbers
 import operator
 import math
 
+try:
+    from version import Version, version
+    if not version.is_backwards_compatible_with('1.0.0'):
+        raise ImportError
+except ImportError:
+    def Version(s): return s
+finally:
+    version = Version('0.1.0')
+
 
 def _operator_fallbacks(fallback_operator, doc=""):
     """Returns tuple of polymorphic binary operators.
@@ -141,16 +150,17 @@ class ModuloN(numbers.Integral):
         return cls(4294967296, value, is_trusted=True)
 
     def __repr__(self) -> str:
+        default = "{self.__class__.__name__}({self._modulus}, {self._value})"
         specials = {2: "{self.__class__.__name__}.bit({self._value})",
                     10: "{self.__class__.__name__}.digit({self._value})",
                     16: "{self.__class__.__name__}.nibble({self._value})",
                     256: "{self.__class__.__name__}.u8({self._value})",
                     65536: "{self.__class__.__name__}.u16({self._value})",
                     4294967296: "{self.__class__.__name__}.u32({self._value})"}
-        return specials.get(self._modulus, "{self.__class__.__name__}({self._modulus}, {self._value})").format(self=self)
+        return specials.get(self._modulus, default).format(self=self)
 
     def __str__(self) -> str:
-        return "{self._value}(mod {self._modulus})".format(self=self)
+        return f"{self._value}(mod {self._modulus})"
 
     def __bytes__(self) -> bytes:
         return bytes(self._value)
@@ -339,8 +349,7 @@ class ModuloPow2(ModuloN):
         return type(self)(self._modulus, ~self._value, is_trusted=True)
 
 
-__all__ = ('ModuloN', 'ModuloPow2')
-
+__all__ = ('version', 'ModuloN', 'ModuloPow2')
 
 if __name__ == '__main__':
     import doctest
