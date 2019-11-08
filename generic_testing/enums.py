@@ -6,9 +6,10 @@ from enum import Enum
 
 from hypothesis import strategies as st
 
-from generic_testing.core import ClassUnderTest
+from generic_testing.core import ClassUnderTest, GenericTests
 from generic_testing.relations import EqualityTests
 from generic_testing.collections_abc import HashableTests, IterableTests, KeyT
+from generic_testing.lattices import LatticeWithComplementTests
 from generic_testing.built_in_types import intTests
 
 
@@ -19,6 +20,7 @@ class _EnumTests(EqualityTests, HashableTests, IterableTests):
     """Tests of Enum class inheritable properties."""
 
     def test_generic_2110_equality_definition(self, a: ClassUnderTest, b: ClassUnderTest):
+        """a == b ⇔ a.value == b.value ⇔ a.name == b.name"""
         self.assertEqual(a == b, a.value == b.value)
         self.assertEqual(a == b, a.name == b.name)
 
@@ -29,7 +31,21 @@ class _EnumTests(EqualityTests, HashableTests, IterableTests):
         IterableTests.test_generic_2400_iter_returns_an_iterator(self, E)
 
     def test_generic_2401_iterator_protocol_observed(self, E: EnumUnderTest) -> None:
+        """Test iterator protocol."""
         IterableTests.test_generic_2401_iterator_protocol_observed(self, E)
+
+    def test_generic_2420_contains_returns_a_boolean(self, E: EnumUnderTest, a: ClassUnderTest) -> None:
+        """isinstance(a in E, bool)"""
+        self.assertIsInstance(a in E, bool)
+
+    def test_generic_2421_contains_over_iterable_definition(self, E: EnumUnderTest, a: ClassUnderTest) -> None:
+        """a in E ⇔ any(a == x for x in E)"""
+        contains = False
+        for x in E:
+            if x == a:
+                contains = True
+                break
+        self.assertEqual(a in E, contains)
 
     def test_generic_2640_name_getitem_roundtrip(self, E: EnumUnderTest, a: ClassUnderTest) -> None:
         """E[a.name] == a"""
@@ -47,21 +63,47 @@ class _EnumTests(EqualityTests, HashableTests, IterableTests):
 class EnumTests(_EnumTests):
     """Tests of Enum class properties."""
 
+    def test_generic_2110_equality_definition(self, a: ClassUnderTest, b: ClassUnderTest):
+        """a == b ⇔ a.value == b.value ⇔ a.name == b.name and a != a.value and b != b.value"""
+        super().test_generic_2110_equality_definition(a, b)
+        self.assertFalse(a == a.value)
+        self.assertFalse(b == b.value)
+
     def test_generic_2800_bool_convention(self, a: ClassUnderTest) -> None:
         """bool(a)"""
         self.assertTrue(bool(a))
 
 
-class UniqueEnumTests(EnumTests):
-    """Tests of unique Enum class properties."""
+class IntEnumTests(intTests, _EnumTests):
+    """Tests of IntEnum class properties"""
 
-    def test_generic_2643_enum_attributes_unique(self, E: EnumUnderTest, attr: KeyT) -> None:
+
+class UniqueEnumMixinTests(GenericTests):
+    """Tests of uniqueness of Enum class."""
+
+    def test_generic_2645_enum_attributes_unique(self, E: EnumUnderTest, attr: KeyT) -> None:
         """E[n].name == n"""
         self.assertEqual(E[attr].name, attr)
 
 
-class IntEnumTests(intTests, _EnumTests):
-    """Tests od IntEnum class properties"""
+class FlagEnumMixinTests(LatticeWithComplementTests):
+    """Test for Flag properties."""
+
+    @property
+    def top(self):
+        return ~self.bottom
+
+    def test_generic_2110_equality_definition(self, a: ClassUnderTest, b: ClassUnderTest):
+        """a == b ⇔ a.value == b.value"""
+        self.assertEqual(a == b, a.value == b.value)
+
+    def test_generic_2640_name_getitem_roundtrip(self, E: EnumUnderTest, a: ClassUnderTest) -> None:
+        """a.name is None or E[a.name] == a"""
+        self.assertTrue(a.name is None or E[a.name] == a)
+
+    def test_generic_2800_bool_convention(self, a: ClassUnderTest) -> None:
+        """bool(a) ⇔ not a == ⊥"""
+        self.assertEqual(bool(a), not a == self.bottom)
 
 
 def enum_strategy_dict(cls: type, members=None, names=None):
@@ -73,4 +115,4 @@ def enum_strategy_dict(cls: type, members=None, names=None):
     return {EnumUnderTest: st.just(cls), ClassUnderTest: members, KeyT: names}
 
 
-__all__ = ('KeyT', 'EnumUnderTest', 'EnumTests', 'UniqueEnumTests', 'IntEnumTests', 'enum_strategy_dict')
+__all__ = ('KeyT', 'EnumUnderTest', 'EnumTests', 'IntEnumTests', 'UniqueEnumMixinTests', 'FlagEnumMixinTests', 'enum_strategy_dict')
