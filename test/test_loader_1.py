@@ -5,6 +5,7 @@
 
 from typing import List
 import collections
+import enum
 
 from hypothesis import strategies as st
 
@@ -50,11 +51,23 @@ class Test_IntSetDecorator(defaultGenericTestLoader.discover(IntSetDecorator)):
         self.assertEqual(isd.total(), 9)
 
 
+class E1(enum.IntEnum):
+    RED = 1
+    BLUE = 2
+    GREEN = 2
+
+
+@Given(enum_strategy_dict(E1))
+class Test_E1(defaultGenericTestLoader.discover(E1)):
+    pass
+
+
 if __name__ == '__main__':
     # Run the tests
     import unittest
     SUITE = unittest.TestSuite()
     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_int))
     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_IntSetDecorator))
+    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_E1))
     TR = unittest.TextTestRunner(verbosity=2)
     TR.run(SUITE)

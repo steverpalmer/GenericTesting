@@ -120,9 +120,6 @@ class GenericTestLoader:
                                         if name.find(excld) >= 0:
                                             setattr(result, name, GenericTests._skip)
                                             break
-#                            if class_description.where:
-#                                for name, val in class_description.where.items():
-#                                    setattr(result, name, getattr(result, val, None))
                     break  # accept only one ClassDescription per docstring
         if result is None:
             for known_T in reversed(self._superclass_mapping):
@@ -141,8 +138,7 @@ class GenericTestLoader:
                 if GenericTestLoader._is_user_defined(T, '__ge__') and \
                    GenericTestLoader._is_user_defined(T, '__lt__') and \
                    GenericTestLoader._is_user_defined(T, '__gt__'):
-                    # :TODO: determine if Total or Partial Order somehow
-                    base_class_list.append(PartialOrderingTests)
+                    base_class_list.append(TotalOrderingTests if GenericTestLoader._is_user_defined(T, 'cmp') else PartialOrderingTests)
                 else:
                     base_class_list.append(LessOrEqualTests)
             if base_class_list:
@@ -160,6 +156,9 @@ defaultGenericTestLoader = GenericTestLoader()
 # They are searched in the reverse order.
 
 # Abstract Base Clases
+defaultGenericTestLoader.register(io.RawIOBase, RawIOBaseTests)
+defaultGenericTestLoader.register(io.BufferedIOBase, BufferedIOBaseTests)
+defaultGenericTestLoader.register(io.TextIOBase, TextIOBaseTests)
 defaultGenericTestLoader.register(collections.abc.Set, SetTests)
 defaultGenericTestLoader.register(collections.abc.MutableSet, MutableSetTests)
 defaultGenericTestLoader.register(collections.abc.KeysView, KeysViewTests)
@@ -190,8 +189,7 @@ defaultGenericTestLoader.register(float, floatTests)
 defaultGenericTestLoader.register(fractions.Fraction, FractionTests)
 defaultGenericTestLoader.register(int, intTests)
 
-defaultGenericTestLoader.register(io.RawIOBase, RawIOBaseTests)
-defaultGenericTestLoader.register(io.BufferedIOBase, BufferedIOBaseTests)
-defaultGenericTestLoader.register(io.TextIOBase, TextIOBaseTests)
+defaultGenericTestLoader.register(enum.Enum, EnumTests)
+defaultGenericTestLoader.register(enum.IntEnum, IntEnumTests)
 
 __all__ = ('GenericTestLoader', 'defaultGenericTestLoader')
