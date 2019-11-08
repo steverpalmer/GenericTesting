@@ -107,6 +107,7 @@ class ContainerOverIterableTests(IterableTests, ContainerTests):
     """
 
     def test_generic_2421_contains_over_iterable_definition(self, a: ElementT, b: ClassUnderTest) -> None:
+        """a in b ⇔ any(a == x for x in b)"""
         contains = False
         for x in b:
             if x == a:
