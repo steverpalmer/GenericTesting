@@ -63,11 +63,9 @@ class _EnumTests(EqualityTests, HashableTests, IterableTests):
 class EnumTests(_EnumTests):
     """Tests of Enum class properties."""
 
-    def test_generic_2110_equality_definition(self, a: ClassUnderTest, b: ClassUnderTest):
-        """a == b ⇔ a.value == b.value ⇔ a.name == b.name and a != a.value and b != b.value"""
-        super().test_generic_2110_equality_definition(a, b)
+    def test_generic_2111_members_distinct_from_value(self, a: ClassUnderTest):
+        """Enum members are not equal to their value."""
         self.assertFalse(a == a.value)
-        self.assertFalse(b == b.value)
 
     def test_generic_2800_bool_convention(self, a: ClassUnderTest) -> None:
         """bool(a)"""
