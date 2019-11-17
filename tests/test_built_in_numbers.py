@@ -8,38 +8,38 @@ import fractions
 
 from hypothesis import strategies as st
 
-from generic_testing import *
+from generic_testing_test_context import generic_testing
 
 
-@Given({ClassUnderTest: st.integers()})
-class Test_int(intTests):
+@generic_testing.Given({generic_testing.ClassUnderTest: st.integers()})
+class Test_int(generic_testing.intTests):
     pass
 
 
 FRACTIONS_RANGE = 10000000000
 
 
-@Given({ClassUnderTest: st.fractions(min_value=fractions.Fraction(-FRACTIONS_RANGE),
-                                     max_value=fractions.Fraction(FRACTIONS_RANGE),
-                                     max_denominator=FRACTIONS_RANGE)})
-class Test_Fraction(FractionTests):
+@generic_testing.Given({generic_testing.ClassUnderTest: st.fractions(min_value=fractions.Fraction(-FRACTIONS_RANGE),
+                                                                     max_value=fractions.Fraction(FRACTIONS_RANGE),
+                                                                     max_denominator=FRACTIONS_RANGE)})
+class Test_Fraction(generic_testing.FractionTests):
     pass
 
 
 FLOATS_RANGE = 1e30
 
 
-@Given({ClassUnderTest: st.floats(min_value=-FLOATS_RANGE, max_value=FLOATS_RANGE)})
-class Test_float(floatTests):
+@generic_testing.Given({generic_testing.ClassUnderTest: st.floats(min_value=-FLOATS_RANGE, max_value=FLOATS_RANGE)})
+class Test_float(generic_testing.floatTests):
     pass
 
 
 COMPLEX_RANGE = 1e10
 
 
-@Given({ClassUnderTest: st.complex_numbers(0.0, COMPLEX_RANGE,
-                                           allow_nan=False, allow_infinity=False)})
-class Test_complex(complexTests):
+@generic_testing.Given({generic_testing.ClassUnderTest: st.complex_numbers(0.0, COMPLEX_RANGE,
+                                                                           allow_nan=False, allow_infinity=False)})
+class Test_complex(generic_testing.complexTests):
     pass
 
 

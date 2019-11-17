@@ -6,11 +6,11 @@ from enum import Enum
 
 from hypothesis import strategies as st
 
-from generic_testing.core import ClassUnderTest, GenericTests
-from generic_testing.relations import EqualityTests
-from generic_testing.collections_abc import HashableTests, IterableTests, KeyT
-from generic_testing.lattices import LatticeWithComplementTests
-from generic_testing.built_in_types import intTests
+from .core import ClassUnderTest, GenericTests
+from .relations import EqualityTests
+from .collections_abc import HashableTests, IterableTests, KeyT
+from .lattices import LatticeWithComplementTests
+from .built_in_types import intTests
 
 
 EnumUnderTest = 'EnumUnderTest'

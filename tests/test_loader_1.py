@@ -9,11 +9,11 @@ import enum
 
 from hypothesis import strategies as st
 
-from generic_testing import *
+from generic_testing_test_context import generic_testing
 
 
-@Given(st.integers())
-class Test_int(defaultGenericTestLoader.discover(int)):
+@generic_testing.Given(st.integers())
+class Test_int(generic_testing.defaultGenericTestLoader.discover(int)):
     pass
 
 
@@ -42,8 +42,8 @@ class IntSetDecorator(collections.abc.Set):
         return "MyClass({self.data})".format(self=self)
 
 
-@Given({core.ClassUnderTest: st.builds(IntSetDecorator), collections_abc.ElementT: st.integers()})
-class Test_IntSetDecorator(defaultGenericTestLoader.discover(IntSetDecorator)):
+@generic_testing.Given({generic_testing.ClassUnderTest: st.builds(IntSetDecorator), generic_testing.collections_abc.ElementT: st.integers()})
+class Test_IntSetDecorator(generic_testing.defaultGenericTestLoader.discover(IntSetDecorator)):
     empty = IntSetDecorator([])
 
     def test_total(self):
@@ -57,8 +57,8 @@ class E1(enum.IntEnum):
     GREEN = 2
 
 
-@Given(enum_strategy_dict(E1))
-class Test_E1(defaultGenericTestLoader.discover(E1)):
+@generic_testing.Given(generic_testing.enum_strategy_dict(E1))
+class Test_E1(generic_testing.defaultGenericTestLoader.discover(E1)):
     pass
 
 

@@ -13,9 +13,9 @@ import codecs
 
 import hypothesis
 
-from generic_testing.timeout import Timeout
-from generic_testing.core import ClassUnderTest
-from generic_testing.collections_abc import IterableTests
+from .timeout import Timeout
+from .core import ClassUnderTest
+from .collections_abc import IterableTests
 
 
 class IOBaseTests(IterableTests):

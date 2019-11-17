@@ -9,7 +9,7 @@ import functools
 
 from hypothesis import strategies as st
 
-from generic_testing import *
+from generic_testing_test_context import generic_testing
 
 
 class C_Iterable:
@@ -23,8 +23,8 @@ class C_Iterable:
         return iter(self.data)
 
 
-@Given(st.lists(st.integers()))
-class Test_01_Iterable(defaultGenericTestLoader.discover(C_Iterable)):
+@generic_testing.Given(st.lists(st.integers()))
+class Test_01_Iterable(generic_testing.defaultGenericTestLoader.discover(C_Iterable)):
     pass
 
 
@@ -39,8 +39,8 @@ class C_Sized:
         return len(self.data)
 
 
-@Given(st.lists(st.integers()))
-class Test_02_Sized(defaultGenericTestLoader.discover(C_Sized)):
+@generic_testing.Given(st.lists(st.integers()))
+class Test_02_Sized(generic_testing.defaultGenericTestLoader.discover(C_Sized)):
     pass
 
 
@@ -55,8 +55,8 @@ class C_Container:
         return key in self.data
 
 
-@Given({ClassUnderTest: st.lists(st.integers()), ElementT: st.integers()})
-class Test_03_Container(defaultGenericTestLoader.discover(C_Container)):
+@generic_testing.Given({generic_testing.ClassUnderTest: st.lists(st.integers()), generic_testing.ElementT: st.integers()})
+class Test_03_Container(generic_testing.defaultGenericTestLoader.discover(C_Container)):
     pass
 
 
@@ -74,8 +74,8 @@ class C_SizedIterable:
         return len(self.data)
 
 
-@Given(st.lists(st.integers()))
-class Test_04_SizedIterable(defaultGenericTestLoader.discover(C_SizedIterable)):
+@generic_testing.Given(st.lists(st.integers()))
+class Test_04_SizedIterable(generic_testing.defaultGenericTestLoader.discover(C_SizedIterable)):
     pass
 
 
@@ -93,8 +93,8 @@ class C_IterableContainer:
         return key in self.data
 
 
-@Given({ClassUnderTest: st.lists(st.integers()), ElementT: st.integers()})
-class Test_05_IterableContainer(defaultGenericTestLoader.discover(C_IterableContainer)):
+@generic_testing.Given({generic_testing.ClassUnderTest: st.lists(st.integers()), generic_testing.ElementT: st.integers()})
+class Test_05_IterableContainer(generic_testing.defaultGenericTestLoader.discover(C_IterableContainer)):
     pass
 
 
@@ -112,8 +112,8 @@ class C_SizedContainer:
         return key in self.data
 
 
-@Given({ClassUnderTest: st.lists(st.integers()), ElementT: st.integers()})
-class Test_06_SizedContainer(defaultGenericTestLoader.discover(C_SizedContainer)):
+@generic_testing.Given({generic_testing.ClassUnderTest: st.lists(st.integers()), generic_testing.ElementT: st.integers()})
+class Test_06_SizedContainer(generic_testing.defaultGenericTestLoader.discover(C_SizedContainer)):
     pass
 
 
@@ -134,8 +134,8 @@ class C_SizedIterableContainer:
         return key in self.data
 
 
-@Given({ClassUnderTest: st.lists(st.integers()), ElementT: st.integers()})
-class Test_07_SizedIterableContainer(defaultGenericTestLoader.discover(C_SizedIterableContainer)):
+@generic_testing.Given({generic_testing.ClassUnderTest: st.lists(st.integers()), generic_testing.ElementT: st.integers()})
+class Test_07_SizedIterableContainer(generic_testing.defaultGenericTestLoader.discover(C_SizedIterableContainer)):
     pass
 
 
@@ -148,8 +148,8 @@ class C_Equals:
         return self.data == other.data
 
 
-@Given(st.builds(C_Equals))
-class Test_08_Equals(defaultGenericTestLoader.discover(C_Equals)):
+@generic_testing.Given(st.builds(C_Equals))
+class Test_08_Equals(generic_testing.defaultGenericTestLoader.discover(C_Equals)):
     pass
 
 
@@ -165,8 +165,8 @@ class C_Equals_and_NotEquals:
         return self.data != other.data
 
 
-@Given(st.builds(C_Equals_and_NotEquals))
-class Test_09_Equals_and_NotEquals(defaultGenericTestLoader.discover(C_Equals_and_NotEquals)):
+@generic_testing.Given(st.builds(C_Equals_and_NotEquals))
+class Test_09_Equals_and_NotEquals(generic_testing.defaultGenericTestLoader.discover(C_Equals_and_NotEquals)):
     pass
 
 
@@ -182,8 +182,8 @@ class C_LessEquals:
         return self.data <= other.data
 
 
-@Given(st.builds(C_LessEquals))
-class Test_10_LessEquals(defaultGenericTestLoader.discover(C_LessEquals)):
+@generic_testing.Given(st.builds(C_LessEquals))
+class Test_10_LessEquals(generic_testing.defaultGenericTestLoader.discover(C_LessEquals)):
     pass
 
 
@@ -200,8 +200,8 @@ class C_Ordered:
         return self.data <= other.data
 
 
-@Given(st.builds(C_Ordered))
-class Test_10_Ordered(defaultGenericTestLoader.discover(C_Ordered)):
+@generic_testing.Given(st.builds(C_Ordered))
+class Test_10_Ordered(generic_testing.defaultGenericTestLoader.discover(C_Ordered)):
     pass
 
 
@@ -230,8 +230,8 @@ class C_FullHouse:
         return self.data <= other.data
 
 
-@Given({ClassUnderTest: st.builds(C_FullHouse), ElementT: st.characters()})
-class Test_11_FullHouse(defaultGenericTestLoader.discover(C_FullHouse)):
+@generic_testing.Given({generic_testing.ClassUnderTest: st.builds(C_FullHouse), generic_testing.ElementT: st.characters()})
+class Test_11_FullHouse(generic_testing.defaultGenericTestLoader.discover(C_FullHouse)):
     pass
 
 
@@ -239,7 +239,7 @@ class Main:
 
     def __init__(self) -> None:
         suite = unittest.TestSuite()
-        names = [name for name, cls in globals().items() if name.startswith('Test_') and issubclass(cls, GenericTests)]
+        names = [name for name, cls in globals().items() if name.startswith('Test_') and issubclass(cls, generic_testing.GenericTests)]
         for name in sorted(names):
             suite.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(globals()[name]))
         tr = unittest.TextTestRunner(verbosity=2)

@@ -11,15 +11,15 @@ import io
 
 import yaml
 
-from generic_testing.core import *
-from generic_testing.relations import *
-from generic_testing.lattices import *
-from generic_testing.arithmetic import *
-from generic_testing.collections_abc import *
-from generic_testing.numbers_abc import *
-from generic_testing.built_in_types import *
-from generic_testing.file_likes import *
-from generic_testing.enums import *
+from .core import *
+from .relations import *
+from .lattices import *
+from .arithmetic import *
+from .collections_abc import *
+from .numbers_abc import *
+from .built_in_types import *
+from .file_likes import *
+from .enums import *
 
 
 class _ClassDescription(yaml.YAMLObject):

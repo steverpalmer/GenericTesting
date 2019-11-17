@@ -9,24 +9,24 @@ import types
 
 from hypothesis import strategies as st
 
-from generic_testing import *
+from generic_testing_test_context import generic_testing
 
 
 element_st = st.integers()
 
 
-@Given({ClassUnderTest: st.frozensets(element_st),
-        ElementT: element_st})
-class Test_frozenset(frozensetTests):
+@generic_testing.Given({generic_testing.ClassUnderTest: st.frozensets(element_st),
+                        generic_testing.ElementT: element_st})
+class Test_frozenset(generic_testing.frozensetTests):
     pass
 
 
 element_st = st.integers()
 
 
-@Given({ClassUnderTest: st.sets(element_st),
-        ElementT: element_st})
-class Test_set(setTests):
+@generic_testing.Given({generic_testing.ClassUnderTest: st.sets(element_st),
+                        generic_testing.ElementT: element_st})
+class Test_set(generic_testing.setTests):
     pass
 
 
@@ -34,9 +34,9 @@ key_st = st.integers()
 value_st = st.integers()
 
 
-@Given({ClassUnderTest: st.builds(lambda m: m.keys(), st.dictionaries(key_st, value_st)),
-        ElementT: key_st})
-class Test_dict_KeysView(dictKeysViewTests):
+@generic_testing.Given({generic_testing.ClassUnderTest: st.builds(lambda m: m.keys(), st.dictionaries(key_st, value_st)),
+                        generic_testing.ElementT: key_st})
+class Test_dict_KeysView(generic_testing.dictKeysViewTests):
     pass
 
 
@@ -44,9 +44,9 @@ key_st = st.integers()
 value_st = st.integers()
 
 
-@Given({ClassUnderTest: st.builds(lambda m: m.items(), st.dictionaries(key_st, value_st)),
-        ElementT: key_st})
-class Test_dict_ItemsView(dictItemsViewTests):
+@generic_testing.Given({generic_testing.ClassUnderTest: st.builds(lambda m: m.items(), st.dictionaries(key_st, value_st)),
+                        generic_testing.ElementT: key_st})
+class Test_dict_ItemsView(generic_testing.dictItemsViewTests):
     pass
 
 
@@ -54,9 +54,9 @@ key_st = st.integers()
 value_st = st.integers()
 
 
-@Given({ClassUnderTest: st.builds(lambda m: m.values(), st.dictionaries(key_st, value_st)),
-        ElementT: key_st})
-class Test_dict_ValuesView(dictValuesViewTests):
+@generic_testing.Given({generic_testing.ClassUnderTest: st.builds(lambda m: m.values(), st.dictionaries(key_st, value_st)),
+                        generic_testing.ElementT: key_st})
+class Test_dict_ValuesView(generic_testing.dictValuesViewTests):
     pass
 
 
@@ -64,10 +64,10 @@ key_st = st.integers()
 value_st = st.integers()
 
 
-@Given({ClassUnderTest: st.builds((lambda d: types.MappingProxyType(d)), st.dictionaries(key_st, value_st)),
-        KeyT: key_st,
-        ValueT: value_st})
-class Test_MappingProxyType(MappingProxyTypeTests):
+@generic_testing.Given({generic_testing.ClassUnderTest: st.builds((lambda d: types.MappingProxyType(d)), st.dictionaries(key_st, value_st)),
+                        generic_testing.KeyT: key_st,
+                        generic_testing.ValueT: value_st})
+class Test_MappingProxyType(generic_testing.MappingProxyTypeTests):
     pass
 
 
@@ -75,10 +75,10 @@ key_st = st.integers()
 value_st = st.integers()
 
 
-@Given({ClassUnderTest: st.dictionaries(key_st, value_st),
-        KeyT: key_st,
-        ValueT: value_st})
-class Test_dict(dictTests):
+@generic_testing.Given({generic_testing.ClassUnderTest: st.dictionaries(key_st, value_st),
+                        generic_testing.KeyT: key_st,
+                        generic_testing.ValueT: value_st})
+class Test_dict(generic_testing.dictTests):
     pass
 
 
@@ -86,10 +86,10 @@ key_st = st.characters()
 value_st = st.integers(min_value=0)
 
 
-@Given({ClassUnderTest: st.builds(collections.Counter, st.text(key_st)),
-        KeyT: key_st,
-        ValueT: value_st})
-class Test_Counter(CounterTests):
+@generic_testing.Given({generic_testing.ClassUnderTest: st.builds(collections.Counter, st.text(key_st)),
+                        generic_testing.KeyT: key_st,
+                        generic_testing.ValueT: value_st})
+class Test_Counter(generic_testing.CounterTests):
     pass
 
 
@@ -97,10 +97,10 @@ key_st = st.integers()
 value_st = st.integers()
 
 
-@Given({ClassUnderTest: st.builds(collections.OrderedDict, st.lists(st.tuples(key_st, value_st))),
-        KeyT: key_st,
-        ValueT: value_st})
-class Test_OrderedDict(OrderedDictTests):
+@generic_testing.Given({generic_testing.ClassUnderTest: st.builds(collections.OrderedDict, st.lists(st.tuples(key_st, value_st))),
+                        generic_testing.KeyT: key_st,
+                        generic_testing.ValueT: value_st})
+class Test_OrderedDict(generic_testing.OrderedDictTests):
     pass
 
 
@@ -118,10 +118,11 @@ key_st = st.integers()
 value_st = st.integers()
 
 
-@Given({ClassUnderTest: st.builds((lambda items: collections.defaultdict(factory(), items)), st.lists(st.tuples(key_st, value_st))),
-        KeyT: key_st,
-        ValueT: value_st})
-class Test_defaultdict(defaultdictTests):
+@generic_testing.Given({generic_testing.ClassUnderTest:
+                        st.builds((lambda items: collections.defaultdict(factory(), items)), st.lists(st.tuples(key_st, value_st))),
+                        generic_testing.KeyT: key_st,
+                        generic_testing.ValueT: value_st})
+class Test_defaultdict(generic_testing.defaultdictTests):
 
     def __init__(self, methodName=None):
         super().__init__(factory(), methodName)
@@ -130,22 +131,22 @@ class Test_defaultdict(defaultdictTests):
 values_st = st.integers()
 
 
-@Given({ClassUnderTest: st.lists(values_st).map(lambda l: tuple(l)),
-        KeyT: st.integers(min_value=-(2**30), max_value=2**30),
-        ValueT: values_st,
-        ScalarT: st.integers(min_value=-1, max_value=10)})
-class Test_tuple(tupleTests):
+@generic_testing.Given({generic_testing.ClassUnderTest: st.lists(values_st).map(lambda l: tuple(l)),
+                        generic_testing.KeyT: st.integers(min_value=-(2**30), max_value=2**30),
+                        generic_testing.ValueT: values_st,
+                        generic_testing.ScalarT: st.integers(min_value=-1, max_value=10)})
+class Test_tuple(generic_testing.tupleTests):
     pass
 
 
 alphabet_st = st.characters()
 
 
-@Given({ClassUnderTest: st.text(alphabet_st),
-        KeyT: st.integers(min_value=-(2**30), max_value=2**30),
-        ValueT: alphabet_st,
-        ScalarT: st.integers(min_value=-1, max_value=10)})
-class Test_str(tupleTests):
+@generic_testing.Given({generic_testing.ClassUnderTest: st.text(alphabet_st),
+                        generic_testing.KeyT: st.integers(min_value=-(2**30), max_value=2**30),
+                        generic_testing.ValueT: alphabet_st,
+                        generic_testing.ScalarT: st.integers(min_value=-1, max_value=10)})
+class Test_str(generic_testing.tupleTests):
 
     empty = ''
 
@@ -153,11 +154,11 @@ class Test_str(tupleTests):
 values_st = st.integers()
 
 
-@Given({ClassUnderTest: st.lists(values_st),
-        KeyT: st.integers(min_value=-(2**30), max_value=2**30),
-        ValueT: values_st,
-        ScalarT: st.integers(min_value=-1, max_value=10)})
-class Test_list(listTests):
+@generic_testing.Given({generic_testing.ClassUnderTest: st.lists(values_st),
+                        generic_testing.KeyT: st.integers(min_value=-(2**30), max_value=2**30),
+                        generic_testing.ValueT: values_st,
+                        generic_testing.ScalarT: st.integers(min_value=-1, max_value=10)})
+class Test_list(generic_testing.listTests):
     pass
 
 

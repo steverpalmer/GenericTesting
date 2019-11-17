@@ -7,10 +7,10 @@ import collections
 
 from hypothesis import assume, strategies as st
 
-from generic_testing.core import GenericTests, ClassUnderTest
-from generic_testing.relations import EqualityTests, PartialOrderingTests
-from generic_testing.lattices import BoundedBelowLatticeTests
-from generic_testing.augmented_assignment import LatticeWithComplementAugmentedTests
+from .core import GenericTests, ClassUnderTest
+from .relations import EqualityTests, PartialOrderingTests
+from .lattices import BoundedBelowLatticeTests
+from .augmented_assignment import LatticeWithComplementAugmentedTests
 
 
 ElementT = 'ElementT'

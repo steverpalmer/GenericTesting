@@ -6,7 +6,7 @@ import abc
 
 from hypothesis import assume
 
-from generic_testing.core import GenericTests, ClassUnderTest
+from .core import GenericTests, ClassUnderTest
 
 
 class AdditionMonoidTests(GenericTests):

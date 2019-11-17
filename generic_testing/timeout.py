@@ -9,7 +9,7 @@ import time
 import datetime
 
 try:
-    from generic_testing.version import Version, version
+    from .version import Version, version
     if not version.is_backwards_compatible_with('1.0.0'):
         raise ImportError
 except ImportError:
