@@ -14,8 +14,9 @@ try:
         raise ImportError
 except ImportError:
     def Version(s): return s  # noqa
-finally:
-    version = Version('1.0.0')
+
+__all__ = ('version', 'Timeout')
+version = Version('1.0.0')
 
 
 ClockDeltaT = numbers.Real
@@ -160,8 +161,6 @@ class Timeout:
         result = Timeout(self._delay, self._start, clock=self._clock)
         return result
 
-
-__all__ = ('version', 'Timeout')
 
 if __name__ == "__main__":
     import doctest

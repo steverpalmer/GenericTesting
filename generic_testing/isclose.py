@@ -15,9 +15,9 @@ try:
         raise ImportError
 except ImportError:
     def Version(s): return s  # noqa
-finally:
-    version = Version('1.0.0')
 
+__all__ = ('version', 'IsClose')
+version = Version('1.0.0')
 
 T = typing.TypeVar('T')  # should support basic operator (+, -) and relations (<, >)
 
@@ -128,8 +128,6 @@ class IsClose(typing.Generic[T, T_abs_tol, T_rel_tol]):
         """greater or close function."""
         return lambda a, b: a > b or self(a, b)
 
-
-__all__ = ('version', 'IsClose')
 
 if __name__ == '__main__':
     import datetime  # noqa F401

@@ -13,8 +13,9 @@ try:
         raise ImportError
 except ImportError:
     def Version(s): return s
-finally:
-    version = Version('0.1.0')
+
+__all__ = ('version', 'ModuloN', 'ModuloPow2')
+version = Version('0.1.0')
 
 
 def _operator_fallbacks(fallback_operator, doc=""):
@@ -348,8 +349,6 @@ class ModuloPow2(ModuloN):
     def __invert__(self) -> 'ModuloN':
         return type(self)(self._modulus, ~self._value, is_trusted=True)
 
-
-__all__ = ('version', 'ModuloN', 'ModuloPow2')
 
 if __name__ == '__main__':
     import doctest
