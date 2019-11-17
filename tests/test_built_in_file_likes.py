@@ -45,6 +45,22 @@ class Test_BufferedReader(generic_testing.BufferedIOBaseTests):
     pass
 
 
+class Test_BufferedReader2(unittest.TestCase):
+
+    def test_os_error(self):
+        b = b'hello'
+        f = tempfile.TemporaryFile()
+        f.write(b)
+        f.seek(0)
+        OUT = io.BufferedReader(f)
+        # Standard Library io module states:
+        # writeable()
+        #   Return True is the stream supports writing. If False, write() and truncate() will raise OSError.
+        self.assertFalse(OUT.writable())
+        with self.assertRaises(OSError):
+            OUT.truncate(0)
+
+
 def _make_buffered_writer_file(b: bytes):
     return io.BufferedWriter(_make_raw_temp_file(b))
 
@@ -111,5 +127,5 @@ if __name__ == '__main__':
             if name.startswith('Test_'):
                 SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(value))
     else:
-        SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_BufferedRWPair))
+        SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_BufferedReader2))
     unittest.TextTestRunner(verbosity=2).run(SUITE)
