@@ -9,7 +9,7 @@ version = Version('0.1.1')
 from .timeout import Timeout, version as _timeout_version
 assert _timeout_version.is_backwards_compatible_with('1.0.0')
 
-from .isclose import IsClose, version as _isclose_version
+from .isclose import IsClose, isclose, version as _isclose_version
 assert _isclose_version.is_backwards_compatible_with('1.0.0')
 
 from .core import *
