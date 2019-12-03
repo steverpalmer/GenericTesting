@@ -2,18 +2,18 @@
 
 """a library of generic tests for the file-like properties."""
 
-from collections import Counter
 import abc
-import enum
-import time
-import os
-import unittest
-import io
 import codecs
+from collections import Counter
+import enum
+import io
+import os
+import time
+import unittest
 
 import hypothesis
 
-from .timeout import Timeout
+from timeout import Timeout
 from .core import ClassUnderTest
 from .collections_abc import IterableTests
 

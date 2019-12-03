@@ -3,8 +3,8 @@
 """A library of generic test for the base classes in the numbers library."""
 
 import abc
-import numbers
 import math
+import numbers
 
 from hypothesis import assume
 

@@ -2,12 +2,12 @@
 
 """Determine the generic test base class for a given class_under_test."""
 
-import enum
 import collections
-import numbers
+import enum
 import fractions
 import inspect
 import io
+import numbers
 
 import yaml
 

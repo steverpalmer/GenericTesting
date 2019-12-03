@@ -3,9 +3,9 @@
 
 """A simplistic ModuloN class to help test the generic_test library."""
 
+import math
 import numbers
 import operator
-import math
 
 try:
     from version import Version, version
