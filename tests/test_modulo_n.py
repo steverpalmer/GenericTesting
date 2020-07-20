@@ -13,12 +13,18 @@ from generic_testing_test_context import generic_testing
 
 
 @generic_testing.Given(st.builds(ModuloN.decimal_digit, st.integers()))
-class Test_ModuloN_decimal_digit(generic_testing.defaultGenericTestLoader.discover(ModuloN, use_docstring_yaml=True)):
+class Test_ModuloN_decimal_digit(
+    generic_testing.defaultGenericTestLoader.discover(ModuloN, use_docstring_yaml=True)
+):
     zero = ModuloN.decimal_digit(0)
     one = ModuloN.decimal_digit(1)
 
 
-class ModuloPow2Tests(generic_testing.defaultGenericTestLoader.discover(ModuloPow2, use_docstring_yaml=True)):
+class ModuloPow2Tests(
+    generic_testing.defaultGenericTestLoader.discover(
+        ModuloPow2, use_docstring_yaml=True
+    )
+):
     @property
     def bottom(self):
         return self.zero
@@ -40,10 +46,12 @@ class Test_ModuloPow2_u16(ModuloPow2Tests):
     one = ModuloPow2.u16(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Run the tests
     SUITE = unittest.TestSuite()
-    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_ModuloN_decimal_digit))
+    SUITE.addTest(
+        unittest.defaultTestLoader.loadTestsFromTestCase(Test_ModuloN_decimal_digit)
+    )
     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_ModuloPow2_bit))
     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_ModuloPow2_u16))
     TR = unittest.TextTestRunner(verbosity=2)

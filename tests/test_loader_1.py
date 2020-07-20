@@ -42,8 +42,15 @@ class IntSetDecorator(collections.abc.Set):
         return "MyClass({self.data})".format(self=self)
 
 
-@generic_testing.Given({generic_testing.ClassUnderTest: st.builds(IntSetDecorator), generic_testing.collections_abc.ElementT: st.integers()})
-class Test_IntSetDecorator(generic_testing.defaultGenericTestLoader.discover(IntSetDecorator)):
+@generic_testing.Given(
+    {
+        generic_testing.ClassUnderTest: st.builds(IntSetDecorator),
+        generic_testing.collections_abc.ElementT: st.integers(),
+    }
+)
+class Test_IntSetDecorator(
+    generic_testing.defaultGenericTestLoader.discover(IntSetDecorator)
+):
     empty = IntSetDecorator([])
 
     def test_total(self):
@@ -62,12 +69,15 @@ class Test_E1(generic_testing.defaultGenericTestLoader.discover(E1)):
     pass
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Run the tests
     import unittest
+
     SUITE = unittest.TestSuite()
     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_int))
-    SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_IntSetDecorator))
+    SUITE.addTest(
+        unittest.defaultTestLoader.loadTestsFromTestCase(Test_IntSetDecorator)
+    )
     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_E1))
     TR = unittest.TextTestRunner(verbosity=2)
     TR.run(SUITE)

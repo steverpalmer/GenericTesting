@@ -9,13 +9,17 @@ import operator
 
 try:
     from version import Version, version
-    if not version.is_backwards_compatible_with('1.0.0'):
+
+    if not version.is_backwards_compatible_with("1.0.0"):
         raise ImportError
 except ImportError:
-    def Version(s): return s
 
-__all__ = ('version', 'ModuloN', 'ModuloPow2')
-version = Version('0.1.0')
+    def Version(s):
+        return s
+
+
+__all__ = ("version", "ModuloN", "ModuloPow2")
+version = Version("0.1.0")
 
 
 def _operator_fallbacks(fallback_operator, doc=""):
@@ -29,10 +33,12 @@ def _operator_fallbacks(fallback_operator, doc=""):
     def forward(a, b):
         if type(a) == type(b):
             if a._modulus == b._modulus:
-                return type(a)(a._modulus, fallback_operator(a._value, b._value), is_trusted=True)
+                return type(a)(
+                    a._modulus, fallback_operator(a._value, b._value), is_trusted=True
+                )
             else:
                 return fallback_operator(int(a), int(b))
-#                 raise ValueError("inconsistent modulus values")
+        #                 raise ValueError("inconsistent modulus values")
         elif isinstance(b, int):
             return fallback_operator(int(a), b)
         elif isinstance(b, float):
@@ -41,16 +47,19 @@ def _operator_fallbacks(fallback_operator, doc=""):
             return fallback_operator(complex(a), b)
         else:
             return NotImplemented
-    forward.__name__ = '__' + fallback_operator.__name__ + '__'
+
+    forward.__name__ = "__" + fallback_operator.__name__ + "__"
     forward.__doc__ = doc
 
     def reverse(b, a):
         if type(a) == type(b):
             if a._modulus == b._modulus:
-                return type(a)(a._modulus, fallback_operator(a._value, b._value), is_trusted=True)
+                return type(a)(
+                    a._modulus, fallback_operator(a._value, b._value), is_trusted=True
+                )
             else:
                 return fallback_operator(int(a), int(b))
-#                 raise ValueError("inconsistent modulus values")
+        #                 raise ValueError("inconsistent modulus values")
         elif isinstance(a, numbers.Integral):
             return fallback_operator(int(a), int(b))
         elif isinstance(a, numbers.Real):
@@ -59,13 +68,14 @@ def _operator_fallbacks(fallback_operator, doc=""):
             return fallback_operator(complex(a), complex(b))
         else:
             return NotImplemented
-    reverse.__name__ = '__r' + fallback_operator.__name__ + '__'
+
+    reverse.__name__ = "__r" + fallback_operator.__name__ + "__"
     reverse.__doc__ = doc
 
     return forward, reverse
 
 
-def _pow(a: 'ModuloN', b: 'ModuloN') -> 'ModuloN':
+def _pow(a: "ModuloN", b: "ModuloN") -> "ModuloN":
     return type(a)(a._modulus, pow(a._value, int(b), a._modulus), is_trusted=True)
 
 
@@ -94,9 +104,11 @@ class ModuloN(numbers.Integral):
       - abs_is_multiplicitive
     """
 
-    __slots__ = ('_modulus', '__value')
+    __slots__ = ("_modulus", "__value")
 
-    def __init__(self, modulus: int, value: int = None, *, is_trusted: bool = False) -> None:
+    def __init__(
+        self, modulus: int, value: int = None, *, is_trusted: bool = False
+    ) -> None:
         """
         >>> _ = ModuloN(8, 3)
         >>> ModuloN(-2)
@@ -152,12 +164,14 @@ class ModuloN(numbers.Integral):
 
     def __repr__(self) -> str:
         default = "{self.__class__.__name__}({self._modulus}, {self._value})"
-        specials = {2: "{self.__class__.__name__}.bit({self._value})",
-                    10: "{self.__class__.__name__}.digit({self._value})",
-                    16: "{self.__class__.__name__}.nibble({self._value})",
-                    256: "{self.__class__.__name__}.u8({self._value})",
-                    65536: "{self.__class__.__name__}.u16({self._value})",
-                    4294967296: "{self.__class__.__name__}.u32({self._value})"}
+        specials = {
+            2: "{self.__class__.__name__}.bit({self._value})",
+            10: "{self.__class__.__name__}.digit({self._value})",
+            16: "{self.__class__.__name__}.nibble({self._value})",
+            256: "{self.__class__.__name__}.u8({self._value})",
+            65536: "{self.__class__.__name__}.u16({self._value})",
+            4294967296: "{self.__class__.__name__}.u32({self._value})",
+        }
         return specials.get(self._modulus, default).format(self=self)
 
     def __str__(self) -> str:
@@ -218,7 +232,7 @@ class ModuloN(numbers.Integral):
             result = self._value / other
         return result
 
-    def __rtruediv__(self, other) -> 'ModuloN':
+    def __rtruediv__(self, other) -> "ModuloN":
         return other / self._value
 
     # FIXME: The following two could be better if modulus is prime!
@@ -229,10 +243,14 @@ class ModuloN(numbers.Integral):
     def __pow__(self, other):
         if type(self) == type(other):
             if self._modulus == other._modulus:
-                return type(self)(self._modulus, pow(self._value, int(other), self._modulus), is_trusted=True)
+                return type(self)(
+                    self._modulus,
+                    pow(self._value, int(other), self._modulus),
+                    is_trusted=True,
+                )
             else:
                 return int(self) ** int(other)
-#                 raise ValueError("inconsistent modulus values")
+        #                 raise ValueError("inconsistent modulus values")
         else:
             return int(self) ** other
 
@@ -249,10 +267,10 @@ class ModuloN(numbers.Integral):
 
     __or__, __ror__ = _operator_fallbacks(None)
 
-    def __neg__(self) -> 'ModuloN':
+    def __neg__(self) -> "ModuloN":
         return type(self)(self._modulus, -self._value, is_trusted=True)
 
-    def __pos__(self) -> 'ModuloN':
+    def __pos__(self) -> "ModuloN":
         return type(self)(self._modulus, self._value, is_trusted=True)
 
     __invert__ = None
@@ -266,16 +284,16 @@ class ModuloN(numbers.Integral):
     def __index__(self) -> int:
         return self._value
 
-    def __round__(self, n: int) -> 'ModuloN':
+    def __round__(self, n: int) -> "ModuloN":
         return self
 
-    def __floor__(self) -> 'ModuloN':
+    def __floor__(self) -> "ModuloN":
         return self
 
-    def __ceil__(self) -> 'ModuloN':
+    def __ceil__(self) -> "ModuloN":
         return self
 
-    def __trunc__(self) -> 'ModuloN':
+    def __trunc__(self) -> "ModuloN":
         return self
 
 
@@ -296,7 +314,9 @@ class ModuloPow2(ModuloN):
       - less_or_equal_consistent_with_addition
     """
 
-    def __init__(self, modulus: int, value: int = None, *, is_trusted: bool = False) -> None:
+    def __init__(
+        self, modulus: int, value: int = None, *, is_trusted: bool = False
+    ) -> None:
         """
         >>> _ = ModuloPow2(8, 3)
         >>> ModuloPow2(-2)
@@ -346,10 +366,11 @@ class ModuloPow2(ModuloN):
 
     __or__, __ror__ = _operator_fallbacks(operator.or_)
 
-    def __invert__(self) -> 'ModuloN':
+    def __invert__(self) -> "ModuloN":
         return type(self)(self._modulus, ~self._value, is_trusted=True)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import doctest
+
     doctest.testmod()

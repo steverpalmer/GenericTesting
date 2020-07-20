@@ -3,8 +3,8 @@ import os
 import io
 import time
 
-#stdin_raw = sys.stdin.buffer.raw
-#os.set_blocking(stdin_raw.fileno(), False)
+# stdin_raw = sys.stdin.buffer.raw
+# os.set_blocking(stdin_raw.fileno(), False)
 stdin_buffer = sys.stdin.buffer
 print(repr(stdin_buffer))
 print(stdin_buffer.isatty())

@@ -52,19 +52,22 @@ class E4(enum.Flag):
 
 
 @generic_testing.Given(generic_testing.enum_strategy_dict(E4))
-class Test_E4(generic_testing.UniqueEnumMixinTests, generic_testing.FlagEnumMixinTests, generic_testing.EnumTests):
-
+class Test_E4(
+    generic_testing.UniqueEnumMixinTests,
+    generic_testing.FlagEnumMixinTests,
+    generic_testing.EnumTests,
+):
     @property
     def bottom(self):
         return E4.black
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     SUITE = unittest.TestSuite()
     name = None  # :TRICK: need to introdcue 'name' before iterating through locals
     value = None  # :TRICK: need to introdcue 'value' before iterating through locals
     for name, value in locals().items():
-        if name.startswith('Test_'):
+        if name.startswith("Test_"):
             SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(value))
     TR = unittest.TextTestRunner(verbosity=2)
     TR.run(SUITE)

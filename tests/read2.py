@@ -15,7 +15,7 @@ class SlowNonBlockingRawFileReader(io.RawIOBase):
 
     def __init__(self, name: str, delay: Union[float, int]) -> None:
         self.name = name
-        self.mode = 'rb'
+        self.mode = "rb"
         self.timeout = Timeout(delay)
         self.f = io.FileIO(self.name, self.mode)
         assert isinstance(self.f, io.RawIOBase)
@@ -85,7 +85,9 @@ class SlowNonBlockingRawFileReader(io.RawIOBase):
             return None
 
 
-def SlowNonBlockingBufferedFileReader(name, buffer_size=io.DEFAULT_BUFFER_SIZE, delay=None):
+def SlowNonBlockingBufferedFileReader(
+    name, buffer_size=io.DEFAULT_BUFFER_SIZE, delay=None
+):
     """Wraps a io.BufferedReader around a SlowNonBlockingRawFileReader"""
     result = io.BufferedReader(SlowNonBlockingRawFileReader(name, delay), buffer_size)
     assert isinstance(result, io.BufferedIOBase)
@@ -101,5 +103,5 @@ with SlowNonBlockingBufferedFileReader(__file__, buffer_size=10, delay=0.5) as f
             print(f"{cnt}: {exc!r}")
         else:
             print(f"{cnt}: {data!r}")
-            if data == b'':
+            if data == b"":
                 break

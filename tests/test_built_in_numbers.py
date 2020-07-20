@@ -19,9 +19,15 @@ class Test_int(generic_testing.intTests):
 FRACTIONS_RANGE = 10000000000
 
 
-@generic_testing.Given({generic_testing.ClassUnderTest: st.fractions(min_value=fractions.Fraction(-FRACTIONS_RANGE),
-                                                                     max_value=fractions.Fraction(FRACTIONS_RANGE),
-                                                                     max_denominator=FRACTIONS_RANGE)})
+@generic_testing.Given(
+    {
+        generic_testing.ClassUnderTest: st.fractions(
+            min_value=fractions.Fraction(-FRACTIONS_RANGE),
+            max_value=fractions.Fraction(FRACTIONS_RANGE),
+            max_denominator=FRACTIONS_RANGE,
+        )
+    }
+)
 class Test_Fraction(generic_testing.FractionTests):
     pass
 
@@ -29,7 +35,13 @@ class Test_Fraction(generic_testing.FractionTests):
 FLOATS_RANGE = 1e30
 
 
-@generic_testing.Given({generic_testing.ClassUnderTest: st.floats(min_value=-FLOATS_RANGE, max_value=FLOATS_RANGE)})
+@generic_testing.Given(
+    {
+        generic_testing.ClassUnderTest: st.floats(
+            min_value=-FLOATS_RANGE, max_value=FLOATS_RANGE
+        )
+    }
+)
 class Test_float(generic_testing.floatTests):
     pass
 
@@ -37,16 +49,21 @@ class Test_float(generic_testing.floatTests):
 COMPLEX_RANGE = 1e10
 
 
-@generic_testing.Given({generic_testing.ClassUnderTest: st.complex_numbers(0.0, COMPLEX_RANGE,
-                                                                           allow_nan=False, allow_infinity=False)})
+@generic_testing.Given(
+    {
+        generic_testing.ClassUnderTest: st.complex_numbers(
+            0.0, COMPLEX_RANGE, allow_nan=False, allow_infinity=False
+        )
+    }
+)
 class Test_complex(generic_testing.complexTests):
     pass
 
 
-__all__ = ('Test_int', 'Test_Fraction', 'Test_float', 'Test_complex')
+__all__ = ("Test_int", "Test_Fraction", "Test_float", "Test_complex")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     SUITE = unittest.TestSuite()
     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_int))
     SUITE.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(Test_Fraction))
