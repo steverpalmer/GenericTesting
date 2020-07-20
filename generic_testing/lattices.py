@@ -12,11 +12,15 @@ from .core import GenericTests, ClassUnderTest
 class LatticeOrTests(GenericTests):
     """Tests of the __or__ operator."""
 
-    def test_generic_2200_or_commutativity(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2200_or_commutativity(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ) -> None:
         """a | b == b | a"""
         self.assertEqual(a | b, b | a)
 
-    def test_generic_2201_or_associativity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
+    def test_generic_2201_or_associativity(
+        self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest
+    ) -> None:
         """a | (b | c) == (a | b) | c"""
         self.assertEqual(a | (b | c), (a | b) | c)
 
@@ -24,11 +28,15 @@ class LatticeOrTests(GenericTests):
 class LatticeAndTests(GenericTests):
     """Tests of the __or__ operator."""
 
-    def test_generic_2205_and_commutativity(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2205_and_commutativity(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ) -> None:
         """a & b == b & a"""
         self.assertEqual(a & b, b & a)
 
-    def test_generic_2206_and_associativity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
+    def test_generic_2206_and_associativity(
+        self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest
+    ) -> None:
         """a & (b & c) == (a & b) & c"""
         self.assertEqual(a & (b & c), (a & b) & c)
 
@@ -36,15 +44,21 @@ class LatticeAndTests(GenericTests):
 class LatticeTests(LatticeOrTests, LatticeAndTests):
     """Tests of the __or__ and __and__ operators."""
 
-    def test_generic_2203_or_and_absorption(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2203_or_and_absorption(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ) -> None:
         """a | (a & b) == a"""
         self.assertEqual(a | (a & b), a)
 
-    def test_generic_2208_and_or_absorption(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2208_and_or_absorption(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ) -> None:
         """a & (a | b) == a"""
         self.assertEqual(a & (a | b), a)
 
-    def test_generic_2209_and_or_distributive(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
+    def test_generic_2209_and_or_distributive(
+        self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest
+    ) -> None:
         """a & (b | c) == (a & b) | (a & c)"""
         self.assertEqual(a & (b | c), a & b | a & c)
 
@@ -90,7 +104,9 @@ class LatticeWithComplementTests(BoundedLatticeTests):
         """a & ~a == ⊥"""
         self.assertEqual(a & ~a, self.bottom)
 
-    def test_generic_2215_xor_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2215_xor_definition(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ) -> None:
         """a ^ b == (a | b) & ~(a & b)"""
         self.assertEqual(a ^ b, (a | b) & ~(a & b))
 
@@ -101,16 +117,27 @@ class BitShiftTests(GenericTests):
     Arguably, these operators are more to do with numbers than "lattices", but they need to be put somewhere.
     """
 
-    def test_generic_2390_lshift_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2390_lshift_definition(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ) -> None:
         """0 <= b ⇒ a << b == a * pow(2, b)"""
         assume(self.zero <= b)
         self.assertEqual(a << b, a * pow(self.one + self.one, b))
 
-    def test_generic_2391_rshift_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2391_rshift_definition(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ) -> None:
         """0 <= b ⇒ a >> b == a // pow(2, b)"""
         assume(self.zero <= b)
         self.assertEqual(a >> b, a // pow(self.one + self.one, b))
 
 
-__all__ = ('LatticeOrTests', 'LatticeAndTests', 'LatticeTests', 'BoundedBelowLatticeTests', 'BoundedLatticeTests', 'LatticeWithComplementTests',
-           'BitShiftTests')
+__all__ = (
+    "LatticeOrTests",
+    "LatticeAndTests",
+    "LatticeTests",
+    "BoundedBelowLatticeTests",
+    "BoundedLatticeTests",
+    "LatticeWithComplementTests",
+    "BitShiftTests",
+)

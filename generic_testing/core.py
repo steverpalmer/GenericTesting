@@ -27,7 +27,7 @@ class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):
         GenericTests default the value to None, and then substitute 'runTest' here.
         """
         if methodName is None:
-            methodName = 'runTest'
+            methodName = "runTest"
         super().__init__(methodName)
 
         # some types are based on floating point approximations,
@@ -115,10 +115,10 @@ class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):
             raise self.failureException(msg)
 
 
-ClassUnderTest = 'ClassUnderTest'
+ClassUnderTest = "ClassUnderTest"
 
 
-def Given(strategy_dict=None, *, testMethodPrefix='test_generic', data_arg='data'):
+def Given(strategy_dict=None, *, testMethodPrefix="test_generic", data_arg="data"):
     """Bind GenericTests to hypothesis strategies.
 
     It binds hypothesis strategies to the test_generic methods using the strategy_dict.
@@ -134,11 +134,17 @@ def Given(strategy_dict=None, *, testMethodPrefix='test_generic', data_arg='data
         for name, method in inspect.getmembers(cls):
             if name.startswith(testMethodPrefix) and callable(method):
                 parameters = inspect.signature(method).parameters
-                args = {arg: param for arg, param in parameters.items() if arg != 'self'}
+                args = {
+                    arg: param for arg, param in parameters.items() if arg != "self"
+                }
                 if len(args) > 0:
                     given_args = dict()
                     for arg, param in args.items():
-                        annotation = cls.relabel(None if param.annotation == inspect.Parameter.empty else param.annotation)
+                        annotation = cls.relabel(
+                            None
+                            if param.annotation == inspect.Parameter.empty
+                            else param.annotation
+                        )
                         if annotation in strategy_dict:
                             strat = strategy_dict[annotation]
                         elif arg == data_arg:
@@ -146,11 +152,14 @@ def Given(strategy_dict=None, *, testMethodPrefix='test_generic', data_arg='data
                         elif isinstance(annotation, st.SearchStrategy):
                             strat = annotation
                         else:
-                            raise TypeError(f"Cannot bind {cls.__name__}.{name}.{arg} with annotation {annotation} to strategy")
+                            raise TypeError(
+                                f"Cannot bind {cls.__name__}.{name}.{arg} with annotation {annotation} to strategy"
+                            )
                         given_args[arg] = strat
                     setattr(cls, name, given(**given_args)(method))
         return cls
+
     return result
 
 
-__all__ = ('GenericTests', 'Given', 'ClassUnderTest')
+__all__ = ("GenericTests", "Given", "ClassUnderTest")

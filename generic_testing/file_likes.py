@@ -89,7 +89,9 @@ class IOBaseTests(IterableTests):
         try:
             a_fileno = a.fileno()
             self.assertIsInstance(a_fileno, int)
-            self.assertIsNotNone(os.fstat(a_fileno))  # hopefully testing that the value is a real file descriptor
+            self.assertIsNotNone(
+                os.fstat(a_fileno)
+            )  # hopefully testing that the value is a real file descriptor
         except OSError:
             pass
 
@@ -150,11 +152,15 @@ class IOBaseTests(IterableTests):
         with self.assertRaises(OSError):
             a.seek(0)
 
-    def test_generic_2586_truncate_when_not_seekable_or_writable(self, a: ClassUnderTest) -> None:
+    def test_generic_2586_truncate_when_not_seekable_or_writable(
+        self, a: ClassUnderTest
+    ) -> None:
         """check that OSError is raised when appropriate"""
         hypothesis.assume(not a.closed)
         if a.seekable() and a.writable():
-            raise unittest.SkipTest("Test only applies to non seekable, non writable streams")
+            raise unittest.SkipTest(
+                "Test only applies to non seekable, non writable streams"
+            )
         with self.assertRaises(OSError):
             a.truncate(0)
 
@@ -164,7 +170,7 @@ class RawIOBaseTests(IOBaseTests):
 
     @property
     def newline(self) -> type:
-        return b'\n'
+        return b"\n"
 
     @property
     def max_test_time_seconds(self) -> float:
@@ -183,7 +189,7 @@ class RawIOBaseTests(IOBaseTests):
         """io.RawIOBase.readall()"""
         hypothesis.assume(not a.closed)
         self._ensure_readable(a)
-        State = enum.Enum('State', ('Looping', 'EOF_Found', 'Timeout'))
+        State = enum.Enum("State", ("Looping", "EOF_Found", "Timeout"))
         timeout = Timeout(self.max_test_time_seconds)
         state = State.Looping
         while state == State.Looping:
@@ -211,7 +217,7 @@ class RawIOBaseTests(IOBaseTests):
         a_readinto = a.readinto(bytearray(0))
         self.assertEqual(a_readinto, 0)
         buf = bytearray(n)
-        State = enum.Enum('State', ('Looping', 'EOF_Found', 'Timeout'))
+        State = enum.Enum("State", ("Looping", "EOF_Found", "Timeout"))
         timeout = Timeout(self.max_test_time_seconds)
         state = State.Looping
         while state == State.Looping:
@@ -235,7 +241,7 @@ class RawIOBaseTests(IOBaseTests):
         """io.RawIOBase.read()"""
         hypothesis.assume(not a.closed)
         self._ensure_readable(a)
-        State = enum.Enum('State', ('Looping', 'EOF_Found', 'Timeout'))
+        State = enum.Enum("State", ("Looping", "EOF_Found", "Timeout"))
         timeout = Timeout(self.max_test_time_seconds)
         state = State.Looping
         while state == State.Looping:
@@ -261,8 +267,8 @@ class RawIOBaseTests(IOBaseTests):
         self._ensure_readable(a)
         n = (n & 0xFFFF) + 1  # limit size of n to something reasonable
         a_read = a.read(0)
-        self.assertEqual(a_read, b'')
-        State = enum.Enum('State', ('Looping', 'EOF_Found', 'Timeout'))
+        self.assertEqual(a_read, b"")
+        State = enum.Enum("State", ("Looping", "EOF_Found", "Timeout"))
         timeout = Timeout(self.max_test_time_seconds)
         state = State.Looping
         while state == State.Looping:
@@ -287,7 +293,7 @@ class RawIOBaseTests(IOBaseTests):
         """io.RawIOBase.readline()"""
         hypothesis.assume(not a.closed)
         self._ensure_readable(a)
-        State = enum.Enum('State', ('Looping', 'EOF_Found', 'Timeout'))
+        State = enum.Enum("State", ("Looping", "EOF_Found", "Timeout"))
         timeout = Timeout(self.max_test_time_seconds)
         state = State.Looping
         while state == State.Looping:
@@ -303,7 +309,10 @@ class RawIOBaseTests(IOBaseTests):
                 if len(sp) < 2:
                     state = State.EOF_Found
                 else:
-                    self.assertTrue(len(sp) == 2 and len(sp[1]) == 0, "multiline response to readline")
+                    self.assertTrue(
+                        len(sp) == 2 and len(sp[1]) == 0,
+                        "multiline response to readline",
+                    )
         if state == State.EOF_Found:
             self.assertEqual(a.readline(), self.dtype())
         a.close()
@@ -317,7 +326,7 @@ class RawIOBaseTests(IOBaseTests):
         n = (n & 0xFFFF) + 1  # limit size of n to something reasonable
         a_readline = a.readline(0)
         self.assertEqual(a_readline, self.dtype())
-        State = enum.Enum('State', ('Looping', 'EOF_Found', 'Timeout'))
+        State = enum.Enum("State", ("Looping", "EOF_Found", "Timeout"))
         timeout = Timeout(self.max_test_time_seconds)
         state = State.Looping
         while state == State.Looping:
@@ -335,7 +344,10 @@ class RawIOBaseTests(IOBaseTests):
                     if len(sp) < 2:
                         state = State.EOF_Found
                     else:
-                        self.assertTrue(len(sp) == 2 and len(sp[1]) == 0, "multiline response to readline")
+                        self.assertTrue(
+                            len(sp) == 2 and len(sp[1]) == 0,
+                            "multiline response to readline",
+                        )
         if state == State.EOF_Found:
             self.assertEqual(a.readline(n), self.dtype())
         a.close()
@@ -410,7 +422,9 @@ class RawIOBaseTests(IOBaseTests):
 class _ReadWriteStorageBinarySteamTests:
     """Discrete test of steams with Read/Write Semantics """
 
-    def test_generic_2587_read_seek_write_on_storage(self, a: ClassUnderTest, b: bytes, n: int) -> None:
+    def test_generic_2587_read_seek_write_on_storage(
+        self, a: ClassUnderTest, b: bytes, n: int
+    ) -> None:
         hypothesis.assume(not a.closed)
         self._ensure_readable(a)
         self._ensure_seekable(a)
@@ -423,7 +437,7 @@ class _ReadWriteStorageBinarySteamTests:
         written = a.write(b)
         self.assertEqual(written, len(b))
         expected = bytearray(original)
-        expected[position:position + written] = b
+        expected[position : position + written] = b  # noqa E203
         a.seek(0)
         self.assertEqual(a.read(), expected)
 
@@ -448,9 +462,11 @@ class FileIOTests(RawIOBaseTests, _ReadWriteStorageBinarySteamTests):
         self.assertIsInstance(a.mode, str)
         mode = a.mode
         self.assertIsInstance(mode, str)
-        self.assertTrue('b' in mode)
+        self.assertTrue("b" in mode)
         c = Counter(mode)
-        self.assertLessEqual(set(c.keys()), set('brwxa+'), f"Unexpected mode character: {mode}")
+        self.assertLessEqual(
+            set(c.keys()), set("brwxa+"), f"Unexpected mode character: {mode}"
+        )
         self.assertSetEqual(set(c.values()), {1}, f"Duplicate mode character: {mode}")
 
 
@@ -495,7 +511,9 @@ class _SharedBufferedTextIOBaseTests:
             if len(sp) < 2:
                 break
             else:
-                self.assertTrue(len(sp) == 2 and len(sp[1]) == 0, "multiline response to readline")
+                self.assertTrue(
+                    len(sp) == 2 and len(sp[1]) == 0, "multiline response to readline"
+                )
         self.assertEqual(a.readline(), self.dtype())
 
     def test_generic_2578_readline_limited(self, a: ClassUnderTest, n: int) -> None:
@@ -516,7 +534,10 @@ class _SharedBufferedTextIOBaseTests:
                 if len(sp) < 2:
                     break
                 else:
-                    self.assertTrue(len(sp) == 2 and len(sp[1]) == 0, "multiline response to readline")
+                    self.assertTrue(
+                        len(sp) == 2 and len(sp[1]) == 0,
+                        "multiline response to readline",
+                    )
         self.assertEqual(a.readline(n), self.dtype())
 
     # TODO: readlines
@@ -527,7 +548,7 @@ class BufferedIOBaseTests(IOBaseTests, _SharedBufferedTextIOBaseTests):
 
     @property
     def newline(self):
-        return b'\n'
+        return b"\n"
 
     def test_generic_2576_readinto(self, a: ClassUnderTest, n: int) -> None:
         """io.BufferedIOBase.readinto(_)"""
@@ -611,7 +632,6 @@ class BufferedIOBaseTests(IOBaseTests, _SharedBufferedTextIOBaseTests):
 
 
 class BytesIOTests(BufferedIOBaseTests, _ReadWriteStorageBinarySteamTests):
-
     def test_generic_2402_zero_iterations_over_empty(self) -> None:
         with self.assertRaises(StopIteration):
             next(iter(io.BytesIO()))
@@ -654,7 +674,7 @@ class BytesIOTests(BufferedIOBaseTests, _ReadWriteStorageBinarySteamTests):
         hypothesis.assume(not a.closed)
         n = (n & 0xFFFF) + 1  # limit size of n to something reasonable
         a_read1 = a.read1(0)
-        self.assertEqual(a_read1, b'')
+        self.assertEqual(a_read1, b"")
         while True:
             a_read1 = a.read1(n)
             self.assertIsInstance(a_read1, self.dtype)
@@ -725,7 +745,7 @@ class TextIOBaseTests(IOBaseTests, _SharedBufferedTextIOBaseTests):
 
     @property
     def newline(self):
-        return '\n'
+        return "\n"
 
     def test_generic_2591_detach(self, a: ClassUnderTest) -> None:
         """io.TextIOBase.detach"""
@@ -747,7 +767,6 @@ class TextIOBaseTests(IOBaseTests, _SharedBufferedTextIOBaseTests):
 
 
 class StringIOTests(TextIOBaseTests):
-
     def test_generic_2402_zero_iterations_over_empty(self) -> None:
         with self.assertRaises(StopIteration):
             next(iter(io.StringIO()))
@@ -807,7 +826,9 @@ class StringIOTests(TextIOBaseTests):
         self.assertEqual(a_truncate, n)
         self.assertEqual(start, finish)
 
-    def test_generic_2587_read_seek_write_on_storage(self, a: ClassUnderTest, s: str, n: int) -> None:
+    def test_generic_2587_read_seek_write_on_storage(
+        self, a: ClassUnderTest, s: str, n: int
+    ) -> None:
         hypothesis.assume(not a.closed)
         self._ensure_readable(a)
         self._ensure_seekable(a)
@@ -819,7 +840,7 @@ class StringIOTests(TextIOBaseTests):
         a.seek(position)
         written = a.write(s)
         self.assertEqual(written, len(s))
-        expected = original[:position] + s + original[min(position + written, length):]
+        expected = original[:position] + s + original[min(position + written, length) :]  # noqa E203
         a.seek(0)
         self.assertEqual(a.read(), expected)
 
@@ -830,4 +851,12 @@ class StringIOTests(TextIOBaseTests):
             a.detach()
 
 
-__all__ = ('IOBaseTests', 'RawIOBaseTests', 'FileIOTests', 'BufferedIOBaseTests', 'BytesIOTests', 'TextIOBaseTests', 'StringIOTests')
+__all__ = (
+    "IOBaseTests",
+    "RawIOBaseTests",
+    "FileIOTests",
+    "BufferedIOBaseTests",
+    "BytesIOTests",
+    "TextIOBaseTests",
+    "StringIOTests",
+)

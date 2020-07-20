@@ -21,7 +21,9 @@ class AdditionMonoidTests(GenericTests):
     def zero(self) -> ClassUnderTest:
         """Addition Identity Value."""
 
-    def test_generic_2220_addition_associativity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
+    def test_generic_2220_addition_associativity(
+        self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest
+    ) -> None:
         """a + (b + c) == (a + b) + c"""
         self.assertEqual(a + (b + c), (a + b) + c)
 
@@ -48,7 +50,9 @@ class AdditionAbelianGroupTests(AdditionGroupTests):
     See https://en.wikipedia.org/wiki/Abelian_group
     """
 
-    def test_generic_2231_addition_commutativity(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2231_addition_commutativity(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ) -> None:
         """a + b == b + a"""
         self.assertEqual(a + b, b + a)
 
@@ -68,7 +72,9 @@ class MultiplicationMonoidTests(GenericTests):
     def one(self) -> ClassUnderTest:
         """Multiplication Identity Value."""
 
-    def test_generic_2234_multiplication_associativity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
+    def test_generic_2234_multiplication_associativity(
+        self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest
+    ) -> None:
         """a * (b * c) == (a * b) * c"""
         self.assertEqual(a * (b * c), (a * b) * c)
 
@@ -85,12 +91,16 @@ class AdditionExtensionsTests:
         """+a == a"""
         self.assertEqual(+a, a)
 
-    def test_generic_2233_sub_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2233_sub_definition(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ) -> None:
         """a - b == a + (-b)"""
         self.assertEqual(a - b, a + (-b))
 
 
-class RingTests(AdditionAbelianGroupTests, AdditionExtensionsTests, MultiplicationMonoidTests):
+class RingTests(
+    AdditionAbelianGroupTests, AdditionExtensionsTests, MultiplicationMonoidTests
+):
     """Tests of the Ring semantics of the basic arithmetic operators.
 
     See https://en.wikipedia.org/wiki/Ring_(mathematics)
@@ -100,11 +110,15 @@ class RingTests(AdditionAbelianGroupTests, AdditionExtensionsTests, Multiplicati
         """0 != 1"""
         self.assertFalse(self.zero == self.one)
 
-    def test_generic_2237_multiplication_addition_left_distributivity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
+    def test_generic_2237_multiplication_addition_left_distributivity(
+        self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest
+    ) -> None:
         """a * (b + c) == (a * b) + (a * c)"""
         self.assertEqual(a * (b + c), (a * b) + (a * c))
 
-    def test_generic_2238_multiplication_addition_right_distributivity(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
+    def test_generic_2238_multiplication_addition_right_distributivity(
+        self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest
+    ) -> None:
         """(a + b) * c = (a * c) + (b * c)"""
         self.assertEqual((a + b) * c, (a * c) + (b * c))
 
@@ -115,7 +129,9 @@ class CommutativeRingTests(RingTests):
     See https://en.wikipedia.org/wiki/Commutative_ring
     """
 
-    def test_generic_2239_multiplication_commutativity(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2239_multiplication_commutativity(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ) -> None:
         """a * b == b * a"""
         self.assertEqual(a * b, b * a)
 
@@ -126,7 +142,9 @@ class FieldTests(CommutativeRingTests):
     See https://en.wikipedia.org/wiki/Field_(mathematics)
     """
 
-    def test_generic_2245_truediv_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2245_truediv_definition(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ) -> None:
         """b != 0 ⇒ (a / b) * b == a"""
         assume(not b == self.zero)
         calc = (a / b) * b
@@ -154,12 +172,16 @@ class FloorDivModTests(GenericTests):
             self.assertLessEqual(self.zero, mod)
             self.assertLess(mod, b)
 
-    def test_generic_2247_floordiv_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2247_floordiv_definition(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ) -> None:
         """b != 0 ⇒ (a // b) * b + (a % b) == a"""
         assume(not b == self.zero)
         self.assertEqual((a // b) * b + a % b, a)
 
-    def test_generic_2248_divmod_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2248_divmod_definition(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ) -> None:
         """b != 0 ⇒ divmod(a, b) == (a // b, a % b)"""
         assume(not b == self.zero)
         self.assertEqual(divmod(a, b), (a // b, a % b))
@@ -193,7 +215,9 @@ class ExponentiationTests(GenericTests):
         assume(not a == self.zero)
         self.assertEqual(a ** self.zero, self.one)
 
-    def test_generic_2252_exponentiation_with_base_zero(self, a: ClassUnderTest) -> None:
+    def test_generic_2252_exponentiation_with_base_zero(
+        self, a: ClassUnderTest
+    ) -> None:
         """a > 0 ⇒ 0 ** a == 0"""
         assume(a > self.zero)
         self.assertEqual(self.zero ** a, self.zero)
@@ -233,16 +257,20 @@ class AbsoluteValueTests(GenericTests):
         """abs(a) == 0 ⇔ a == 0"""
         self.assertEqual(abs(a) == self.abs_zero, a == self.zero)
 
-    def test_generic_2273_abs_is_multiplicitive(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2273_abs_is_multiplicitive(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ) -> None:
         """abs(a * b) == abs(a) * abs(b)"""
         self.assertEqual(abs(a * b), abs(a) * abs(b))
 
-    def test_generic_2274_abs_is_subadditive(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2274_abs_is_subadditive(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ) -> None:
         """abs(a + b) <= abs(a) + abs(b)"""
         self.assertLessEqual(abs(a + b), abs(a) + abs(b))
 
 
-ScalarT = 'ScalarT'
+ScalarT = "ScalarT"
 
 
 class RModuleTests(AdditionAbelianGroupTests):
@@ -258,7 +286,9 @@ class RModuleTests(AdditionAbelianGroupTests):
     def scalar_one(self) -> ScalarT:
         """Multiplication Identity Value."""
 
-    def test_generic_2234_multiplication_associativity(self, r: ScalarT, s: ScalarT, a: ClassUnderTest) -> None:
+    def test_generic_2234_multiplication_associativity(
+        self, r: ScalarT, s: ScalarT, a: ClassUnderTest
+    ) -> None:
         """(r * s) * a == (r * (s * a)"""
         self.assertEqual((r * s) * a, r * (s * a))
 
@@ -266,15 +296,21 @@ class RModuleTests(AdditionAbelianGroupTests):
         """1 * a == a"""
         self.assertEqual(self.scalar_one * a, a)
 
-    def test_generic_2237_multiplication_addition_left_distributivity(self, r: ScalarT, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2237_multiplication_addition_left_distributivity(
+        self, r: ScalarT, a: ClassUnderTest, b: ClassUnderTest
+    ) -> None:
         """r * (a + b) == (r * a) + (r * b)"""
         self.assertEqual(r * (a + b), r * a + r * b)
 
-    def test_generic_2239_multiplication_commutativity(self, r: ScalarT, a: ClassUnderTest) -> None:
+    def test_generic_2239_multiplication_commutativity(
+        self, r: ScalarT, a: ClassUnderTest
+    ) -> None:
         """r * a == a * r"""
         self.assertEqual(r * a, a * r)
 
-    def test_generic_2240_r_module_multiplication_addition_left_distributivity(self, r: ScalarT, s: ScalarT, a: ClassUnderTest) -> None:
+    def test_generic_2240_r_module_multiplication_addition_left_distributivity(
+        self, r: ScalarT, s: ScalarT, a: ClassUnderTest
+    ) -> None:
         """(r + s) * a == (r * a) + (s * a)"""
         self.assertEqual((r + s) * a, r * a + s * a)
 
@@ -293,13 +329,15 @@ class VectorSpaceTests(RModuleTests, AdditionExtensionsTests):
         """Zero in the scalar type."""
         return self.scalar_one - self.scalar_one
 
-    def test_generic_2245_truediv_definition(self, r: ScalarT, a: ClassUnderTest) -> None:
+    def test_generic_2245_truediv_definition(
+        self, r: ScalarT, a: ClassUnderTest
+    ) -> None:
         """r != 0 ⇒ (a / r) == (1 / r) * a"""
         assume(not r == self.scalar_zero)
         self.assertEqual(a / r, (self.scalar_one / r) * a)
 
 
-VectorSpaceT = 'VectorSpaceT'
+VectorSpaceT = "VectorSpaceT"
 
 
 class AffineSpaceTests:
@@ -313,7 +351,9 @@ class AffineSpaceTests:
     def vector_space_zero(self) -> VectorSpaceT:
         """Addition Identity Value."""
 
-    def test_generic_2220_addition_associativity(self, a: ClassUnderTest, b: VectorSpaceT, c: VectorSpaceT) -> None:
+    def test_generic_2220_addition_associativity(
+        self, a: ClassUnderTest, b: VectorSpaceT, c: VectorSpaceT
+    ) -> None:
         """a + (b + c) == (a + b) + c"""
         self.assertEqual(a + (b + c), (a + b) + c)
 
@@ -322,7 +362,9 @@ class AffineSpaceTests:
         self.assertEqual(a + self.vector_space_zero, a)
 
     # This may be derivable from the others, but I don't see how
-    def test_generic_2290_sub_distributivity(self, a: ClassUnderTest, b: ClassUnderTest, v: VectorSpaceT, w: VectorSpaceT) -> None:
+    def test_generic_2290_sub_distributivity(
+        self, a: ClassUnderTest, b: ClassUnderTest, v: VectorSpaceT, w: VectorSpaceT
+    ) -> None:
         """(a + v) - (b + w) == (a - b) + (v - w)"""
         self.assertEqual((a + v) - (b + w), (a - b) + (v - w))
 
@@ -331,12 +373,29 @@ class AffineSpaceTests:
         """a - a == 0"""
         self.assertEqual(a - a, self.vector_space_zero)
 
-    def test_generic_2292_sub_special_case_2(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2292_sub_special_case_2(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ) -> None:
         """a + (b - a) == b"""
         self.assertEqual(a + (b - a), b)
 
 
-__all__ = ('AdditionMonoidTests', 'AdditionGroupTests', 'AdditionAbelianGroupTests', 'AdditionCommutativeGroupTests',
-           'MultiplicationMonoidTests', 'RingTests', 'CommutativeRingTests', 'FieldTests',
-           'FloorDivModTests', 'ExponentiationTests', 'AbsoluteValueTests', 'AdditionExtensionsTests',
-           'ScalarT', 'RModuleTests', 'VectorSpaceTests', 'VectorSpaceT', 'AffineSpaceTests')
+__all__ = (
+    "AdditionMonoidTests",
+    "AdditionGroupTests",
+    "AdditionAbelianGroupTests",
+    "AdditionCommutativeGroupTests",
+    "MultiplicationMonoidTests",
+    "RingTests",
+    "CommutativeRingTests",
+    "FieldTests",
+    "FloorDivModTests",
+    "ExponentiationTests",
+    "AbsoluteValueTests",
+    "AdditionExtensionsTests",
+    "ScalarT",
+    "RModuleTests",
+    "VectorSpaceTests",
+    "VectorSpaceT",
+    "AffineSpaceTests",
+)

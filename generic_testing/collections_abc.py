@@ -13,9 +13,9 @@ from .lattices import BoundedBelowLatticeTests
 from .augmented_assignment import LatticeWithComplementAugmentedTests
 
 
-ElementT = 'ElementT'
-KeyT = 'KeyT'
-ValueT = 'ValueT'
+ElementT = "ElementT"
+KeyT = "KeyT"
+ValueT = "ValueT"
 
 
 class HashableTests(GenericTests):
@@ -25,7 +25,9 @@ class HashableTests(GenericTests):
         """isinstance(hash(a), int)"""
         self.assertIsInstance(hash(a), int)
 
-    def test_generic_2136_hash_equal_on_equal_inputs(self, a: ClassUnderTest, b: ClassUnderTest):
+    def test_generic_2136_hash_equal_on_equal_inputs(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ):
         """a == b ⇒ hash(a) == hash(b)"""
         self.assertImplies(a == b, hash(a) == hash(b))
 
@@ -57,7 +59,9 @@ class SizedTests(GenericTests):
     I assume that the len() function returns a value that can be compared to an int.
     """
 
-    def test_generic_2410_len_returns_a_non_negative_int(self, a: ClassUnderTest) -> None:
+    def test_generic_2410_len_returns_a_non_negative_int(
+        self, a: ClassUnderTest
+    ) -> None:
         """0 <= len(a)"""
         a_len = len(a)
         self.assertIsInstance(a_len, int)
@@ -77,7 +81,9 @@ class ContainerTests(GenericTests):
     If this is not true for your contained, then simply skip this test.
     """
 
-    def test_generic_2420_contains_returns_a_boolean(self, a: ElementT, b: ClassUnderTest) -> None:
+    def test_generic_2420_contains_returns_a_boolean(
+        self, a: ElementT, b: ClassUnderTest
+    ) -> None:
         """isinstance(a in b, bool)"""
         self.assertIsInstance(a in b, bool)
 
@@ -106,7 +112,9 @@ class ContainerOverIterableTests(IterableTests, ContainerTests):
     implemented as an iteration ..."
     """
 
-    def test_generic_2421_contains_over_iterable_definition(self, a: ElementT, b: ClassUnderTest) -> None:
+    def test_generic_2421_contains_over_iterable_definition(
+        self, a: ElementT, b: ClassUnderTest
+    ) -> None:
         """a in b ⇔ any(a == x for x in b)"""
         contains = False
         for x in b:
@@ -116,7 +124,9 @@ class ContainerOverIterableTests(IterableTests, ContainerTests):
         self.assertEqual(a in b, contains)
 
 
-class SizedIterableContainerWithEmptyTests(SizedOverIterableTests, ContainerOverIterableTests):
+class SizedIterableContainerWithEmptyTests(
+    SizedOverIterableTests, ContainerOverIterableTests
+):
     """These test common properties of almost all containers."""
 
     @property
@@ -137,14 +147,21 @@ class SizedIterableContainerWithEmptyTests(SizedOverIterableTests, ContainerOver
         self.assertFalse(a in self.empty)
 
 
-class SetTests(SizedIterableContainerWithEmptyTests, EqualityTests, PartialOrderingTests, BoundedBelowLatticeTests):
+class SetTests(
+    SizedIterableContainerWithEmptyTests,
+    EqualityTests,
+    PartialOrderingTests,
+    BoundedBelowLatticeTests,
+):
     """The property tests of collections.abc.Set."""
 
     @property
     def bottom(self) -> ClassUnderTest:
         return self.empty
 
-    def test_generic_2110_equality_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2110_equality_definition(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ) -> None:
         """a == b ⇔ (x in a ⇔ x in b)"""
         expected = True
         universe = a | b
@@ -154,7 +171,9 @@ class SetTests(SizedIterableContainerWithEmptyTests, EqualityTests, PartialOrder
                 break
         self.assertEqual(a == b, expected)
 
-    def test_generic_2145_less_or_equal_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2145_less_or_equal_definition(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ) -> None:
         """a <= b ⇔ (x in a ⇒ x in b)"""
         expected = True
         for x in a:
@@ -163,32 +182,46 @@ class SetTests(SizedIterableContainerWithEmptyTests, EqualityTests, PartialOrder
                 break
         self.assertEqual(a <= b, expected)
 
-    def test_generic_2151_ordering_consistent_with_lattice(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2151_ordering_consistent_with_lattice(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ) -> None:
         """(a & b <= a <= a | b) and (a & b <= b <= a | b)"""
         union = a | b
         intersection = a & b
         self.assertTrue(intersection <= a <= union)
         self.assertTrue(intersection <= b <= union)
 
-    def test_generic_2430_disjoint_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2430_disjoint_definition(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ) -> None:
         """a.isdisjoint(b) ⇔ a & b == ∅"""
         self.assertEqual(a.isdisjoint(b), a & b == self.empty)
 
-    def test_generic_2431_sub_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2431_sub_definition(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ) -> None:
         """x in a - b ⇔ x in a and x not in b"""
         c = a - b
         universe = a | b
         self.assertLessEqual(c, universe)
         for x in universe:
-            self.assertEqual(x in c, x in a and x not in b, f"fails for a={a!r}, b={b!r}, x={x!r}")
+            self.assertEqual(
+                x in c, x in a and x not in b, f"fails for a={a!r}, b={b!r}, x={x!r}"
+            )
 
-    def test_generic_2432_xor_defintion(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2432_xor_defintion(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ) -> None:
         """x in a ^ b ⇔ x in a and x not in b or x not in a and x in b"""
         c = a ^ b
         universe = a | b
         self.assertLessEqual(c, universe)
         for x in universe:
-            self.assertEqual(x in c, x in a and x not in b or x not in a and x in b, f"fails for a={a!r}, b={b!r}, x={x!r}")
+            self.assertEqual(
+                x in c,
+                x in a and x not in b or x not in a and x in b,
+                f"fails for a={a!r}, b={b!r}, x={x!r}",
+            )
 
 
 class MappingViewTests(SizedTests):
@@ -234,7 +267,9 @@ class MutableSetTests(SetTests, LatticeWithComplementAugmentedTests):
         for x in universe:
             self.assertEqual(x in a, x in a_copy or x == b)
 
-    def test_generic_2461_discard_definition(self, a: ClassUnderTest, b: ElementT) -> None:
+    def test_generic_2461_discard_definition(
+        self, a: ClassUnderTest, b: ElementT
+    ) -> None:
         """a.discard(b); x in a ⇔ x in a₀ and not x == b"""
         a_copy = self.copy(a)
         a.discard(b)
@@ -252,10 +287,14 @@ class MappingTests(SizedIterableContainerWithEmptyTests, EqualityTests):
             return KeyT
         return annotation
 
-    def test_generic_2110_equality_definition(self, a: ClassUnderTest, b: ClassUnderTest):
+    def test_generic_2110_equality_definition(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ):
         self.assertEqual(a == b, a.keys() == b.keys() and all(a[k] == b[k] for k in a))
 
-    def test_generic_2480_getitem_on_empty_either_succeeds_or_raises_KeyError(self, a: KeyT) -> None:
+    def test_generic_2480_getitem_on_empty_either_succeeds_or_raises_KeyError(
+        self, a: KeyT
+    ) -> None:
         try:
             self.empty[a]
         except KeyError:
@@ -263,7 +302,9 @@ class MappingTests(SizedIterableContainerWithEmptyTests, EqualityTests):
         except BaseException:
             self.fail()
 
-    def test_generic_2481_getitem_over_all_keys_succeeds(self, a: ClassUnderTest) -> None:
+    def test_generic_2481_getitem_over_all_keys_succeeds(
+        self, a: ClassUnderTest
+    ) -> None:
         a_keys = a.keys()
         self.assertIsInstance(a_keys, collections.abc.KeysView)
         try:
@@ -280,7 +321,9 @@ class MappingTests(SizedIterableContainerWithEmptyTests, EqualityTests):
         """Test values method."""
         self.assertIsInstance(a.values(), collections.abc.ValuesView)
 
-    def test_generic_2492_get_definition(self, a: ClassUnderTest, b: KeyT, c: ValueT) -> None:
+    def test_generic_2492_get_definition(
+        self, a: ClassUnderTest, b: KeyT, c: ValueT
+    ) -> None:
         """Test get method."""
         if b in a:
             expected = a[b]
@@ -305,7 +348,9 @@ class MutableMappingTests(MappingTests):
         self.assertNotEqual(id(a), id(a_copy))
         self.assertEqual(a, a_copy)
 
-    def test_generic_2500_setitem_definition(self, a: ClassUnderTest, b: KeyT, c: ValueT) -> None:
+    def test_generic_2500_setitem_definition(
+        self, a: ClassUnderTest, b: KeyT, c: ValueT
+    ) -> None:
         """a[b] = c; a[k] == c if k == b else a₀[k]"""
         a_copy = self.copy(a)
         a[b] = c
@@ -353,7 +398,9 @@ class MutableMappingTests(MappingTests):
         a.clear()
         self.assertTrue(a == self.empty)
 
-    def test_generic_2505_update_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2505_update_definition(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ) -> None:
         """Test update method."""
         a_copy = self.copy(a)
         a.update(b)
@@ -361,7 +408,9 @@ class MutableMappingTests(MappingTests):
         for k in a:
             self.assertEqual(a[k], b[k] if k in b else a_copy[k])
 
-    def test_generic_2506_setdefault_definition(self, a: ClassUnderTest, b: KeyT, c: ValueT) -> None:
+    def test_generic_2506_setdefault_definition(
+        self, a: ClassUnderTest, b: KeyT, c: ValueT
+    ) -> None:
         """Test setdefault method."""
         a_copy = self.copy(a)
         v = a.setdefault(b, c)
@@ -387,7 +436,9 @@ class SequenceTests(SizedIterableContainerWithEmptyTests):
         with self.assertRaises(IndexError):
             self.empty[i]
 
-    def test_generic_2531_getitem_has_same_order_as_iterator(self, a: ClassUnderTest) -> None:
+    def test_generic_2531_getitem_has_same_order_as_iterator(
+        self, a: ClassUnderTest
+    ) -> None:
         i = 0
         for x in a:
             self.assertEqual(x, a[i])
@@ -395,7 +446,9 @@ class SequenceTests(SizedIterableContainerWithEmptyTests):
         with self.assertRaises(IndexError):
             a[i]
 
-    def test_generic_2532_getitem_over_negative_indices_definition(self, a: ClassUnderTest) -> None:
+    def test_generic_2532_getitem_over_negative_indices_definition(
+        self, a: ClassUnderTest
+    ) -> None:
         """a[-i] == a[len(a) - i]"""
         a_len = len(a)
         i = 1
@@ -405,7 +458,9 @@ class SequenceTests(SizedIterableContainerWithEmptyTests):
         with self.assertRaises(IndexError):
             a[-a_len - 1]
 
-    def test_generic_2533_getitem_slice_definition(self, a: ClassUnderTest, data) -> None:
+    def test_generic_2533_getitem_slice_definition(
+        self, a: ClassUnderTest, data
+    ) -> None:
         """a[start:stop:step][i] = a[start + i * step]"""
         a_len = len(a)
         if a_len > 0:
@@ -417,7 +472,7 @@ class SequenceTests(SizedIterableContainerWithEmptyTests):
             a_slice = a[start:stop:step]
             i = 0
             j = start
-            while (j < stop if step >= 0 else j > stop):
+            while j < stop if step >= 0 else j > stop:
                 self.assertEqual(a_slice[i], a[j])
                 i += 1
                 j += step
@@ -442,7 +497,9 @@ class SequenceTests(SizedIterableContainerWithEmptyTests):
         except ValueError:
             self.assertFalse(b in a)
 
-    def test_generic_2537_index_definition_extra_tests(self, a: ClassUnderTest, data) -> None:
+    def test_generic_2537_index_definition_extra_tests(
+        self, a: ClassUnderTest, data
+    ) -> None:
         assume(len(a) > 0)
         b = data.draw(st.sampled_from(a))
         self.assertTrue(b in a)
@@ -455,7 +512,9 @@ class SequenceTests(SizedIterableContainerWithEmptyTests):
                 count += 1
         self.assertEqual(count, a.count(b))
 
-    def test_generic_2539_count_definition_extra_tests(self, a: ClassUnderTest, data) -> None:
+    def test_generic_2539_count_definition_extra_tests(
+        self, a: ClassUnderTest, data
+    ) -> None:
         assume(len(a) > 0)
         b = data.draw(st.sampled_from(a))
         SequenceTests.test_generic_2538_count_definition(self, a, b)
@@ -476,7 +535,9 @@ class MutableSequenceTests(SequenceTests):
         self.assertNotEqual(id(a), id(a_copy))
         self.assertEqual(a, a_copy)
 
-    def test_generic_2550_setitem_definition(self, a: ClassUnderTest, b: KeyT, c: ValueT) -> None:
+    def test_generic_2550_setitem_definition(
+        self, a: ClassUnderTest, b: KeyT, c: ValueT
+    ) -> None:
         """a[b] = c; a[i] == c if i == b else a₀[i]"""
         a_len = len(a)
         if -a_len <= b < a_len:
@@ -510,7 +571,9 @@ class MutableSequenceTests(SequenceTests):
             with self.assertRaises(IndexError):
                 del a[b]
 
-    def test_generic_2554_insert_definition(self, a: ClassUnderTest, b: KeyT, c: ValueT) -> None:
+    def test_generic_2554_insert_definition(
+        self, a: ClassUnderTest, b: KeyT, c: ValueT
+    ) -> None:
         """a.insert(b, c); a[i] == c if i == b else a₀[i - int(i > b)]"""
         a_len = len(a)
         a_copy = self.copy(a)
@@ -546,7 +609,9 @@ class MutableSequenceTests(SequenceTests):
             self.assertEqual(x, a_copy[-i - 1])
             i += 1
 
-    def test_generic_2562_extend_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2562_extend_definition(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ) -> None:
         """a.extend(b); a[i] == a₀[i] if i < len(a₀) else b[i - len(a₀)]"""
         a_len = len(a)
         a_copy = self.copy(a)
@@ -591,7 +656,9 @@ class MutableSequenceTests(SequenceTests):
             with self.assertRaises(ValueError):
                 a.remove(b)
 
-    def test_generic_2565_iadd_definition(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2565_iadd_definition(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ) -> None:
         """a += b; a[i] == a₀[i] if i < len(a₀) else b[i - len(a₀)]"""
         a_len = len(a)
         a_copy = self.copy(a)
@@ -603,8 +670,25 @@ class MutableSequenceTests(SequenceTests):
             i += 1
 
 
-__all__ = ('ElementT', 'KeyT', 'ValueT',
-           'HashableTests', 'IterableTests', 'SizedTests', 'ContainerTests',
-           'SizedOverIterableTests', 'ContainerOverIterableTests', 'SizedIterableContainerWithEmptyTests',
-           'SetTests', 'MappingViewTests', 'KeysViewTests', 'ItemsViewTests', 'ValuesViewTests', 'MutableSetTests',
-           'MappingTests', 'MutableMappingTests', 'SequenceTests', 'MutableSequenceTests')
+__all__ = (
+    "ElementT",
+    "KeyT",
+    "ValueT",
+    "HashableTests",
+    "IterableTests",
+    "SizedTests",
+    "ContainerTests",
+    "SizedOverIterableTests",
+    "ContainerOverIterableTests",
+    "SizedIterableContainerWithEmptyTests",
+    "SetTests",
+    "MappingViewTests",
+    "KeysViewTests",
+    "ItemsViewTests",
+    "ValuesViewTests",
+    "MutableSetTests",
+    "MappingTests",
+    "MutableMappingTests",
+    "SequenceTests",
+    "MutableSequenceTests",
+)

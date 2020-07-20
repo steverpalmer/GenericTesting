@@ -11,7 +11,12 @@ from hypothesis import assume
 from .core import ClassUnderTest
 from .relations import EqualityTests, TotalOrderingTests
 from .lattices import LatticeWithComplementTests, BitShiftTests
-from .arithmetic import FieldTests, AbsoluteValueTests, FloorDivModTests, ExponentiationTests
+from .arithmetic import (
+    FieldTests,
+    AbsoluteValueTests,
+    FloorDivModTests,
+    ExponentiationTests,
+)
 
 
 class _ComplexTests(EqualityTests, FieldTests, AbsoluteValueTests):
@@ -46,36 +51,52 @@ class ComplexTests(_ComplexTests):
         self.assertEqual(complex(1), complex(self.one))
         self.assertEqual(complex(0, 1), complex(self.i))
 
-    def test_generic_2310_conjugate_is_additive(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2310_conjugate_is_additive(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ) -> None:
         """(a + b).conjugate() == a.conjugate() + b.conjugate()"""
         self.assertEqual((a + b).conjugate(), a.conjugate() + b.conjugate())
 
-    def test_generic_2311_conjugate_is_multiplicitive(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2311_conjugate_is_multiplicitive(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ) -> None:
         """(a * b).conjugate() == a.conjugate() * b.conjugate()"""
         self.assertEqual((a * b).conjugate(), a.conjugate() * b.conjugate())
 
-    def test_generic_2312_conjugate_has_same_absolute_value(self, a: ClassUnderTest) -> None:
+    def test_generic_2312_conjugate_has_same_absolute_value(
+        self, a: ClassUnderTest
+    ) -> None:
         """abs(a.conjugate()) == abs(a)"""
         self.assertEqual(abs(a.conjugate()), abs(a))
 
-    def test_generic_2313_conjugate_has_same_real_value(self, a: ClassUnderTest) -> None:
+    def test_generic_2313_conjugate_has_same_real_value(
+        self, a: ClassUnderTest
+    ) -> None:
         """a.conjugate().real == a.real"""
         self.assertEqual(a.conjugate().real, a.real)
 
-    def test_generic_2314_conjugate_has_negated_imag_value(self, a: ClassUnderTest) -> None:
+    def test_generic_2314_conjugate_has_negated_imag_value(
+        self, a: ClassUnderTest
+    ) -> None:
         """a.conjugate().imag == -a.imag"""
         self.assertEqual(a.conjugate().imag, -a.imag)
 
-    def test_generic_2315_imag_is_zero_iff_conjugate_equals_self(self, a: ClassUnderTest) -> None:
+    def test_generic_2315_imag_is_zero_iff_conjugate_equals_self(
+        self, a: ClassUnderTest
+    ) -> None:
         """a.conjugate() == a ⇒ a.imag == 0"""
         self.assertEqual(a == a.conjugate(), a.imag == self.abs_zero)
 
-    def test_generic_2316_absolute_value_real_and_imag_values(self, a: ClassUnderTest) -> None:
+    def test_generic_2316_absolute_value_real_and_imag_values(
+        self, a: ClassUnderTest
+    ) -> None:
         """abs(a) * abs(a) == a.real * a.real + a.imag * a.imag"""
         self.assertEqual(abs(a) * abs(a), a.real * a.real + a.imag * a.imag)
 
 
-class _RealTests(_ComplexTests, TotalOrderingTests, FloorDivModTests, ExponentiationTests):
+class _RealTests(
+    _ComplexTests, TotalOrderingTests, FloorDivModTests, ExponentiationTests
+):
     """The property tests of numbers.Real that are shared with derived classes."""
 
     @property
@@ -86,11 +107,15 @@ class _RealTests(_ComplexTests, TotalOrderingTests, FloorDivModTests, Exponentia
         """0 <= 1"""
         self.assertTrue(self.zero <= self.one)
 
-    def test_generic_2353_less_or_equal_consistent_with_addition(self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest) -> None:
+    def test_generic_2353_less_or_equal_consistent_with_addition(
+        self, a: ClassUnderTest, b: ClassUnderTest, c: ClassUnderTest
+    ) -> None:
         """a <= b ⇔ a + c <= b + c"""
         self.assertEqual(a <= b, a + c <= b + c)
 
-    def test_generic_2354_less_or_equal_consistent_with_multiplication(self, a: ClassUnderTest, b: ClassUnderTest) -> None:
+    def test_generic_2354_less_or_equal_consistent_with_multiplication(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ) -> None:
         """0 <= a and 0 <= b ⇒ 0 <= a * b"""
         self.assertImplies(self.zero <= a and self.zero <= b, self.zero <= a * b)
 
@@ -131,7 +156,10 @@ class RealTests(_RealTests):
     def test_generic_2342_round_towards_even(self, a: ClassUnderTest) -> None:
         """abs(a - round(a)) == 0.5 ⇒ round(a) % 2 == 0"""
         round_result = round(a)
-        self.assertImplies(self.isclose(abs(float(a) - float(round_result)), 0.5), round_result % 2.0 == 0.0)
+        self.assertImplies(
+            self.isclose(abs(float(a) - float(round_result)), 0.5),
+            round_result % 2.0 == 0.0,
+        )
 
     # :TODO: It would be good to have tests of round(a, n)
 
@@ -214,5 +242,12 @@ class IntegralTests(_RationalTests, LatticeWithComplementTests, BitShiftTests):
         self.assertEqual(1, int(self.one))
 
 
-__all__ = ('ComplexTests', 'RealTests', 'RationalTests', 'IntegralTests',
-           '_ComplexTests', '_RealTests', '_RationalTests')
+__all__ = (
+    "ComplexTests",
+    "RealTests",
+    "RationalTests",
+    "IntegralTests",
+    "_ComplexTests",
+    "_RealTests",
+    "_RationalTests",
+)

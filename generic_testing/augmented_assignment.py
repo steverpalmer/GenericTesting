@@ -60,7 +60,9 @@ class ComplexAugmentedAssignmentTests(GenericTests):
         a *= b
         self.assertEqual(a, a_expected)
 
-    def test_generic_2286_itruediv_definition(self, a: ClassUnderTest, b: ClassUnderTest):
+    def test_generic_2286_itruediv_definition(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ):
         """a /= b; a == a₀ / b"""
         assume(not b == self.zero)
         a_expected = a / b
@@ -71,7 +73,9 @@ class ComplexAugmentedAssignmentTests(GenericTests):
 class FloorDivAugmentedAssignmentTests(GenericTests):
     """Tests of the __ifloor__ and __imod__ assignment operators."""
 
-    def test_generic_2287_ifloordiv_definition(self, a: ClassUnderTest, b: ClassUnderTest):
+    def test_generic_2287_ifloordiv_definition(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ):
         """a //= b; a == a₀ // b"""
         assume(not b == self.zero)
         a_expected = a // b
@@ -89,14 +93,18 @@ class FloorDivAugmentedAssignmentTests(GenericTests):
 class IntegralAugmentedAssignmentTests(ComplexAugmentedAssignmentTests):
     """Tests of the integer arithmetic assignment operators."""
 
-    def test_generic_2392_ilshift_definition(self, a: ClassUnderTest, b: ClassUnderTest):
+    def test_generic_2392_ilshift_definition(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ):
         """0 <= b ⇒ a <<= b; a == a₀ << b"""
         assume(self.zero <= b)
         a_expected = a << b
         a <<= b
         self.assertEqual(a, a_expected)
 
-    def test_generic_2393_irshift_definition(self, a: ClassUnderTest, b: ClassUnderTest):
+    def test_generic_2393_irshift_definition(
+        self, a: ClassUnderTest, b: ClassUnderTest
+    ):
         """0 <= b ⇒ a >>= b; a == a₀ >> b"""
         assume(self.zero <= b)
         a_expected = a >> b
@@ -104,6 +112,10 @@ class IntegralAugmentedAssignmentTests(ComplexAugmentedAssignmentTests):
         self.assertEqual(a, a_expected)
 
 
-__all__ = ('LatticeAugmentedAssignmentTests', 'LatticeWithComplementAugmentedTests',
-           'ComplexAugmentedAssignmentTests', 'FloorDivAugmentedAssignmentTests',
-           'IntegralAugmentedAssignmentTests')
+__all__ = (
+    "LatticeAugmentedAssignmentTests",
+    "LatticeWithComplementAugmentedTests",
+    "ComplexAugmentedAssignmentTests",
+    "FloorDivAugmentedAssignmentTests",
+    "IntegralAugmentedAssignmentTests",
+)

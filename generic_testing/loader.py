@@ -24,12 +24,14 @@ from .enums import *
 
 class _ClassDescription(yaml.YAMLObject):
 
-    yaml_tag = '!ClassDescription'
+    yaml_tag = "!ClassDescription"
     yaml_loader = yaml.SafeLoader
 
     @staticmethod
-    def _is_none_or_list_of_str(l) -> bool:
-        return l is None or (isinstance(l, list) and all(isinstance(s, str) for s in l))
+    def _is_none_or_list_of_str(lst) -> bool:
+        return lst is None or (
+            isinstance(lst, list) and all(isinstance(s, str) for s in lst)
+        )
 
     def __new__(cls, *, has=None, excluding=None, skipping=None):
         assert cls._is_none_or_list_of_str(has)
@@ -69,7 +71,9 @@ class GenericTestLoader:
 
     def __init__(self):
         """Constructor."""
-        self._superclass_mapping = collections.OrderedDict([(type(object), EqualityTests)])
+        self._superclass_mapping = collections.OrderedDict(
+            [(type(object), EqualityTests)]
+        )
 
     def register(self, T: type, T_Tests: GenericTests):
         """Register a base class to test mapping."""
@@ -81,14 +85,16 @@ class GenericTestLoader:
         attr = getattr(obj, mthd, None)
         return attr is not None and attr is not getattr(object, mthd, None)
 
-    collection_like_list = ([],  # Init
-                            [ContainerTests],  # Container
-                            [IterableTests],  # Iterable
-                            [ContainerOverIterableTests],  # Container and Iterable
-                            [SizedTests],  # Sized
-                            [SizedTests, ContainerTests],  # Sized and Container
-                            [SizedOverIterableTests],  # Sized and Iterable
-                            [ContainerOverIterableTests, SizedOverIterableTests])  # Sized, Iterable and Container
+    collection_like_list = (
+        [],  # Init
+        [ContainerTests],  # Container
+        [IterableTests],  # Iterable
+        [ContainerOverIterableTests],  # Container and Iterable
+        [SizedTests],  # Sized
+        [SizedTests, ContainerTests],  # Sized and Container
+        [SizedOverIterableTests],  # Sized and Iterable
+        [ContainerOverIterableTests, SizedOverIterableTests],
+    )  # Sized, Iterable and Container
 
     def discover(self, T: type, *, use_docstring_yaml: bool = False) -> GenericTests:
         """Generate Base Case based on supplied class."""
@@ -100,14 +106,16 @@ class GenericTestLoader:
                     if class_description.has:
                         base_class_list = []
                         for model in class_description.has:
-                            model = str(model) + 'Tests'
+                            model = str(model) + "Tests"
                             if model in globals():
                                 base_class_list.append(globals()[model])
                             else:
                                 print(f"ERROR: Model {model} not in globals")
                         if base_class_list:
+
                             class result(*base_class_list):
                                 pass
+
                             if class_description.excluding:
                                 for name, _ in inspect.getmembers(result):
                                     for excld in class_description.excluding:
@@ -128,22 +136,32 @@ class GenericTestLoader:
                     break
         if result is None:
             # Need to work a bit harder
-            base_class_list = list(self.collection_like_list[_ContainerLikeFlags.discover(T)])
-            if GenericTestLoader._is_user_defined(T, '__eq__'):
-                if GenericTestLoader._is_user_defined(T, '__ne__'):
+            base_class_list = list(
+                self.collection_like_list[_ContainerLikeFlags.discover(T)]
+            )
+            if GenericTestLoader._is_user_defined(T, "__eq__"):
+                if GenericTestLoader._is_user_defined(T, "__ne__"):
                     base_class_list.append(EqualityTests)
                 else:
                     base_class_list.append(EqualsOnlyTests)
-            if GenericTestLoader._is_user_defined(T, '__le__'):
-                if GenericTestLoader._is_user_defined(T, '__ge__') and \
-                   GenericTestLoader._is_user_defined(T, '__lt__') and \
-                   GenericTestLoader._is_user_defined(T, '__gt__'):
-                    base_class_list.append(TotalOrderingTests if GenericTestLoader._is_user_defined(T, 'cmp') else PartialOrderingTests)
+            if GenericTestLoader._is_user_defined(T, "__le__"):
+                if (
+                    GenericTestLoader._is_user_defined(T, "__ge__")
+                    and GenericTestLoader._is_user_defined(T, "__lt__")  # noqa W503
+                    and GenericTestLoader._is_user_defined(T, "__gt__")  # noqa W503
+                ):
+                    base_class_list.append(
+                        TotalOrderingTests
+                        if GenericTestLoader._is_user_defined(T, "cmp")
+                        else PartialOrderingTests
+                    )
                 else:
                     base_class_list.append(LessOrEqualTests)
             if base_class_list:
+
                 class result(*base_class_list):
                     pass
+
         if result is None:
             raise TypeError()
         assert issubclass(result, GenericTests)
@@ -192,4 +210,4 @@ defaultGenericTestLoader.register(int, intTests)
 defaultGenericTestLoader.register(enum.Enum, EnumTests)
 defaultGenericTestLoader.register(enum.IntEnum, IntEnumTests)
 
-__all__ = ('GenericTestLoader', 'defaultGenericTestLoader')
+__all__ = ("GenericTestLoader", "defaultGenericTestLoader")
