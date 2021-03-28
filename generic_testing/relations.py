@@ -1,8 +1,17 @@
-# Copyright 2018 Steve Palmer
+# Copyright 2021 Steve Palmer
 
 """A library of generic test for the elementary relationships."""
 
 from .core import GenericTests, ClassUnderTest
+
+
+__all__ = (
+    "EqualsOnlyTests",
+    "EqualityTests",
+    "LessOrEqualTests",
+    "PartialOrderingTests",
+    "TotalOrderingTests",
+)
 
 
 class EqualsOnlyTests(GenericTests):
@@ -96,12 +105,3 @@ class TotalOrderingTests(PartialOrderingTests):
     ) -> None:
         """a <= b or b <= a"""
         self.assertTrue(a <= b or b <= a)
-
-
-__all__ = (
-    "EqualsOnlyTests",
-    "EqualityTests",
-    "LessOrEqualTests",
-    "PartialOrderingTests",
-    "TotalOrderingTests",
-)

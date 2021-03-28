@@ -1,4 +1,4 @@
-# Copyright 2018 Steve Palmer
+# Copyright 2021 Steve Palmer
 
 """A library of generic test for the elementary function properties."""
 
@@ -8,15 +8,26 @@ from hypothesis import strategies as st
 
 from .core import ClassUnderTest, GenericTests
 from .relations import EqualityTests
-from .collections_abc import HashableTests, IterableTests, KeyT
+from .collections_abc import HashableMixinTests, IterableMixinTests, KeyT
 from .lattices import LatticeWithComplementTests
 from .built_in_types import intTests
+
+
+__all__ = (
+    "KeyT",
+    "EnumUnderTest",
+    "EnumTests",
+    "IntEnumTests",
+    "UniqueEnumMixinTests",
+    "FlagEnumMixinTests",
+    "enum_strategy_dict",
+)
 
 
 EnumUnderTest = "EnumUnderTest"
 
 
-class _EnumTests(EqualityTests, HashableTests, IterableTests):
+class _EnumTests(HashableMixinTests, IterableMixinTests, EqualityTests):
     """Tests of Enum class inheritable properties."""
 
     def test_generic_2110_equality_definition(
@@ -30,11 +41,11 @@ class _EnumTests(EqualityTests, HashableTests, IterableTests):
 
     def test_generic_2400_iter_returns_an_iterator(self, E: EnumUnderTest) -> None:
         """Test __iter__ method."""
-        IterableTests.test_generic_2400_iter_returns_an_iterator(self, E)
+        IterableMixinTests.test_generic_2400_iter_returns_an_iterator(self, E)
 
     def test_generic_2401_iterator_protocol_observed(self, E: EnumUnderTest) -> None:
         """Test iterator protocol."""
-        IterableTests.test_generic_2401_iterator_protocol_observed(self, E)
+        IterableMixinTests.test_generic_2401_iterator_protocol_observed(self, E)
 
     def test_generic_2420_contains_returns_a_boolean(
         self, E: EnumUnderTest, a: ClassUnderTest
@@ -86,7 +97,7 @@ class IntEnumTests(intTests, _EnumTests):
     """Tests of IntEnum class properties"""
 
 
-class UniqueEnumMixinTests(GenericTests):
+class UniqueEnumMixinTests:
     """Tests of uniqueness of Enum class."""
 
     def test_generic_2645_enum_attributes_unique(
@@ -127,14 +138,3 @@ def enum_strategy_dict(cls: type, members=None, names=None):
     if names is None:
         names = st.sampled_from(list(cls.__members__))
     return {EnumUnderTest: st.just(cls), ClassUnderTest: members, KeyT: names}
-
-
-__all__ = (
-    "KeyT",
-    "EnumUnderTest",
-    "EnumTests",
-    "IntEnumTests",
-    "UniqueEnumMixinTests",
-    "FlagEnumMixinTests",
-    "enum_strategy_dict",
-)

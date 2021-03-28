@@ -1,4 +1,4 @@
-# Copyright 2019 Steve Palmer
+# Copyright 2021 Steve Palmer
 
 """a library of generic tests for the file-like properties."""
 
@@ -14,11 +14,22 @@ import unittest
 import hypothesis
 
 from .timeout import Timeout
-from .core import ClassUnderTest
-from .collections_abc import IterableTests
+from .core import GenericTests, ClassUnderTest
+from .collections_abc import IterableMixinTests
 
 
-class IOBaseTests(IterableTests):
+__all__ = (
+    "IOBaseTests",
+    "RawIOBaseTests",
+    "FileIOTests",
+    "BufferedIOBaseTests",
+    "BytesIOTests",
+    "TextIOBaseTests",
+    "StringIOTests",
+)
+
+
+class IOBaseTests(IterableMixinTests, GenericTests):
     """Tests of IOBase inheritable properties."""
 
     @property
@@ -849,14 +860,3 @@ class StringIOTests(TextIOBaseTests):
         hypothesis.assume(not a.closed)
         with self.assertRaises(io.UnsupportedOperation):
             a.detach()
-
-
-__all__ = (
-    "IOBaseTests",
-    "RawIOBaseTests",
-    "FileIOTests",
-    "BufferedIOBaseTests",
-    "BytesIOTests",
-    "TextIOBaseTests",
-    "StringIOTests",
-)

@@ -1,4 +1,4 @@
-# Copyright 2018 Steve Palmer
+# Copyright 2021 Steve Palmer
 
 """Fundemental tools in the GenericTesting library."""
 
@@ -10,6 +10,9 @@ import datetime
 from hypothesis import given, strategies as st
 
 from .isclose import IsClose
+
+
+__all__ = ("GenericTests", "Given", "ClassUnderTest")
 
 
 class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):
@@ -59,16 +62,17 @@ class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):
     def _skip(self) -> None:
         raise unittest.SkipTest("")
 
-    def assertIsInstance(self, obj, type_, msg: str = None):
-        """Confirm type of object.
+    # Added in version 3.2
+    # def assertIsInstance(self, obj, type_, msg: str = None):
+    #     """Confirm type of object.
 
-        I kept writing self.assertTrue(isinstance(obj, type_)),
-        and getting little useful information back on failure!
-        """
-        if not isinstance(obj, type_):
-            if msg is None:
-                msg = f"{obj!r} has type {type(obj).__name__}, not a subclass of {type_.__name__} as expected"
-            raise self.failureException(msg)
+    #     I kept writing self.assertTrue(isinstance(obj, type_)),
+    #     and getting little useful information back on failure!
+    #     """
+    #     if not isinstance(obj, type_):
+    #         if msg is None:
+    #             msg = f"{obj!r} has type {type(obj).__name__}, not a subclass of {type_.__name__} as expected"
+    #         raise self.failureException(msg)
 
     def assertImplies(self, antecedent, consequent, msg: str = None):
         """Confirm implication.
@@ -97,7 +101,7 @@ class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):
         """
         if self.isclose(a, b):
             if msg is None:
-                msg = f"{a} is not close enough to {b}"
+                msg = f"{a} is too close to {b}"
             raise self.failureException(msg)
 
     def assertCloseOrLessThan(self, a, b, msg: str = None):
@@ -111,7 +115,7 @@ class GenericTests(unittest.TestCase, metaclass=abc.ABCMeta):
         """Confirm one number is close or greater than another."""
         if not (a > b or self.isclose(a, b)):
             if msg is None:
-                msg = f"{a} is not sufficiently less than {b}"
+                msg = f"{a} is not sufficiently greater than {b}"
             raise self.failureException(msg)
 
 
@@ -160,6 +164,3 @@ def Given(strategy_dict=None, *, testMethodPrefix="test_generic", data_arg="data
         return cls
 
     return result
-
-
-__all__ = ("GenericTests", "Given", "ClassUnderTest")

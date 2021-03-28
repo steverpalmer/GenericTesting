@@ -1,4 +1,4 @@
-# Copyright 2018 Steve Palmer
+# Copyright 2021 Steve Palmer
 
 """A library of generic test for the elementary arithmetic operators."""
 
@@ -7,6 +7,27 @@ import abc
 from hypothesis import assume
 
 from .core import GenericTests, ClassUnderTest
+
+
+__all__ = (
+    "AdditionMonoidTests",
+    "AdditionGroupTests",
+    "AdditionAbelianGroupTests",
+    "AdditionCommutativeGroupTests",
+    "MultiplicationMonoidTests",
+    "RingTests",
+    "CommutativeRingTests",
+    "FieldTests",
+    "FloorDivModMixinTests",
+    "ExponentiationMixinTests",
+    "AbsoluteValueMixinTests",
+    "AdditionExtensionsMixinTests",
+    "ScalarT",
+    "RModuleTests",
+    "VectorSpaceTests",
+    "VectorSpaceT",
+    "AffineSpaceMixinTests",
+)
 
 
 class AdditionMonoidTests(GenericTests):
@@ -34,7 +55,7 @@ class AdditionMonoidTests(GenericTests):
 
 
 class AdditionGroupTests(AdditionMonoidTests):
-    """Tests of the Group semantics of the __add__ operator.
+    """Tests of the Group semantics of the __add__ and __neg__ operators.
 
     See https://en.wikipedia.org/wiki/Group_(mathematics)
     """
@@ -45,7 +66,7 @@ class AdditionGroupTests(AdditionMonoidTests):
 
 
 class AdditionAbelianGroupTests(AdditionGroupTests):
-    """Tests of the Abelian Group semantics of the __add__ operator.
+    """Tests of the Abelian Group semantics of the __add__ and __neg__ operators.
 
     See https://en.wikipedia.org/wiki/Abelian_group
     """
@@ -84,7 +105,7 @@ class MultiplicationMonoidTests(GenericTests):
         self.assertEqual(self.one * a, a)
 
 
-class AdditionExtensionsTests:
+class AdditionExtensionsMixinTests:
     """Discrete tests of the __pos__ and __sub__ methods."""
 
     def test_generic_2232_pos_definition(self, a: ClassUnderTest) -> None:
@@ -99,7 +120,7 @@ class AdditionExtensionsTests:
 
 
 class RingTests(
-    AdditionAbelianGroupTests, AdditionExtensionsTests, MultiplicationMonoidTests
+    AdditionExtensionsMixinTests, AdditionAbelianGroupTests, MultiplicationMonoidTests
 ):
     """Tests of the Ring semantics of the basic arithmetic operators.
 
@@ -151,7 +172,7 @@ class FieldTests(CommutativeRingTests):
         self.assertEqual(calc, type(calc)(a))
 
 
-class FloorDivModTests(GenericTests):
+class FloorDivModMixinTests:
     """Discrete tests for __floordiv__, __mod__ and __divmod__ operators.
 
     It is assumed that these will be inherited along with
@@ -187,7 +208,7 @@ class FloorDivModTests(GenericTests):
         self.assertEqual(divmod(a, b), (a // b, a % b))
 
 
-class ExponentiationTests(GenericTests):
+class ExponentiationMixinTests:
     """Discrete tests of __pow__ operator.
 
     It is assumed that these will be inherited along with
@@ -233,7 +254,7 @@ class ExponentiationTests(GenericTests):
         self.assertEqual(a ** self.one, a)
 
 
-class AbsoluteValueTests(GenericTests):
+class AbsoluteValueMixinTests:
     """Discrete tests of __abs__ operator.
 
     It is assumed that these will be inherited along with
@@ -315,7 +336,7 @@ class RModuleTests(AdditionAbelianGroupTests):
         self.assertEqual((r + s) * a, r * a + s * a)
 
 
-class VectorSpaceTests(RModuleTests, AdditionExtensionsTests):
+class VectorSpaceTests(AdditionExtensionsMixinTests, RModuleTests):
     """Tests of the Vector Space semantics of the basic arithmetic operators.
 
     See https://en.wikipedia.org/wiki/Vector_space
@@ -340,7 +361,7 @@ class VectorSpaceTests(RModuleTests, AdditionExtensionsTests):
 VectorSpaceT = "VectorSpaceT"
 
 
-class AffineSpaceTests:
+class AffineSpaceMixinTests:
     """Tests of the Affine Space semantics of the basic operators.
 
     See https://en.wikipedia.org/wiki/Affine_space
@@ -378,24 +399,3 @@ class AffineSpaceTests:
     ) -> None:
         """a + (b - a) == b"""
         self.assertEqual(a + (b - a), b)
-
-
-__all__ = (
-    "AdditionMonoidTests",
-    "AdditionGroupTests",
-    "AdditionAbelianGroupTests",
-    "AdditionCommutativeGroupTests",
-    "MultiplicationMonoidTests",
-    "RingTests",
-    "CommutativeRingTests",
-    "FieldTests",
-    "FloorDivModTests",
-    "ExponentiationTests",
-    "AbsoluteValueTests",
-    "AdditionExtensionsTests",
-    "ScalarT",
-    "RModuleTests",
-    "VectorSpaceTests",
-    "VectorSpaceT",
-    "AffineSpaceTests",
-)

@@ -1,4 +1,4 @@
-# Copyright 2018 Steve Palmer
+# Copyright 2021 Steve Palmer
 
 """Determine the generic test base class for a given class_under_test."""
 
@@ -20,6 +20,9 @@ from .numbers_abc import *
 from .built_in_types import *
 from .file_likes import *
 from .enums import *
+
+
+__all__ = ("GenericTestLoader", "defaultGenericTestLoader")
 
 
 class _ClassDescription(yaml.YAMLObject):
@@ -87,13 +90,13 @@ class GenericTestLoader:
 
     collection_like_list = (
         [],  # Init
-        [ContainerTests],  # Container
-        [IterableTests],  # Iterable
-        [ContainerOverIterableTests],  # Container and Iterable
-        [SizedTests],  # Sized
-        [SizedTests, ContainerTests],  # Sized and Container
-        [SizedOverIterableTests],  # Sized and Iterable
-        [ContainerOverIterableTests, SizedOverIterableTests],
+        [ContainerMixinTests],  # Container
+        [IterableMixinTests],  # Iterable
+        [ContainerOverIterableMixinTests],  # Container and Iterable
+        [SizedMixinTests],  # Sized
+        [SizedMixinTests, ContainerMixinTests],  # Sized and Container
+        [SizedOverIterableMixinTests],  # Sized and Iterable
+        [ContainerOverIterableMixinTests, SizedOverIterableMixinTests],
     )  # Sized, Iterable and Container
 
     def discover(self, T: type, *, use_docstring_yaml: bool = False) -> GenericTests:
@@ -158,6 +161,8 @@ class GenericTestLoader:
                 else:
                     base_class_list.append(LessOrEqualTests)
             if base_class_list:
+                if not any(issubclass(bc, GenericTests) for bc in base_class_list):
+                    base_class_list.append(GenericTests)
 
                 class result(*base_class_list):
                     pass
@@ -209,5 +214,3 @@ defaultGenericTestLoader.register(int, intTests)
 
 defaultGenericTestLoader.register(enum.Enum, EnumTests)
 defaultGenericTestLoader.register(enum.IntEnum, IntEnumTests)
-
-__all__ = ("GenericTestLoader", "defaultGenericTestLoader")

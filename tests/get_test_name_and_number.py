@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright 2018 Steve Palmer
+# Copyright 2021 Steve Palmer
 
 """Generate a complete list of test numbers and names."""
 

@@ -1,4 +1,4 @@
-# Copyright 2018 Steve Palmer
+# Copyright 2021 Steve Palmer
 
 """A library of generic test for the base classes in the numbers library."""
 
@@ -10,16 +10,27 @@ from hypothesis import assume
 
 from .core import ClassUnderTest
 from .relations import EqualityTests, TotalOrderingTests
-from .lattices import LatticeWithComplementTests, BitShiftTests
+from .lattices import LatticeWithComplementTests, BitShiftMixinTests
 from .arithmetic import (
     FieldTests,
-    AbsoluteValueTests,
-    FloorDivModTests,
-    ExponentiationTests,
+    AbsoluteValueMixinTests,
+    FloorDivModMixinTests,
+    ExponentiationMixinTests,
 )
 
 
-class _ComplexTests(EqualityTests, FieldTests, AbsoluteValueTests):
+__all__ = (
+    "ComplexTests",
+    "RealTests",
+    "RationalTests",
+    "IntegralTests",
+    "_ComplexTests",
+    "_RealTests",
+    "_RationalTests",
+)
+
+
+class _ComplexTests(AbsoluteValueMixinTests, EqualityTests, FieldTests):
     """The property tests of numbers.Complex that are shared with derived classes."""
 
     def test_generic_2800_bool_convention(self, a: ClassUnderTest) -> None:
@@ -95,7 +106,7 @@ class ComplexTests(_ComplexTests):
 
 
 class _RealTests(
-    _ComplexTests, TotalOrderingTests, FloorDivModTests, ExponentiationTests
+        FloorDivModMixinTests, ExponentiationMixinTests, _ComplexTests, TotalOrderingTests
 ):
     """The property tests of numbers.Real that are shared with derived classes."""
 
@@ -226,7 +237,7 @@ class RationalTests(_RationalTests):
         self.assertEqual(math.gcd(int(a.numerator), int(a.denominator)), 1)
 
 
-class IntegralTests(_RationalTests, LatticeWithComplementTests, BitShiftTests):
+class IntegralTests(BitShiftMixinTests, _RationalTests, LatticeWithComplementTests):
     """The property tests specific to the base class numbers.Integral."""
 
     @property
@@ -240,14 +251,3 @@ class IntegralTests(_RationalTests, LatticeWithComplementTests, BitShiftTests):
     def test_generic_2380_int_function(self) -> None:
         self.assertEqual(0, int(self.zero))
         self.assertEqual(1, int(self.one))
-
-
-__all__ = (
-    "ComplexTests",
-    "RealTests",
-    "RationalTests",
-    "IntegralTests",
-    "_ComplexTests",
-    "_RealTests",
-    "_RationalTests",
-)

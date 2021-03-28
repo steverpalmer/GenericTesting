@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright 2019 Steve Palmer
+# Copyright 2021 Steve Palmer
 
 """Extension to math.isclose and cmath.isclose."""
 

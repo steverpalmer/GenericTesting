@@ -1,4 +1,4 @@
-# Copyright 2018 Steve Palmer
+# Copyright 2021 Steve Palmer
 
 """A library of generic test for the python built-in types."""
 
@@ -16,7 +16,7 @@ from .arithmetic import AdditionMonoidTests, ScalarT
 from .numbers_abc import IntegralTests, RationalTests, RealTests, ComplexTests
 from .collections_abc import (
     ElementT,
-    HashableTests,
+    HashableMixinTests,
     SetTests,
     KeysViewTests,
     ItemsViewTests,
@@ -28,18 +28,38 @@ from .collections_abc import (
     MutableSequenceTests,
 )
 from .augmented_assignment import (
-    ComplexAugmentedAssignmentTests,
-    FloorDivAugmentedAssignmentTests,
-    IntegralAugmentedAssignmentTests,
-    LatticeWithComplementAugmentedTests,
+    ComplexAugmentedAssignmentMixinTests,
+    FloorDivAugmentedAssignmentMixinTests,
+    IntegralAugmentedAssignmentMixinTests,
+    LatticeWithComplementAugmentedAssignmentMixinTests,
+)
+
+
+__all__ = (
+    "intTests",
+    "FractionTests",
+    "floatTests",
+    "complexTests",
+    "frozensetTests",
+    "setTests",
+    "dictKeysViewTests",
+    "dictItemsViewTests",
+    "dictValuesViewTests",
+    "MappingProxyTypeTests",
+    "dictTests",
+    "CounterTests",
+    "OrderedDictTests",
+    "defaultdictTests",
+    "tupleTests",
+    "listTests",
 )
 
 
 class intTests(
+    IntegralAugmentedAssignmentMixinTests,
+    FloorDivAugmentedAssignmentMixinTests,
+    LatticeWithComplementAugmentedAssignmentMixinTests,
     IntegralTests,
-    IntegralAugmentedAssignmentTests,
-    FloorDivAugmentedAssignmentTests,
-    LatticeWithComplementAugmentedTests,
 ):
     """Tests of int class properties."""
 
@@ -61,13 +81,13 @@ class intTests(
     ) -> None:
         super().test_generic_2391_rshift_definition(a, b & 63)
 
-    @wraps(IntegralAugmentedAssignmentTests.test_generic_2392_ilshift_definition)
+    @wraps(IntegralAugmentedAssignmentMixinTests.test_generic_2392_ilshift_definition)
     def test_generic_2392_ilshift_definition(
         self, a: ClassUnderTest, b: ClassUnderTest
     ):
         super().test_generic_2392_ilshift_definition(a, b & 63)
 
-    @wraps(IntegralAugmentedAssignmentTests.test_generic_2393_irshift_definition)
+    @wraps(IntegralAugmentedAssignmentMixinTests.test_generic_2393_irshift_definition)
     def test_generic_2393_irshift_definition(
         self, a: ClassUnderTest, b: ClassUnderTest
     ):
@@ -77,7 +97,9 @@ class intTests(
 
 
 class FractionTests(
-    RationalTests, ComplexAugmentedAssignmentTests, FloorDivAugmentedAssignmentTests
+    ComplexAugmentedAssignmentMixinTests,
+    FloorDivAugmentedAssignmentMixinTests,
+    RationalTests,
 ):
     """Tests of Fraction class properties."""
 
@@ -87,7 +109,9 @@ class FractionTests(
 
 
 class floatTests(
-    RealTests, ComplexAugmentedAssignmentTests, FloorDivAugmentedAssignmentTests
+    ComplexAugmentedAssignmentMixinTests,
+    FloorDivAugmentedAssignmentMixinTests,
+    RealTests,
 ):
     """Tests of float class properties."""
 
@@ -131,7 +155,7 @@ class floatTests(
     # TODO: tests for as_integer_ratio, is_integer, hex, fromhex
 
 
-class complexTests(ComplexTests, ComplexAugmentedAssignmentTests):
+class complexTests(ComplexAugmentedAssignmentMixinTests, ComplexTests):
     """Tests of complex class properties."""
 
     zero = complex(0)
@@ -219,7 +243,7 @@ class _frozensetTests(SetTests):
         self.assertEqual(a.symmetric_difference(b), a ^ b)
 
 
-class frozensetTests(_frozensetTests, HashableTests):
+class frozensetTests(HashableMixinTests, _frozensetTests):
     """Tests of frozenset class properties."""
 
 
@@ -481,7 +505,7 @@ class _tupleTests(
                 min(a)
 
 
-class tupleTests(_tupleTests, HashableTests):
+class tupleTests(HashableMixinTests, _tupleTests):
     """Tests of tuple class properties."""
 
 
@@ -509,23 +533,3 @@ class listTests(_tupleTests, MutableSequenceTests):
         a_copy = self.copy(a)
         a *= b
         self.assertEqual(a, a_copy * b)
-
-
-__all__ = (
-    "intTests",
-    "FractionTests",
-    "floatTests",
-    "complexTests",
-    "frozensetTests",
-    "setTests",
-    "dictKeysViewTests",
-    "dictItemsViewTests",
-    "dictValuesViewTests",
-    "MappingProxyTypeTests",
-    "dictTests",
-    "CounterTests",
-    "OrderedDictTests",
-    "defaultdictTests",
-    "tupleTests",
-    "listTests",
-)

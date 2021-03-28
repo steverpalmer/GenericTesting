@@ -1,4 +1,4 @@
-# Copyright 2018 Steve Palmer
+# Copyright 2021 Steve Palmer
 
 """A library of generic test for the elementary bitwise operators."""
 
@@ -9,7 +9,18 @@ from hypothesis import assume
 from .core import GenericTests, ClassUnderTest
 
 
-class LatticeOrTests(GenericTests):
+__all__ = (
+    "LatticeOrMixinTests",
+    "LatticeAndMixinTests",
+    "LatticeTests",
+    "BoundedBelowLatticeTests",
+    "BoundedLatticeTests",
+    "LatticeWithComplementTests",
+    "BitShiftMixinTests",
+)
+
+
+class LatticeOrMixinTests:
     """Tests of the __or__ operator."""
 
     def test_generic_2200_or_commutativity(
@@ -25,8 +36,8 @@ class LatticeOrTests(GenericTests):
         self.assertEqual(a | (b | c), (a | b) | c)
 
 
-class LatticeAndTests(GenericTests):
-    """Tests of the __or__ operator."""
+class LatticeAndMixinTests:
+    """Tests of the __and__ operator."""
 
     def test_generic_2205_and_commutativity(
         self, a: ClassUnderTest, b: ClassUnderTest
@@ -41,7 +52,7 @@ class LatticeAndTests(GenericTests):
         self.assertEqual(a & (b & c), (a & b) & c)
 
 
-class LatticeTests(LatticeOrTests, LatticeAndTests):
+class LatticeTests(LatticeOrMixinTests, LatticeAndMixinTests, GenericTests):
     """Tests of the __or__ and __and__ operators."""
 
     def test_generic_2203_or_and_absorption(
@@ -111,7 +122,7 @@ class LatticeWithComplementTests(BoundedLatticeTests):
         self.assertEqual(a ^ b, (a | b) & ~(a & b))
 
 
-class BitShiftTests(GenericTests):
+class BitShiftMixinTests:
     """Tests of the __lshift__ and __rshift__ operators.
 
     Arguably, these operators are more to do with numbers than "lattices", but they need to be put somewhere.
@@ -130,14 +141,3 @@ class BitShiftTests(GenericTests):
         """0 <= b ⇒ a >> b == a // pow(2, b)"""
         assume(self.zero <= b)
         self.assertEqual(a >> b, a // pow(self.one + self.one, b))
-
-
-__all__ = (
-    "LatticeOrTests",
-    "LatticeAndTests",
-    "LatticeTests",
-    "BoundedBelowLatticeTests",
-    "BoundedLatticeTests",
-    "LatticeWithComplementTests",
-    "BitShiftTests",
-)

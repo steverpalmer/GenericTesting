@@ -1,4 +1,4 @@
-# Copyright 2018 Steve Palmer
+# Copyright 2021 Steve Palmer
 
 """A library of generic test for the augmented assignment operators."""
 
@@ -7,7 +7,16 @@ from hypothesis import assume
 from .core import GenericTests, ClassUnderTest
 
 
-class LatticeAugmentedAssignmentTests(GenericTests):
+__all__ = (
+    "LatticeAugmentedAssignmentMixinTests",
+    "LatticeWithComplementAugmentedAssignmentMixinTests",
+    "ComplexAugmentedAssignmentMixinTests",
+    "FloorDivAugmentedAssignmentMixinTests",
+    "IntegralAugmentedAssignmentMixinTests",
+)
+
+
+class LatticeAugmentedAssignmentMixinTests:
     """Tests of the __ior__ and __iand__ assignment operators."""
 
     def test_generic_2280_ior_definition(self, a: ClassUnderTest, b: ClassUnderTest):
@@ -23,7 +32,7 @@ class LatticeAugmentedAssignmentTests(GenericTests):
         self.assertEqual(a, a_expected)
 
 
-class LatticeWithComplementAugmentedTests(LatticeAugmentedAssignmentTests):
+class LatticeWithComplementAugmentedAssignmentMixinTests(LatticeAugmentedAssignmentMixinTests):
     """Tests of the lattice assignment operators."""
 
     def test_generic_2282_isub_definition(self, a: ClassUnderTest, b: ClassUnderTest):
@@ -39,7 +48,7 @@ class LatticeWithComplementAugmentedTests(LatticeAugmentedAssignmentTests):
         self.assertEqual(a, a_expected)
 
 
-class ComplexAugmentedAssignmentTests(GenericTests):
+class ComplexAugmentedAssignmentMixinTests:
     """Tests of the basic arithmetic assignment operators."""
 
     def test_generic_2282_isub_definition(self, a: ClassUnderTest, b: ClassUnderTest):
@@ -70,7 +79,7 @@ class ComplexAugmentedAssignmentTests(GenericTests):
         self.assertEqual(a, a_expected)
 
 
-class FloorDivAugmentedAssignmentTests(GenericTests):
+class FloorDivAugmentedAssignmentMixinTests:
     """Tests of the __ifloor__ and __imod__ assignment operators."""
 
     def test_generic_2287_ifloordiv_definition(
@@ -90,7 +99,7 @@ class FloorDivAugmentedAssignmentTests(GenericTests):
         self.assertEqual(a, a_expected)
 
 
-class IntegralAugmentedAssignmentTests(ComplexAugmentedAssignmentTests):
+class IntegralAugmentedAssignmentMixinTests(ComplexAugmentedAssignmentMixinTests):
     """Tests of the integer arithmetic assignment operators."""
 
     def test_generic_2392_ilshift_definition(
@@ -110,12 +119,3 @@ class IntegralAugmentedAssignmentTests(ComplexAugmentedAssignmentTests):
         a_expected = a >> b
         a >>= b
         self.assertEqual(a, a_expected)
-
-
-__all__ = (
-    "LatticeAugmentedAssignmentTests",
-    "LatticeWithComplementAugmentedTests",
-    "ComplexAugmentedAssignmentTests",
-    "FloorDivAugmentedAssignmentTests",
-    "IntegralAugmentedAssignmentTests",
-)

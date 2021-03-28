@@ -1,4 +1,4 @@
-# Copyright 2018 Steve Palmer
+# Copyright 2021 Steve Palmer
 
 """A library of generic test for the base classes in the collections.abc library."""
 
@@ -10,7 +10,32 @@ from hypothesis import assume, strategies as st
 from .core import GenericTests, ClassUnderTest
 from .relations import EqualityTests, PartialOrderingTests
 from .lattices import BoundedBelowLatticeTests
-from .augmented_assignment import LatticeWithComplementAugmentedTests
+from .augmented_assignment import LatticeWithComplementAugmentedAssignmentMixinTests
+
+
+__all__ = (
+    "ElementT",
+    "KeyT",
+    "ValueT",
+    "HashableMixinTests",
+    "IterableMixinTests",
+    "SizedMixinTests",
+    "ContainerMixinTests",
+    "SizedOverIterableMixinTests",
+    "ContainerOverIterableMixinTests",
+    "CollectionTests",
+    "CollectionWithEmptyTests",
+    "SetTests",
+    "MappingViewMixinTests",
+    "KeysViewTests",
+    "ItemsViewTests",
+    "ValuesViewTests",
+    "MutableSetTests",
+    "MappingTests",
+    "MutableMappingTests",
+    "SequenceTests",
+    "MutableSequenceTests",
+)
 
 
 ElementT = "ElementT"
@@ -18,7 +43,7 @@ KeyT = "KeyT"
 ValueT = "ValueT"
 
 
-class HashableTests(GenericTests):
+class HashableMixinTests:
     """The property tests of collections.abc.Hashable."""
 
     def test_generic_2135_hash_returns_an_int(self, a: ClassUnderTest):
@@ -32,7 +57,7 @@ class HashableTests(GenericTests):
         self.assertImplies(a == b, hash(a) == hash(b))
 
 
-class IterableTests(GenericTests):
+class IterableMixinTests:
     """The property test of collections.abc.Iterables."""
 
     def test_generic_2400_iter_returns_an_iterator(self, a: ClassUnderTest) -> None:
@@ -53,7 +78,7 @@ class IterableTests(GenericTests):
         self.fail()  # ... but nothing else
 
 
-class SizedTests(GenericTests):
+class SizedMixinTests:
     """The property test of collections.abc.Sized.
 
     I assume that the len() function returns a value that can be compared to an int.
@@ -72,7 +97,7 @@ class SizedTests(GenericTests):
         self.assertEqual(len(a) != 0, bool(a))
 
 
-class ContainerTests(GenericTests):
+class ContainerMixinTests:
     """The property test of collections.abc.Container.
 
     In fact, the standard does *not* say that the __contains__ method must return a bool.
@@ -88,7 +113,7 @@ class ContainerTests(GenericTests):
         self.assertIsInstance(a in b, bool)
 
 
-class SizedOverIterableTests(SizedTests, IterableTests):
+class SizedOverIterableMixinTests(SizedMixinTests, IterableMixinTests):
     """The property tests of an class that is both collections.abc.Sized and collections.abc.Iterable.
 
     In fact, this is *not* required, but it would be a surprise if it were not true.
@@ -105,7 +130,7 @@ class SizedOverIterableTests(SizedTests, IterableTests):
         self.assertEqual(a_len, iter_count)
 
 
-class ContainerOverIterableTests(IterableTests, ContainerTests):
+class ContainerOverIterableMixinTests(IterableMixinTests, ContainerMixinTests):
     """The property tests of an class that is both collections.abc.Iterable and collections.abc.Container.
 
     See Language Reference Manual §3.3.6 "The membership test operators (in and not in) are normally
@@ -124,10 +149,14 @@ class ContainerOverIterableTests(IterableTests, ContainerTests):
         self.assertEqual(a in b, contains)
 
 
-class SizedIterableContainerWithEmptyTests(
-    SizedOverIterableTests, ContainerOverIterableTests
+class CollectionTests(
+    SizedOverIterableMixinTests, ContainerOverIterableMixinTests, GenericTests
 ):
-    """These test common properties of almost all containers."""
+    """Tests for Collecions of things """
+
+
+class CollectionWithEmptyTests(CollectionTests):
+    """These test common properties of almost all collections."""
 
     @property
     @abc.abstractmethod
@@ -148,7 +177,7 @@ class SizedIterableContainerWithEmptyTests(
 
 
 class SetTests(
-    SizedIterableContainerWithEmptyTests,
+    CollectionWithEmptyTests,
     EqualityTests,
     PartialOrderingTests,
     BoundedBelowLatticeTests,
@@ -224,26 +253,26 @@ class SetTests(
             )
 
 
-class MappingViewTests(SizedTests):
+class MappingViewMixinTests(SizedMixinTests):
     """The property tests of collections.abc.MappingView.
 
     :TODO: Maybe could try to test the dynamic nature of mapping views here.
     """
 
 
-class KeysViewTests(MappingViewTests, SetTests):
+class KeysViewTests(MappingViewMixinTests, SetTests):
     """The property tests of collections.abc.KeysView."""
 
 
-class ItemsViewTests(MappingViewTests, SetTests):
+class ItemsViewTests(MappingViewMixinTests, SetTests):
     """The property tests of collections.abc.ItemsView."""
 
 
-class ValuesViewTests(MappingViewTests, ContainerOverIterableTests):
+class ValuesViewTests(CollectionTests):
     """The property tests of collections.abc.ValuesView."""
 
 
-class MutableSetTests(SetTests, LatticeWithComplementAugmentedTests):
+class MutableSetTests(LatticeWithComplementAugmentedAssignmentMixinTests, SetTests):
     """The property tests of collections.abc.MutableSet."""
 
     @abc.abstractmethod
@@ -278,7 +307,7 @@ class MutableSetTests(SetTests, LatticeWithComplementAugmentedTests):
             self.assertEqual(x in a, x in a_copy and not x == b)
 
 
-class MappingTests(SizedIterableContainerWithEmptyTests, EqualityTests):
+class MappingTests(CollectionWithEmptyTests, EqualityTests):
     """The property tests of collections.abc.Mapping."""
 
     @staticmethod
@@ -422,7 +451,7 @@ class MutableMappingTests(MappingTests):
         self.assertEqual(a, a_copy)
 
 
-class SequenceTests(SizedIterableContainerWithEmptyTests):
+class SequenceTests(CollectionWithEmptyTests):
     """The property tests of collections.abc.Sequence."""
 
     @staticmethod
@@ -668,27 +697,3 @@ class MutableSequenceTests(SequenceTests):
         for x in a:
             self.assertEqual(x, a_copy[i] if i < a_len else b[i - a_len])
             i += 1
-
-
-__all__ = (
-    "ElementT",
-    "KeyT",
-    "ValueT",
-    "HashableTests",
-    "IterableTests",
-    "SizedTests",
-    "ContainerTests",
-    "SizedOverIterableTests",
-    "ContainerOverIterableTests",
-    "SizedIterableContainerWithEmptyTests",
-    "SetTests",
-    "MappingViewTests",
-    "KeysViewTests",
-    "ItemsViewTests",
-    "ValuesViewTests",
-    "MutableSetTests",
-    "MappingTests",
-    "MutableMappingTests",
-    "SequenceTests",
-    "MutableSequenceTests",
-)

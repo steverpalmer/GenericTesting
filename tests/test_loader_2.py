@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright 2018 Steve Palmer
+# Copyright 2021 Steve Palmer
 
 """A test of the generic_test.loader using the defined methods."""
 
@@ -132,7 +132,7 @@ class Test_06_SizedContainer(
     pass
 
 
-class C_SizedIterableContainer:
+class C_Collection:
     def __init__(self, data) -> None:
         assert isinstance(data, collections.abc.Iterable)
         super().__init__()
@@ -155,7 +155,7 @@ class C_SizedIterableContainer:
     }
 )
 class Test_07_SizedIterableContainer(
-    generic_testing.defaultGenericTestLoader.discover(C_SizedIterableContainer)
+    generic_testing.defaultGenericTestLoader.discover(C_Collection)
 ):
     pass
 
@@ -229,7 +229,7 @@ class Test_10_Ordered(generic_testing.defaultGenericTestLoader.discover(C_Ordere
 @functools.total_ordering
 class C_FullHouse:
     def __init__(self, data: str):
-        self.data = data.upper()
+        self.data = data
 
     def __iter__(self):
         return iter(self.data)
@@ -238,7 +238,7 @@ class C_FullHouse:
         return len(self.data)
 
     def __contains__(self, key):
-        return key.upper() in self.data
+        return key in self.data
 
     def __eq__(self, other):
         return self.data == other.data
@@ -248,6 +248,9 @@ class C_FullHouse:
 
     def __le__(self, other):
         return self.data <= other.data
+
+    def __repr__(self) -> str:
+        return f"{type(self).__name__}({self.data!r})"
 
 
 @generic_testing.Given(
