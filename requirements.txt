@@ -1,4 +1,4 @@
 attrs==18.2.0
 coverage==4.5.2
 hypothesis==4.4.3
-PyYAML==5.1
+PyYAML==5.4
