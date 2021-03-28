@@ -9,7 +9,7 @@ import types
 
 from hypothesis import assume
 
-from isclose import IsClose, isclose
+from .isclose import IsClose, isclose
 from .core import ClassUnderTest
 from .relations import EqualityTests, TotalOrderingTests
 from .arithmetic import AdditionMonoidTests, ScalarT

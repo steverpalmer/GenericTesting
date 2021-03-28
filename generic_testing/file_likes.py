@@ -13,7 +13,7 @@ import unittest
 
 import hypothesis
 
-from timeout import Timeout
+from .timeout import Timeout
 from .core import ClassUnderTest
 from .collections_abc import IterableTests
 

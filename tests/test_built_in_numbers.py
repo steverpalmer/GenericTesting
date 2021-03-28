@@ -52,7 +52,7 @@ COMPLEX_RANGE = 1e10
 @generic_testing.Given(
     {
         generic_testing.ClassUnderTest: st.complex_numbers(
-            0.0, COMPLEX_RANGE, allow_nan=False, allow_infinity=False
+            min_magnitude=0.0, max_magnitude=COMPLEX_RANGE, allow_nan=False, allow_infinity=False
         )
     }
 )
